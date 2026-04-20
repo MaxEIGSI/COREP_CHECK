@@ -1,3 +1,11 @@
+cd /Users/maximeleyrit/Documents/COREP_check
+git add .
+git commit -m ""
+git push
+
+
+
+
 # COREP_check
 
 Single canonical project to read COREP files, evaluate rules, and explain rule logic.
@@ -12,6 +20,9 @@ Use `src/corep_blocks.py` as the **only public block API**.
 	- `templates_used`, `tables`, `rows`, `columns`, `sheets`, `corep_dir`
 - Output:
 	- `{template: {file_path, tables: {table_or_sheet: {sheet_name, dataframe}}}}`
+
+Table-to-sheet resolution uses `src/data/mapping_table.xlsx` first (columns: `tables_input`, `tables_output`).
+If no mapping match is found, it falls back to automatic marker-based sheet detection.
 
 ### Block 2 — `block_process_2_prepare_data`
 - Purpose: create missing workbook stubs + seed deterministic values

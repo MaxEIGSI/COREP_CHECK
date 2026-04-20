@@ -9,23 +9,23 @@ import pandas as pd
 from openpyxl.cell.cell import MergedCell
 
 try:
-    from src.get_RC_value import (
+    from v2.get_RC_value import (
         DEFAULT_BASED_TEMPLATE_PATH,
         DEFAULT_BASED_TEMPLATE_SHEET,
         DEFAULT_COREP_DIR,
         normalize_axis_code,
         parse_selector,
     )
-    from src.rule_engine import CorepDataRepository, RuleEngineError, normalize_template_id
+    from v2.rule_engine import CorepDataRepository, RuleEngineError, normalize_template_id
 except ModuleNotFoundError:
-    from get_RC_value import (
+    from v2.get_RC_value import (
         DEFAULT_BASED_TEMPLATE_PATH,
         DEFAULT_BASED_TEMPLATE_SHEET,
         DEFAULT_COREP_DIR,
         normalize_axis_code,
         parse_selector,
     )
-    from rule_engine import CorepDataRepository, RuleEngineError, normalize_template_id
+    from v2.rule_engine import CorepDataRepository, RuleEngineError, normalize_template_id
 
 
 def _parse_axis_tokens(value: Any) -> Set[str]:

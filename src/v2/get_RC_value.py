@@ -11,11 +11,12 @@ import pandas as pd
 from openpyxl.worksheet.worksheet import Worksheet
 
 
-PROJECT_ROOT = Path(__file__).resolve().parents[1]
-DATA_DIR = PROJECT_ROOT / "src" / "data"
+MODULE_DIR = Path(__file__).resolve().parent
+DATA_DIR = MODULE_DIR / "data"
 DEFAULT_COREP_DIR = DATA_DIR / "COREP_files"
 DEFAULT_BASED_TEMPLATE_PATH = DATA_DIR / "EGDQ_publication_2026.xlsx"
 DEFAULT_BASED_TEMPLATE_SHEET = "v4.2"
+DEFAULT_MAPPING_TABLE_PATH = DATA_DIR / "mapping_table.xlsx"
 
 ALL_SENTINEL = "__ALL__"
 
@@ -46,6 +47,116 @@ def resolve_based_template_path(
 
 def resolve_based_template_sheet(sheet_name: Optional[str] = None) -> str:
     return sheet_name if sheet_name else DEFAULT_BASED_TEMPLATE_SHEET
+
+
+def resolve_mapping_table_path(mapping_table_path: Optional[str | Path] = None) -> Path:
+    return Path(mapping_table_path) if mapping_table_path is not None else DEFAULT_MAPPING_TABLE_PATH
+
+
+def _normalize_table_key(value: Any) -> str:
+    return str(value).strip().upper().replace(" ", "")
+
+
+def _table_template_key(table_key: str) -> Optional[str]:
+    match = re.match(r"([A-Z]\d{2}\.\d{2})", table_key)
+    return match.group(1) if match else None
+
+
+def _find_mapped_sheet_value(mapping: Dict[str, str], table_key: str) -> Optional[str]:
+    direct = mapping.get(table_key)
+    if direct is not None:
+        return direct
+
+    template_key = _table_template_key(table_key)
+    if template_key is None:
+        return None
+
+    candidate_outputs = {
+        output
+        for key, output in mapping.items()
+        if _table_template_key(key) == template_key
+    }
+    if len(candidate_outputs) == 1:
+        return next(iter(candidate_outputs))
+
+    return mapping.get(template_key)
+
+
+def load_table_sheet_mapping(
+    mapping_table_path: Optional[str | Path] = None,
+) -> Dict[str, str]:
+    path = resolve_mapping_table_path(mapping_table_path)
+    if not path.exists():
+        return {}
+
+    df = pd.read_excel(path)
+    if df.empty:
+        return {}
+
+    normalized_cols = {col: str(col).strip().lower().replace(" ", "_") for col in df.columns}
+
+    input_col = None
+    output_col = None
+    for col, norm in normalized_cols.items():
+        if input_col is None and "input" in norm and "table" in norm:
+            input_col = col
+        if output_col is None and "output" in norm and ("table" in norm or "sheet" in norm):
+            output_col = col
+
+    if input_col is None or output_col is None:
+        if len(df.columns) >= 2:
+            input_col = df.columns[0]
+            output_col = df.columns[1]
+        else:
+            return {}
+
+    mapping: Dict[str, str] = {}
+    for _, row in df.iterrows():
+        table_in = row.get(input_col)
+        sheet_out = row.get(output_col)
+        if table_in is None or sheet_out is None:
+            continue
+        if pd.isna(table_in) or pd.isna(sheet_out):
+            continue
+        table_key = _normalize_table_key(table_in)
+        sheet_name = str(sheet_out).strip()
+        if table_key and sheet_name:
+            mapping[table_key] = sheet_name
+
+    return mapping
+
+
+def find_mapped_sheet_for_table(
+    table_name: str,
+    mapping_table_path: Optional[str | Path] = None,
+) -> Optional[str]:
+    mapping = load_table_sheet_mapping(mapping_table_path)
+    table_key = _normalize_table_key(table_name)
+    return _find_mapped_sheet_value(mapping, table_key)
+
+
+def _normalize_sheet_key(value: Any) -> str:
+    return re.sub(r"[^A-Z0-9]", "", str(value).upper())
+
+
+def _match_sheet_name(wb: openpyxl.Workbook, mapped_name: str) -> Optional[str]:
+    if mapped_name in wb.sheetnames:
+        return mapped_name
+
+    target = _normalize_sheet_key(mapped_name)
+    if not target:
+        return None
+
+    for sheet in wb.sheetnames:
+        if _normalize_sheet_key(sheet) == target:
+            return sheet
+
+    for sheet in wb.sheetnames:
+        candidate = _normalize_sheet_key(sheet)
+        if candidate.startswith(target) or target in candidate:
+            return sheet
+
+    return None
 
 
 def parse_selector(value: Any) -> Optional[List[str]]:
@@ -170,7 +281,14 @@ def resolve_sheet_for_table(
     wb: openpyxl.Workbook,
     template_code: str,
     table_name: str,
+    mapping_table_path: Optional[str | Path] = None,
 ) -> str:
+    mapped_sheet = find_mapped_sheet_for_table(table_name, mapping_table_path)
+    if mapped_sheet is not None:
+        matched = _match_sheet_name(wb, mapped_sheet)
+        if matched is not None:
+            return matched
+
     template_from_table, suffix_letter = split_table_name(table_name)
     normalized_template = normalize_template_code(template_code)
 
@@ -382,6 +500,7 @@ def extract_table_dataframes(
     rows: Optional[List[str]],
     columns: Optional[List[str]],
     sheets: Optional[List[str]],
+    mapping_table_path: Optional[str | Path] = None,
 ) -> Dict[str, Dict[str, Any]]:
     wb = openpyxl.load_workbook(file_path, data_only=True)
 
@@ -391,7 +510,12 @@ def extract_table_dataframes(
 
     if scoped_tables:
         for table_name in scoped_tables:
-            sheet_name = resolve_sheet_for_table(wb, template_code, table_name)
+            sheet_name = resolve_sheet_for_table(
+                wb,
+                template_code,
+                table_name,
+                mapping_table_path=mapping_table_path,
+            )
             ws = wb[sheet_name]
             df = filter_dataframe(worksheet_to_dataframe(ws), rows, columns)
             table_map[table_name] = {
@@ -419,6 +543,7 @@ def get_value(
     columns: Any = None,
     sheets: Any = None,
     corep_dir: Optional[str | Path] = None,
+    mapping_table_path: Optional[str | Path] = None,
 ) -> Dict[str, Dict[str, Any]]:
     template_selector = parse_selector(templates_used)
     if not template_selector:
@@ -445,6 +570,7 @@ def get_value(
             rows=row_selector,
             columns=column_selector,
             sheets=sheet_selector,
+            mapping_table_path=mapping_table_path,
         )
 
         result[normalized_template] = {

@@ -7,8 +7,8 @@ from typing import Any, Dict, List
 import pandas as pd
 
 try:
-    from src.get_RC_value import DEFAULT_BASED_TEMPLATE_PATH, DEFAULT_BASED_TEMPLATE_SHEET, DEFAULT_COREP_DIR
-    from src.corep_blocks import (
+    from v2.get_RC_value import DEFAULT_BASED_TEMPLATE_PATH, DEFAULT_BASED_TEMPLATE_SHEET, DEFAULT_COREP_DIR
+    from v2.corep_blocks import (
         block_process_1_extract_values,
         block_process_2_prepare_data,
         block_process_3_evaluate_single_rule,
@@ -18,8 +18,8 @@ try:
         run_block_workflow,
     )
 except ModuleNotFoundError:
-    from get_RC_value import DEFAULT_BASED_TEMPLATE_PATH, DEFAULT_BASED_TEMPLATE_SHEET, DEFAULT_COREP_DIR  # type: ignore
-    from corep_blocks import (  # type: ignore
+    from v2.get_RC_value import DEFAULT_BASED_TEMPLATE_PATH, DEFAULT_BASED_TEMPLATE_SHEET, DEFAULT_COREP_DIR  # type: ignore
+    from v2.corep_blocks import (  # type: ignore
         block_process_1_extract_values,
         block_process_2_prepare_data,
         block_process_3_evaluate_single_rule,

@@ -8,11 +8,11 @@ from typing import Any, Dict, List
 import pandas as pd
 
 try:
-    from src.get_RC_value import DEFAULT_BASED_TEMPLATE_PATH, DEFAULT_BASED_TEMPLATE_SHEET, DEFAULT_COREP_DIR
-    from src.rule_engine import evaluate_rules, load_rules
+    from v2.get_RC_value import DEFAULT_BASED_TEMPLATE_PATH, DEFAULT_BASED_TEMPLATE_SHEET, DEFAULT_COREP_DIR
+    from v2.rule_engine import evaluate_rules, load_rules
 except ModuleNotFoundError:
-    from get_RC_value import DEFAULT_BASED_TEMPLATE_PATH, DEFAULT_BASED_TEMPLATE_SHEET, DEFAULT_COREP_DIR  # type: ignore
-    from rule_engine import evaluate_rules, load_rules  # type: ignore
+    from v2.get_RC_value import DEFAULT_BASED_TEMPLATE_PATH, DEFAULT_BASED_TEMPLATE_SHEET, DEFAULT_COREP_DIR  # type: ignore
+    from v2.rule_engine import evaluate_rules, load_rules  # type: ignore
 
 # Config columns to carry into the output for easy inspection
 _CONFIG_COLS = [

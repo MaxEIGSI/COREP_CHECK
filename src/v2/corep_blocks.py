@@ -7,31 +7,31 @@ from typing import Any, Dict, List, Mapping, Optional
 import pandas as pd
 
 try:
-    from src.get_RC_value import (
+    from v2.get_RC_value import (
         DEFAULT_BASED_TEMPLATE_PATH,
         DEFAULT_BASED_TEMPLATE_SHEET,
         DEFAULT_COREP_DIR,
         get_value,
         load_based_template,
     )
-    from src.rule_engine import evaluate_rule, evaluate_rules
-    from src.run_pipeline import run_pipeline
-    from src.explain_rule_logic import build_logic_audit
-    from src.create_stub_workbooks import create_stubs
-    from src.seed_corep_values import seed_corep_values
+    from v2.rule_engine import evaluate_rule, evaluate_rules
+    from v2.run_pipeline import run_pipeline
+    from v2.explain_rule_logic import build_logic_audit
+    from v2.create_stub_workbooks import create_stubs
+    from v2.seed_corep_values import seed_corep_values
 except ModuleNotFoundError:
-    from get_RC_value import (  # type: ignore
+    from v2.get_RC_value import (  # type: ignore
         DEFAULT_BASED_TEMPLATE_PATH,
         DEFAULT_BASED_TEMPLATE_SHEET,
         DEFAULT_COREP_DIR,
         get_value,
         load_based_template,
     )
-    from rule_engine import evaluate_rule, evaluate_rules  # type: ignore
-    from run_pipeline import run_pipeline  # type: ignore
-    from explain_rule_logic import build_logic_audit  # type: ignore
-    from create_stub_workbooks import create_stubs  # type: ignore
-    from seed_corep_values import seed_corep_values  # type: ignore
+    from v2.rule_engine import evaluate_rule, evaluate_rules  # type: ignore
+    from v2.run_pipeline import run_pipeline  # type: ignore
+    from v2.explain_rule_logic import build_logic_audit  # type: ignore
+    from v2.create_stub_workbooks import create_stubs  # type: ignore
+    from v2.seed_corep_values import seed_corep_values  # type: ignore
 
 
 @dataclass(frozen=True)

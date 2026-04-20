@@ -24,7 +24,7 @@ import openpyxl
 import pandas as pd
 
 try:
-    from src.get_RC_value import (
+    from v2.get_RC_value import (
         DEFAULT_BASED_TEMPLATE_PATH,
         DEFAULT_BASED_TEMPLATE_SHEET,
         DEFAULT_COREP_DIR,
@@ -33,9 +33,9 @@ try:
         parse_selector,
         sequence_to_marker,
     )
-    from src.rule_engine import normalize_template_id, template_to_file_name, RuleEngineError
+    from v2.rule_engine import normalize_template_id, template_to_file_name, RuleEngineError
 except ModuleNotFoundError:
-    from get_RC_value import (  # type: ignore
+    from v2.get_RC_value import (  # type: ignore
         DEFAULT_BASED_TEMPLATE_PATH,
         DEFAULT_BASED_TEMPLATE_SHEET,
         DEFAULT_COREP_DIR,
@@ -44,7 +44,7 @@ except ModuleNotFoundError:
         parse_selector,
         sequence_to_marker,
     )
-    from rule_engine import normalize_template_id, template_to_file_name, RuleEngineError  # type: ignore
+    from v2.rule_engine import normalize_template_id, template_to_file_name, RuleEngineError  # type: ignore
 
 
 # ---------------------------------------------------------------------------

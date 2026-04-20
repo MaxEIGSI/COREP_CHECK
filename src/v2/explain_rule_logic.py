@@ -8,9 +8,9 @@ from typing import Any, Dict, List, Optional, Sequence, Tuple
 import pandas as pd
 
 try:
-    from src.get_RC_value import DEFAULT_BASED_TEMPLATE_PATH, DEFAULT_BASED_TEMPLATE_SHEET, parse_selector
+    from v2.get_RC_value import DEFAULT_BASED_TEMPLATE_PATH, DEFAULT_BASED_TEMPLATE_SHEET, parse_selector
 except ModuleNotFoundError:
-    from get_RC_value import DEFAULT_BASED_TEMPLATE_PATH, DEFAULT_BASED_TEMPLATE_SHEET, parse_selector  # type: ignore
+    from v2.get_RC_value import DEFAULT_BASED_TEMPLATE_PATH, DEFAULT_BASED_TEMPLATE_SHEET, parse_selector  # type: ignore
 
 
 REF_PATTERN = re.compile(r"\{([^{}]+)\}")

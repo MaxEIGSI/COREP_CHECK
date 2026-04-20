@@ -12,14 +12,16 @@ import openpyxl
 import pandas as pd
 
 try:
-    from src.get_RC_value import (
+    from v2.get_RC_value import (
         ALL_SENTINEL,
         DEFAULT_BASED_TEMPLATE_PATH,
         DEFAULT_BASED_TEMPLATE_SHEET,
         DEFAULT_COREP_DIR,
+        DEFAULT_MAPPING_TABLE_PATH,
         build_column_code_map,
         build_row_code_map,
         contains_template_hint,
+        load_table_sheet_mapping,
         letter_to_sequence,
         normalize_axis_code,
         parse_selector,
@@ -27,14 +29,16 @@ try:
         worksheet_to_dataframe,
     )
 except ModuleNotFoundError:
-    from get_RC_value import (
+    from v2.get_RC_value import (
         ALL_SENTINEL,
         DEFAULT_BASED_TEMPLATE_PATH,
         DEFAULT_BASED_TEMPLATE_SHEET,
         DEFAULT_COREP_DIR,
+        DEFAULT_MAPPING_TABLE_PATH,
         build_column_code_map,
         build_row_code_map,
         contains_template_hint,
+        load_table_sheet_mapping,
         letter_to_sequence,
         normalize_axis_code,
         parse_selector,
@@ -195,6 +199,59 @@ def resolve_sheet_for_table_generic(
     raise RuleEngineError(f"No worksheet found for table {table_name} (marker {marker})")
 
 
+def _normalize_sheet_key(value: Any) -> str:
+    return re.sub(r"[^A-Z0-9]", "", str(value).upper())
+
+
+def _normalize_table_key(value: Any) -> str:
+    return str(value).strip().upper().replace(" ", "")
+
+
+def _table_template_key(table_key: str) -> Optional[str]:
+    match = re.match(r"([A-Z]\d{2}\.\d{2})", table_key)
+    return match.group(1) if match else None
+
+
+def _find_mapped_sheet_value(mapping: Dict[str, str], table_key: str) -> Optional[str]:
+    direct = mapping.get(table_key)
+    if direct is not None:
+        return direct
+
+    template_key = _table_template_key(table_key)
+    if template_key is None:
+        return None
+
+    candidate_outputs = {
+        output
+        for key, output in mapping.items()
+        if _table_template_key(key) == template_key
+    }
+    if len(candidate_outputs) == 1:
+        return next(iter(candidate_outputs))
+
+    return mapping.get(template_key)
+
+
+def _match_sheet_name(wb: openpyxl.Workbook, mapped_name: str) -> Optional[str]:
+    if mapped_name in wb.sheetnames:
+        return mapped_name
+
+    target = _normalize_sheet_key(mapped_name)
+    if not target:
+        return None
+
+    for sheet in wb.sheetnames:
+        if _normalize_sheet_key(sheet) == target:
+            return sheet
+
+    for sheet in wb.sheetnames:
+        candidate = _normalize_sheet_key(sheet)
+        if candidate.startswith(target) or target in candidate:
+            return sheet
+
+    return None
+
+
 def is_empty(value: Any) -> bool:
     if value is None:
         return True
@@ -264,10 +321,16 @@ def values_length(value: Any) -> int:
 
 
 class CorepDataRepository:
-    def __init__(self, corep_dir: str | Path = DEFAULT_COREP_DIR):
+    def __init__(
+        self,
+        corep_dir: str | Path = DEFAULT_COREP_DIR,
+        mapping_table_path: str | Path = DEFAULT_MAPPING_TABLE_PATH,
+    ):
         self.corep_dir = Path(corep_dir)
+        self.mapping_table_path = Path(mapping_table_path)
         self._workbooks: Dict[str, openpyxl.Workbook] = {}
         self._sheet_context: Dict[Tuple[str, str], SheetContext] = {}
+        self._table_sheet_mapping = load_table_sheet_mapping(self.mapping_table_path)
 
     def workbook_for_template(self, template: str) -> openpyxl.Workbook:
         norm = normalize_template_id(template)
@@ -278,6 +341,13 @@ class CorepDataRepository:
         return self._workbooks[norm]
 
     def get_table_sheet(self, template: str, table: str) -> str:
+        mapped_sheet = _find_mapped_sheet_value(self._table_sheet_mapping, _normalize_table_key(table))
+        if mapped_sheet is not None:
+            wb = self.workbook_for_template(template)
+            matched = _match_sheet_name(wb, mapped_sheet)
+            if matched is not None:
+                return matched
+
         return resolve_sheet_for_table_generic(self.workbook_for_template(template), template, table)
 
     def all_sheets(self, template: str) -> List[str]:
