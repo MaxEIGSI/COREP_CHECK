@@ -1,0 +1,195 @@
+You are a senior Python engineer. Build a robust, scalable rule engine to evaluate formulas on COREP Excel data.
+
+Do NOT create case-by-case logic (no “10 scenarios”). Everything must be handled through a unified model.
+
+If something is unclear, ask before coding.
+
+---
+
+## CONTEXT
+
+We extract and validate data from COREP Excel files using a configuration file.
+
+CONFIG FILE:
+- Path: src/data/EGDQ_publication_2026.xlsx
+- Sheet: v4.2
+- Loaded as pandas DataFrame
+
+Columns:
+- Templates used (e.g. "C07.00" or "C07.00;C08.00")
+- Tables (e.g. "C07.00.a", can be empty)
+- Rows (e.g. "0010", "0010;0020", "All", empty)
+- Columns (same logic)
+- Sheets (optional override)
+- Precondition (optional logical condition)
+- Formula (mandatory rule to evaluate)
+- Arithmetic approach ("exact" or "interval")
+
+---
+
+## CORE IDEA (CRITICAL)
+
+DO NOT create multiple processes.
+
+Instead, normalize everything into:
+
+(template, table, row, column, sheet)
+
+Each rule = a set of coordinates + a formula to evaluate.
+
+---
+
+## DIMENSIONS HANDLING
+
+You must resolve each field into iterable sets:
+
+- Templates → list
+- Tables → list (default = template if empty)
+- Rows → list or ALL
+- Columns → list or ALL
+- Sheets → list or ALL
+
+Then compute the Cartesian product:
+
+for template in templates:
+  for table in tables:
+    for sheet in sheets:
+      for row in rows:
+        for column in columns:
+
+This defines the scope of evaluation.
+
+---
+
+## FORMULA LANGUAGE
+
+Formulas use a DSL like:
+
+- {r0010,c0210}
+- {c0215}
+- {r0040}
+- {qx2022}
+- sum[{...}]
+- count[{...}]
+- conditions: (*), != empty, > 0
+
+You must:
+
+1. Parse formulas
+2. Convert them into executable logic
+3. Map each token to:
+   (template, table, row, column, sheet)
+
+---
+
+## EXAMPLES OF RULE INTERPRETATION
+
+### Case 1
+{c0215}(*) != empty
+
+→ For all selected rows:
+check value(template, table, row, c0215) != empty
+
+---
+
+### Case 2
+{r0010,c0210} = {r0090,c0210} + {r0110,c0210} + {r0130,c0210}
+
+→ For each sheet:
+value(0010,0210) == sum(other rows)
+
+---
+
+### Case 3
+{r0140,c0020}(*) = empty
+
+→ Apply across all specified sheets
+
+---
+
+### Case 4
+{r0040} = 1 * {r0120}
+
+→ Apply across all selected columns
+
+---
+
+### Case 5 (complex)
+sum[{C33.00.a,(sNNN excluding qx2014)}] = {C33.00.a,qx2014}
+
+→ Aggregate across sheets
+→ Exclude specific sheet
+→ Compare with reference sheet
+
+---
+
+## PRECONDITIONS
+
+If a precondition exists:
+- Evaluate it first
+- Only apply formula if TRUE
+
+Example:
+{c0200} > 0
+
+---
+
+## TARGET
+
+Build a rule engine:
+
+evaluate_rule(rule_row, data_mapping) -> result
+
+Where:
+- rule_row = one row from config
+- data_mapping = preloaded COREP data
+
+---
+
+## ARCHITECTURE
+
+You MUST implement:
+
+1. Dimension resolver
+2. Formula parser (DSL → AST or structured objects)
+3. Value resolver (fetch from Excel)
+4. Evaluation engine
+5. Aggregation engine (sum, count, filters)
+
+---
+
+## OUTPUT
+
+Return structured results:
+
+{
+  "rule_id": ...,
+  "status": "PASS" | "FAIL",
+  "details": [
+      {
+          "coordinates": (template, table, row, column, sheet),
+          "expected": ...,
+          "actual": ...
+      }
+  ]
+}
+
+---
+
+## TASK
+
+Implement ONLY:
+
+<<< FOCUS HERE >>>
+[REPLACE THIS WITH THE STEP YOU WANT]
+<<< END FOCUS >>>
+
+---
+
+## RULES
+
+- No hardcoding
+- No duplication
+- No case-based branching
+- Everything must be generic
+- Code must be testable

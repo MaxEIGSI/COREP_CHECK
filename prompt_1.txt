@@ -1,0 +1,111 @@
+You are a senior Python engineer. Your task is to design clean, modular, production-grade code. 
+Do NOT make assumptions. If something is unclear, ask questions before coding.
+
+## CONTEXT
+
+We extract data from COREP Excel files using a configuration file ("based_template").
+
+CONFIG FILE:
+- Path: src/data/EGDQ_publication_2026.xlsx
+- Sheet: v4.2
+- Loaded as pandas DataFrame
+
+Columns:
+- Templates used (e.g. "C07.00" or "C07.00;C08.00")
+- Tables (e.g. "C07.00.a", can be empty)
+- Rows (e.g. "0010", "0010;0020", "All", or empty)
+- Columns (same logic as Rows)
+- Sheets (optional override, can be "All" or empty)
+
+COREP FILES:
+- Located in: src/data/COREP_files/
+- Example: G_EU_C_C0700.xlsx
+- Each file contains multiple sheets
+
+## CORE LOGIC
+
+1. TEMPLATE → FILE
+Example:
+C07.00 → G_EU_C_C0700.xlsx
+
+2. TABLE → SHEET (CRITICAL)
+
+Sheets must be identified by CONTENT (not name):
+
+Example:
+"C07.00.a" → sheet containing "- 0001"
+"C07.00.b" → sheet containing "- 0002"
+
+Mapping rule:
+- "0001" → "a"
+- "0002" → "b"
+- etc.
+
+You must scan sheet content to detect this.
+
+3. ROWS / COLUMNS
+
+- Can be single, multiple (";"), "All", or empty
+- Columns are NOT reliable by index due to merged cells
+- You must reconstruct column mapping properly
+
+4. SHEETS PARAM
+
+- If provided → restrict scope
+- Else → auto-detect via table logic
+
+## TARGET
+
+Build a system that allows:
+
+get_value(
+    templates_used,
+    tables=None,
+    rows=None,
+    columns=None,
+    sheets=None
+)
+
+And returns the correct extracted value(s).
+
+## ARCHITECTURE REQUIREMENTS
+
+- Use pandas + openpyxl
+- Fully modular (no monolith)
+- No hardcoding
+- Handle:
+  - multiple templates
+  - missing tables
+  - merged cells
+  - inconsistent formats
+
+## OUTPUT FORMAT
+
+Return a structured mapping:
+
+{
+    template: {
+        file_path: str,
+        tables: {
+            table_name: {
+                sheet_name: str,
+                dataframe: pd.DataFrame
+            }
+        }
+    }
+}
+
+## TASK
+
+Implement ONLY the following part:
+
+<<< FOCUS HERE >>>
+[REPLACE THIS WITH THE SPECIFIC TASK FOR THIS PROMPT]
+<<< END FOCUS >>>
+
+## RULES
+
+- Do not implement everything at once
+- Keep code clean and testable
+- Add comments only where needed
+- If blocked → ask precise questions
