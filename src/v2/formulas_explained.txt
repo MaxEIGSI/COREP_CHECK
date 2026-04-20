@@ -1,0 +1,33 @@
+template : C14.00	
+table : C14.00	
+rows: All
+columns : empty 
+formula : {c0020} != empty
+
+What we need to do is 
+(template, table, for all rows, column=c0020) check is the value of the excel cell is not empty (it can be 0 or it can be a formula or anything but just not empty) 
+
+
+____
+same for this which not working : 
+template : C17.01
+table : C17.01.a (will be mapped to C17.01)
+rows: empty
+columns : 0010; 0020; 0030; 0040; 0050; 0060; 0070; 0080
+formula : {r0910}(*) <= sum({r0010}(*),{r0110}(*),{r0210}(*),{r0310}(*),{r0410}(*),{r0510}(*),{r0610}(*),{r0710}(*),{r0810}(*))
+
+
+so for each mentionned columns, we need to check if 
+(template, table, row=r0910, column=0010) <= (template, table, row=r0010, column=0010) + (template, table, row=r0110, column=0010) + (template, table, row=r0210, column=0010) + ...
+
+_____
+
+same for this which not working : 
+template : C17.01
+table : (empty so we take the same value as template -> sheetname is equals to C1701)
+rows: {rX=0020;rN=0010}; {rX=0120;rN=0110}; {rX=0220;rN=0210}
+columns : empty
+formula : {C17.01.a,rX,c0080}(*) > 0 or {C17.01.a,rN,c0080}(*) > 0	{C17.01.b,rX,c0090}(*) != empty
+
+that means that inside the row formula, you need to check : 
+(template=C17.01, table=C17.01, row=each value of rX (so 0020, 0120, 0220), column=c0080) > 0 or (template=C17.01, table=C17.01, row=each value of rN (so 0020, 0120, 0220), column=c0080) > 0  or (template=C17.01, table=C17.01, row=each value of rX (so 0020, 0120, 0220), column=c0090) is not empty 

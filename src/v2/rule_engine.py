@@ -98,7 +98,9 @@ class RefSpec:
     template: Optional[str]
     table: Optional[str]
     row: Optional[str]
+    row_alias: Optional[str]
     column: Optional[str]
+    column_alias: Optional[str]
     sheet: Optional[str]
     include_sheet_pattern: Optional[str]
     exclude_sheets: Tuple[str, ...]
@@ -320,6 +322,100 @@ def values_length(value: Any) -> int:
     return len(str(value).strip())
 
 
+def split_selector_groups(value: Any) -> Optional[List[str]]:
+    if value is None:
+        return None
+
+    if isinstance(value, float) and pd.isna(value):
+        return None
+
+    if not isinstance(value, str):
+        return parse_selector(value)
+
+    text = value.strip()
+    if not text:
+        return None
+    if text.lower() == "all":
+        return [ALL_SENTINEL]
+
+    parts: List[str] = []
+    current: List[str] = []
+    brace_depth = 0
+
+    for char in text:
+        if char == "{":
+            brace_depth += 1
+        elif char == "}" and brace_depth > 0:
+            brace_depth -= 1
+
+        if char == ";" and brace_depth == 0:
+            chunk = "".join(current).strip()
+            if chunk:
+                parts.append(chunk)
+            current = []
+            continue
+
+        current.append(char)
+
+    tail = "".join(current).strip()
+    if tail:
+        parts.append(tail)
+
+    return parts or None
+
+
+def parse_axis_assignment_groups(value: Any, axis_prefix: str) -> Optional[List[Dict[str, str]]]:
+    tokens = split_selector_groups(value)
+    if not tokens or ALL_SENTINEL in tokens:
+        return None
+
+    groups: List[Dict[str, str]] = []
+    normalized_prefix = axis_prefix.lower()
+
+    for token in tokens:
+        text = str(token).strip()
+        if not text:
+            continue
+
+        inner = text[1:-1].strip() if text.startswith("{") and text.endswith("}") else text
+        if "=" not in inner:
+            continue
+
+        group: Dict[str, str] = {}
+        for part in inner.split(";"):
+            item = part.strip()
+            if not item or "=" not in item:
+                continue
+
+            alias_name, raw_value = [chunk.strip() for chunk in item.split("=", 1)]
+            alias_key = alias_name.lower()
+            if not alias_key.startswith(normalized_prefix):
+                continue
+
+            axis_value = normalize_axis_code(raw_value)
+            if axis_value is None:
+                continue
+            group[alias_key] = axis_value.zfill(4)
+
+        if group:
+            groups.append(group)
+
+    return groups or None
+
+
+def combine_alias_groups(
+    row_groups: Optional[List[Dict[str, str]]],
+    column_groups: Optional[List[Dict[str, str]]],
+) -> List[Dict[str, str]]:
+    if row_groups and column_groups:
+        return [{**row_map, **col_map} for row_map, col_map in product(row_groups, column_groups)]
+    if row_groups:
+        return row_groups
+    if column_groups:
+        return column_groups
+    return [{}]
+
+
 class CorepDataRepository:
     def __init__(
         self,
@@ -463,6 +559,9 @@ class DimensionResolver:
 
         out: List[str] = []
         for token in tokens:
+            token_text = str(token).strip()
+            if "=" in token_text:
+                continue
             norm = normalize_axis_code(token)
             if norm is not None:
                 out.append(norm.zfill(4))
@@ -483,7 +582,9 @@ class DimensionResolver:
             raise RuleEngineError("No valid template in rule")
 
         rows = self._parse_axis(rule_row.get("Rows"))
+        row_alias_groups = parse_axis_assignment_groups(rule_row.get("Rows"), "r")
         columns = self._parse_axis(rule_row.get("Columns"))
+        column_alias_groups = parse_axis_assignment_groups(rule_row.get("Columns"), "c")
         sheets_override = self._parse_sheets(rule_row.get("Sheets"))
         tables_selector = parse_selector(rule_row.get("Tables"))
         has_explicit_tables = bool(tables_selector)
@@ -514,6 +615,7 @@ class DimensionResolver:
                 "table_sheets": table_sheets,
                 "rows": rows,
                 "columns": columns,
+                "alias_groups": combine_alias_groups(row_alias_groups, column_alias_groups),
             }
 
         return {"templates": templates, "template_scope": template_scope}
@@ -603,7 +705,9 @@ class FormulaParser:
         template: Optional[str] = None
         table: Optional[str] = None
         row: Optional[str] = None
+        row_alias: Optional[str] = None
         column: Optional[str] = None
+        column_alias: Optional[str] = None
         sheet: Optional[str] = None
         include_sheet_pattern: Optional[str] = None
         exclude_sheets: List[str] = []
@@ -642,9 +746,17 @@ class FormulaParser:
                 row = norm.zfill(4) if norm else lowered[1:]
                 continue
 
+            if re.fullmatch(r"r[a-z][a-z0-9_]*", lowered):
+                row_alias = lowered
+                continue
+
             if re.fullmatch(r"c\d{2,4}", lowered):
                 norm = normalize_axis_code(lowered[1:])
                 column = norm.zfill(4) if norm else lowered[1:]
+                continue
+
+            if re.fullmatch(r"c[a-z][a-z0-9_]*", lowered):
+                column_alias = lowered
                 continue
 
             if re.fullmatch(r"qx\d+", lowered):
@@ -652,13 +764,16 @@ class FormulaParser:
                 continue
 
             if lowered.startswith("s"):
-                include_sheet_pattern = f"^{re.escape(lowered).replace('NNN', r'\\d+').replace(r'\\*', '.*')}$"
+                escaped = re.escape(lowered).replace('NNN', r'\\d+').replace(r'\\*', '.*')
+                include_sheet_pattern = f"^{escaped}$"
 
         return RefSpec(
             template=template,
             table=table,
             row=row,
+            row_alias=row_alias,
             column=column,
+            column_alias=column_alias,
             sheet=sheet,
             include_sheet_pattern=include_sheet_pattern,
             exclude_sheets=tuple(exclude_sheets),
@@ -671,7 +786,17 @@ class ValueResolver:
         self.repository = repository
         self.scope = scope
 
-    def _resolve_axis(self, base_value: Optional[str], override: Optional[str]) -> Optional[str]:
+    def _resolve_axis(
+        self,
+        base_value: Optional[str],
+        override: Optional[str],
+        alias_name: Optional[str],
+        alias_map: Optional[Mapping[str, str]],
+    ) -> Optional[str]:
+        if alias_name is not None and alias_map is not None:
+            alias_value = alias_map.get(alias_name.lower())
+            if alias_value is not None:
+                return alias_value
         if override is None:
             return base_value
         norm = normalize_axis_code(override)
@@ -703,7 +828,12 @@ class ValueResolver:
 
         return selected or [base_sheet]
 
-    def resolve_ref(self, base: Coordinate, ref: RefSpec) -> Any:
+    def resolve_ref(
+        self,
+        base: Coordinate,
+        ref: RefSpec,
+        alias_map: Optional[Mapping[str, str]] = None,
+    ) -> Any:
         template = ref.template or base.template
         table = ref.table or base.table
 
@@ -714,8 +844,8 @@ class ValueResolver:
 
         sheets = self._selected_sheets(template, table, default_sheet, ref)
 
-        row = self._resolve_axis(base.row, ref.row)
-        column = self._resolve_axis(base.column, ref.column)
+        row = self._resolve_axis(base.row, ref.row, ref.row_alias, alias_map)
+        column = self._resolve_axis(base.column, ref.column, ref.column_alias, alias_map)
 
         expand_rows = ref.wildcard and row is None
         expand_cols = ref.wildcard and column is None
@@ -739,7 +869,7 @@ class ValueResolver:
                     )
                 )
 
-        if ref.wildcard or len(values) > 1:
+        if len(values) > 1:
             return values
         return values[0] if values else None
 
@@ -881,12 +1011,41 @@ class RuleEvaluator:
         self.dimension_resolver = DimensionResolver(repository)
         self.formula_parser = FormulaParser()
 
-    def _candidate_axis(self, context_map: Dict[str, int], selected: Optional[List[str]]) -> List[Optional[str]]:
+    def _candidate_axis(
+        self,
+        context_map: Dict[str, int],
+        selected: Optional[List[str]],
+        anchor: Optional[str] = None,
+        alias_map: Optional[Mapping[str, str]] = None,
+        axis_prefix: Optional[str] = None,
+    ) -> List[Optional[str]]:
         if selected is None:
-            axis: List[Optional[str]] = list(context_map.keys())
+            if anchor is not None and anchor in context_map:
+                axis: List[Optional[str]] = [anchor]
+            elif alias_map is not None and axis_prefix is not None:
+                alias_values = [
+                    value
+                    for key, value in alias_map.items()
+                    if key.startswith(axis_prefix.lower()) and value in context_map
+                ]
+                axis = list(dict.fromkeys(alias_values))
+            else:
+                axis = list(context_map.keys())
         else:
             axis = [code for code in selected if code in context_map]
         return axis or [None]
+
+    def _resolve_ref_anchor(
+        self,
+        explicit_value: Optional[str],
+        alias_name: Optional[str],
+        alias_map: Optional[Mapping[str, str]],
+    ) -> Optional[str]:
+        if alias_name is not None and alias_map is not None:
+            alias_value = alias_map.get(alias_name.lower())
+            if alias_value is not None:
+                return alias_value
+        return explicit_value
 
     def evaluate_rule(self, rule_row: pd.Series) -> RuleResult:
         rule_id = str(rule_row.get("Id", "UNKNOWN"))
@@ -913,29 +1072,131 @@ class RuleEvaluator:
         details: List[RuleDetail] = []
         any_fail = False
 
+        first_formula_ref: Optional[RefSpec] = None
+        if formula_expr.refs:
+            first_formula_ref = next(iter(formula_expr.refs.values()))
+
         for template in scope["templates"]:
             meta = scope["template_scope"][template]
             for table in meta["tables"]:
                 for sheet in meta["table_sheets"][table]:
                     context = self.repository.context(template, sheet)
-                    row_candidates = self._candidate_axis(context.row_map, meta["rows"])
-                    col_candidates = self._candidate_axis(context.col_map, meta["columns"])
+                    alias_groups = meta.get("alias_groups") or [{}]
 
-                    for row_code, col_code in product(row_candidates, col_candidates):
-                        coordinate = Coordinate(
-                            template=template,
-                            table=table,
-                            row=row_code,
-                            column=col_code,
-                            sheet=sheet,
+                    for alias_map in alias_groups:
+                        anchor_row = self._resolve_ref_anchor(
+                            first_formula_ref.row if first_formula_ref is not None else None,
+                            first_formula_ref.row_alias if first_formula_ref is not None else None,
+                            alias_map,
+                        )
+                        anchor_col = self._resolve_ref_anchor(
+                            first_formula_ref.column if first_formula_ref is not None else None,
+                            first_formula_ref.column_alias if first_formula_ref is not None else None,
+                            alias_map,
                         )
 
-                        env: Dict[str, Any] = {"None": None, "True": True, "False": False}
+                        row_candidates = self._candidate_axis(
+                            context.row_map,
+                            meta["rows"],
+                            anchor=anchor_row,
+                            alias_map=alias_map,
+                            axis_prefix="r",
+                        )
+                        col_candidates = self._candidate_axis(
+                            context.col_map,
+                            meta["columns"],
+                            anchor=anchor_col,
+                            alias_map=alias_map,
+                            axis_prefix="c",
+                        )
 
-                        try:
-                            for ref_name, ref_spec in formula_expr.refs.items():
-                                env[ref_name] = value_resolver.resolve_ref(coordinate, ref_spec)
-                        except Exception as exc:
+                        for row_code, col_code in product(row_candidates, col_candidates):
+                            coordinate = Coordinate(
+                                template=template,
+                                table=table,
+                                row=row_code,
+                                column=col_code,
+                                sheet=sheet,
+                            )
+
+                            env: Dict[str, Any] = {"None": None, "True": True, "False": False}
+
+                            try:
+                                for ref_name, ref_spec in formula_expr.refs.items():
+                                    env[ref_name] = value_resolver.resolve_ref(coordinate, ref_spec, alias_map=alias_map)
+                            except Exception as exc:
+                                details.append(
+                                    RuleDetail(
+                                        coordinates=(
+                                            coordinate.template,
+                                            coordinate.table,
+                                            coordinate.row,
+                                            coordinate.column,
+                                            coordinate.sheet,
+                                        ),
+                                        expected=True,
+                                        actual=None,
+                                        passed=False,
+                                        message=f"Reference resolution error: {exc}",
+                                    )
+                                )
+                                any_fail = True
+                                continue
+
+                            if pre_expr is not None:
+                                pre_env = dict(env)
+                                try:
+                                    for ref_name, ref_spec in pre_expr.refs.items():
+                                        pre_env[ref_name] = value_resolver.resolve_ref(coordinate, ref_spec, alias_map=alias_map)
+                                except Exception as exc:
+                                    details.append(
+                                        RuleDetail(
+                                            coordinates=(
+                                                coordinate.template,
+                                                coordinate.table,
+                                                coordinate.row,
+                                                coordinate.column,
+                                                coordinate.sheet,
+                                            ),
+                                            expected=True,
+                                            actual=None,
+                                            passed=False,
+                                            message=f"Precondition resolution error: {exc}",
+                                        )
+                                    )
+                                    any_fail = True
+                                    continue
+                                try:
+                                    if not bool(evaluator.evaluate(pre_expr.ast_root, pre_env)):
+                                        continue
+                                except Exception as exc:
+                                    details.append(
+                                        RuleDetail(
+                                            coordinates=(
+                                                coordinate.template,
+                                                coordinate.table,
+                                                coordinate.row,
+                                                coordinate.column,
+                                                coordinate.sheet,
+                                            ),
+                                            expected=True,
+                                            actual=None,
+                                            passed=False,
+                                            message=f"Precondition evaluation error: {exc}",
+                                        )
+                                    )
+                                    any_fail = True
+                                    continue
+
+                            try:
+                                actual = evaluator.evaluate(formula_expr.ast_root, env)
+                                passed = bool(actual)
+                                message = ""
+                            except Exception as exc:
+                                actual = None
+                                passed = False
+                                message = f"Evaluation error: {exc}"
+
                             details.append(
                                 RuleDetail(
                                     coordinates=(
@@ -946,85 +1207,13 @@ class RuleEvaluator:
                                         coordinate.sheet,
                                     ),
                                     expected=True,
-                                    actual=None,
-                                    passed=False,
-                                    message=f"Reference resolution error: {exc}",
+                                    actual=actual,
+                                    passed=passed,
+                                    message=message,
                                 )
                             )
-                            any_fail = True
-                            continue
-
-                        if pre_expr is not None:
-                            pre_env = dict(env)
-                            try:
-                                for ref_name, ref_spec in pre_expr.refs.items():
-                                    pre_env[ref_name] = value_resolver.resolve_ref(coordinate, ref_spec)
-                            except Exception as exc:
-                                details.append(
-                                    RuleDetail(
-                                        coordinates=(
-                                            coordinate.template,
-                                            coordinate.table,
-                                            coordinate.row,
-                                            coordinate.column,
-                                            coordinate.sheet,
-                                        ),
-                                        expected=True,
-                                        actual=None,
-                                        passed=False,
-                                        message=f"Precondition resolution error: {exc}",
-                                    )
-                                )
+                            if not passed:
                                 any_fail = True
-                                continue
-                            try:
-                                if not bool(evaluator.evaluate(pre_expr.ast_root, pre_env)):
-                                    continue
-                            except Exception as exc:
-                                details.append(
-                                    RuleDetail(
-                                        coordinates=(
-                                            coordinate.template,
-                                            coordinate.table,
-                                            coordinate.row,
-                                            coordinate.column,
-                                            coordinate.sheet,
-                                        ),
-                                        expected=True,
-                                        actual=None,
-                                        passed=False,
-                                        message=f"Precondition evaluation error: {exc}",
-                                    )
-                                )
-                                any_fail = True
-                                continue
-
-                        try:
-                            actual = evaluator.evaluate(formula_expr.ast_root, env)
-                            passed = bool(actual)
-                            message = ""
-                        except Exception as exc:
-                            actual = None
-                            passed = False
-                            message = f"Evaluation error: {exc}"
-
-                        details.append(
-                            RuleDetail(
-                                coordinates=(
-                                    coordinate.template,
-                                    coordinate.table,
-                                    coordinate.row,
-                                    coordinate.column,
-                                    coordinate.sheet,
-                                ),
-                                expected=True,
-                                actual=actual,
-                                passed=passed,
-                                message=message,
-                            )
-                        )
-                        if not passed:
-                            any_fail = True
 
         if not details:
             return RuleResult(rule_id=rule_id, status="SKIPPED", details=[], reason="No coordinates evaluated")
