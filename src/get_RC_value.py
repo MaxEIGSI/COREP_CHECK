@@ -11,7 +11,7 @@ import pandas as pd
 from openpyxl.worksheet.worksheet import Worksheet
 
 
-PROJECT_ROOT = Path(__file__).resolve().parents[2]
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
 DATA_DIR = PROJECT_ROOT / "src" / "data"
 DEFAULT_COREP_DIR = DATA_DIR / "COREP_files"
 DEFAULT_BASED_TEMPLATE_PATH = DATA_DIR / "EGDQ_publication_2026.xlsx"
