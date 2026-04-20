@@ -27,14 +27,30 @@ def _clean(val: Any) -> Any:
     return val
 
 
+def _to_json_text(value: Any) -> str:
+    if value is None:
+        return ""
+    if isinstance(value, float) and pd.isna(value):
+        return ""
+    try:
+        return json.dumps(value, ensure_ascii=False, default=str)
+    except Exception:
+        return str(value)
+
+
 def _summarize_rule(result: Dict[str, Any], config_row: pd.Series) -> Dict[str, Any]:
     details = result.get("details", [])
     fail_count = sum(1 for d in details if not d.get("passed", False))
+    first_detail = details[0] if details else {}
+    sample_formula_values = _to_json_text(first_detail.get("formula_values", {}))
+    sample_precondition_values = _to_json_text(first_detail.get("precondition_values", {}))
     row: Dict[str, Any] = {col: _clean(config_row.get(col)) for col in _CONFIG_COLS}
     row["Engine status"] = result.get("status")
     row["Skip / error reason"] = result.get("reason") or ""
     row["Evaluated points"] = len(details)
     row["Failed points"] = fail_count
+    row["Sample formula values"] = sample_formula_values
+    row["Sample precondition values"] = sample_precondition_values
     return row
 
 
@@ -56,6 +72,8 @@ def _flatten_details(result: Dict[str, Any]) -> List[Dict[str, Any]]:
                 "Expected": d.get("expected"),
                 "Actual": d.get("actual"),
                 "Passed": d.get("passed"),
+                "Formula values": _to_json_text(d.get("formula_values", {})),
+                "Precondition values": _to_json_text(d.get("precondition_values", {})),
                 "Message": d.get("message") or "",
             }
         )

@@ -66,6 +66,8 @@ class RuleDetail:
     actual: Any
     passed: bool
     message: str = ""
+    formula_values: Optional[Dict[str, Any]] = None
+    precondition_values: Optional[Dict[str, Any]] = None
 
 
 @dataclass
@@ -87,6 +89,8 @@ class RuleResult:
                     "actual": detail.actual,
                     "passed": detail.passed,
                     "message": detail.message,
+                    "formula_values": detail.formula_values or {},
+                    "precondition_values": detail.precondition_values or {},
                 }
                 for detail in self.details
             ],
@@ -105,6 +109,7 @@ class RefSpec:
     include_sheet_pattern: Optional[str]
     exclude_sheets: Tuple[str, ...]
     wildcard: bool
+    label: str
 
 
 @dataclass
@@ -294,6 +299,23 @@ def values_sum(values: Iterable[Any]) -> Optional[float]:
     if not nums:
         return None
     return float(sum(nums))
+
+
+def values_largest_sum(count_value: Any, values: Iterable[Any]) -> Optional[float]:
+    count_num = to_number(count_value)
+    if count_num is None:
+        return None
+
+    top_n = max(0, int(count_num))
+    nums = [to_number(v) for v in flatten(values)]
+    nums = [n for n in nums if n is not None]
+    if not nums:
+        return None
+    if top_n == 0:
+        return 0.0
+
+    largest = sorted(nums, reverse=True)[:top_n]
+    return float(sum(largest))
 
 
 def values_count(values: Iterable[Any]) -> int:
@@ -603,10 +625,7 @@ class DimensionResolver:
                     continue
 
                 if table == template:
-                    if not has_explicit_tables:
-                        table_sheets[table] = available_sheets[:1] if available_sheets else []
-                    else:
-                        table_sheets[table] = available_sheets
+                    table_sheets[table] = available_sheets[:1] if available_sheets else []
                 else:
                     table_sheets[table] = [self.repository.get_table_sheet(template, table)]
 
@@ -644,6 +663,7 @@ class FormulaParser:
 
         normalized = self.REF_PATTERN.sub(_replace_ref, text)
         normalized = self._normalize_operators(normalized)
+        normalized = self._normalize_largest_sum(normalized)
         normalized = self._normalize_aggregations(normalized)
 
         try:
@@ -666,6 +686,51 @@ class FormulaParser:
         for func in AGG_FUNCS:
             out = self._convert_bracket_call(out, func)
         return out
+
+    def _normalize_largest_sum(self, text: str) -> str:
+        pattern = re.compile(r"\bsum\s*\(", flags=re.IGNORECASE)
+        result: List[str] = []
+        cursor = 0
+
+        while True:
+            match = pattern.search(text, cursor)
+            if not match:
+                result.append(text[cursor:])
+                break
+
+            start = match.start()
+            open_idx = match.end() - 1
+            depth = 0
+            close_idx = -1
+            for idx in range(open_idx, len(text)):
+                if text[idx] == "(":
+                    depth += 1
+                elif text[idx] == ")":
+                    depth -= 1
+                    if depth == 0:
+                        close_idx = idx
+                        break
+
+            if close_idx < 0:
+                raise RuleEngineError("Unclosed parenthesis for sum(...) expression")
+
+            inner = text[open_idx + 1 : close_idx].strip()
+            largest_match = re.fullmatch(
+                r"(?is)(\d+)\s+largest\s+values\s+among\s*\((.*)\)",
+                inner,
+            )
+
+            result.append(text[cursor:start])
+            if largest_match is None:
+                result.append(text[start : close_idx + 1])
+            else:
+                top_n = largest_match.group(1)
+                values_expr = largest_match.group(2).strip()
+                result.append(f"largest_sum({top_n}, {values_expr})")
+
+            cursor = close_idx + 1
+
+        return "".join(result)
 
     def _convert_bracket_call(self, text: str, func_name: str) -> str:
         pattern = re.compile(rf"\b{func_name}\s*\[")
@@ -717,6 +782,11 @@ class FormulaParser:
         for part in parts:
             cleaned = part.strip()
             lowered = cleaned.lower()
+
+            qualifier_match = re.fullmatch(r"((?:r|c)[a-z0-9_]+)\s+in\s+.+", lowered)
+            if qualifier_match is not None:
+                lowered = qualifier_match.group(1)
+                cleaned = lowered
 
             if lowered.startswith("(") and lowered.endswith(")"):
                 lowered = lowered[1:-1].strip()
@@ -778,6 +848,7 @@ class FormulaParser:
             include_sheet_pattern=include_sheet_pattern,
             exclude_sheets=tuple(exclude_sheets),
             wildcard=wildcard,
+            label=raw_ref.strip(),
         )
 
 
@@ -883,6 +954,12 @@ class AstEvaluator:
         if isinstance(node, ast.Constant):
             return node.value
 
+        if isinstance(node, ast.Tuple):
+            return tuple(self.evaluate(elt, env) for elt in node.elts)
+
+        if isinstance(node, ast.List):
+            return [self.evaluate(elt, env) for elt in node.elts]
+
         if isinstance(node, ast.Name):
             if node.id not in env:
                 raise RuleEngineError(f"Unknown symbol: {node.id}")
@@ -930,6 +1007,10 @@ class AstEvaluator:
 
             if func_name == "sum":
                 return values_sum(args)
+            if func_name == "largest_sum":
+                if not args:
+                    return None
+                return values_largest_sum(args[0], args[1:])
             if func_name == "count":
                 return values_count(args)
             if func_name == "max":
@@ -956,6 +1037,8 @@ class AstEvaluator:
                 return left_num + right_num
             return f"{left}{right}"
         if isinstance(op, ast.Sub):
+            if left_num is None and right_num is None:
+                return 0.0
             return None if left_num is None or right_num is None else left_num - right_num
         if isinstance(op, ast.Mult):
             return None if left_num is None or right_num is None else left_num * right_num
@@ -993,13 +1076,35 @@ class AstEvaluator:
         if isinstance(operator, ast.NotEq):
             return left != right
         if isinstance(operator, ast.Gt):
-            return left > right
+            try:
+                return left > right
+            except TypeError:
+                return False
         if isinstance(operator, ast.GtE):
-            return left >= right
+            try:
+                return left >= right
+            except TypeError:
+                return False
         if isinstance(operator, ast.Lt):
-            return left < right
+            try:
+                return left < right
+            except TypeError:
+                return False
         if isinstance(operator, ast.LtE):
-            return left <= right
+            try:
+                return left <= right
+            except TypeError:
+                return False
+        if isinstance(operator, ast.In):
+            try:
+                return left in right
+            except TypeError:
+                return False
+        if isinstance(operator, ast.NotIn):
+            try:
+                return left not in right
+            except TypeError:
+                return True
 
         raise RuleEngineError("Unsupported comparison operator")
 
@@ -1120,10 +1225,13 @@ class RuleEvaluator:
                             )
 
                             env: Dict[str, Any] = {"None": None, "True": True, "False": False}
+                            formula_values: Dict[str, Any] = {}
 
                             try:
                                 for ref_name, ref_spec in formula_expr.refs.items():
-                                    env[ref_name] = value_resolver.resolve_ref(coordinate, ref_spec, alias_map=alias_map)
+                                    resolved = value_resolver.resolve_ref(coordinate, ref_spec, alias_map=alias_map)
+                                    env[ref_name] = resolved
+                                    formula_values[f"{{{ref_spec.label}}}"] = resolved
                             except Exception as exc:
                                 details.append(
                                     RuleDetail(
@@ -1138,6 +1246,7 @@ class RuleEvaluator:
                                         actual=None,
                                         passed=False,
                                         message=f"Reference resolution error: {exc}",
+                                        formula_values=formula_values,
                                     )
                                 )
                                 any_fail = True
@@ -1145,9 +1254,12 @@ class RuleEvaluator:
 
                             if pre_expr is not None:
                                 pre_env = dict(env)
+                                precondition_values: Dict[str, Any] = {}
                                 try:
                                     for ref_name, ref_spec in pre_expr.refs.items():
-                                        pre_env[ref_name] = value_resolver.resolve_ref(coordinate, ref_spec, alias_map=alias_map)
+                                        resolved_pre = value_resolver.resolve_ref(coordinate, ref_spec, alias_map=alias_map)
+                                        pre_env[ref_name] = resolved_pre
+                                        precondition_values[f"{{{ref_spec.label}}}"] = resolved_pre
                                 except Exception as exc:
                                     details.append(
                                         RuleDetail(
@@ -1162,6 +1274,8 @@ class RuleEvaluator:
                                             actual=None,
                                             passed=False,
                                             message=f"Precondition resolution error: {exc}",
+                                            formula_values=formula_values,
+                                            precondition_values=precondition_values,
                                         )
                                     )
                                     any_fail = True
@@ -1183,10 +1297,14 @@ class RuleEvaluator:
                                             actual=None,
                                             passed=False,
                                             message=f"Precondition evaluation error: {exc}",
+                                            formula_values=formula_values,
+                                            precondition_values=precondition_values,
                                         )
                                     )
                                     any_fail = True
                                     continue
+                            else:
+                                precondition_values = {}
 
                             try:
                                 actual = evaluator.evaluate(formula_expr.ast_root, env)
@@ -1210,6 +1328,8 @@ class RuleEvaluator:
                                     actual=actual,
                                     passed=passed,
                                     message=message,
+                                    formula_values=formula_values,
+                                    precondition_values=precondition_values,
                                 )
                             )
                             if not passed:

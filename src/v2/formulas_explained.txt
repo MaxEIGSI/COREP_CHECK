@@ -31,3 +31,73 @@ formula : {C17.01.a,rX,c0080}(*) > 0 or {C17.01.a,rN,c0080}(*) > 0	{C17.01.b,rX,
 
 that means that inside the row formula, you need to check : 
 (template=C17.01, table=C17.01, row=each value of rX (so 0020, 0120, 0220), column=c0080) > 0 or (template=C17.01, table=C17.01, row=each value of rN (so 0020, 0120, 0220), column=c0080) > 0  or (template=C17.01, table=C17.01, row=each value of rX (so 0020, 0120, 0220), column=c0090) is not empty 
+
+
+____
+same for this which not working : 
+template : C17.01
+table : C17.01.a
+rows: {rX=0030;rY=0040}; {rX=0130;rY=0140}
+columns : 0010; 0020; 0030
+formula : {rY}(*) not in (empty,0)
+
+that means that inside the row formula, you need to check : 
+(template=C17.01, table=C17.01, row=each value of rY (so 0040, 0140), column=and for each column (0010; 0020; 0030)) that the value is not (or empty or equals to 0)
+
+___
+
+same for this which not working : 
+template : C17.01
+table : C17.01
+rows: {rX=0020;rN=0010}; {rX=0120;rN=0110}; {rX=0220;rN=0210}
+columns : 0010; 0020; 0030
+formula : {rX}(*) > 0
+
+that means that inside the row formula, you need to check : 
+(template=C17.01, table=C17.01, row=each value of rX (so 0020, 0120, 0220), column=and for each column (0010; 0020; 0030)) that the value is above 0 
+
+____
+
+What if i have this formula : ({r0922 in EUR} >= {r0912} * 20000) and ({r0922 in EUR} <= {r0912} * 100000)
+
+you ignore " in EUR" so you just checj if cell value (r0922) >= (r0912)*2000 etc 
+
+
+____
+
+When we have a formula like : {c0080} <= sum(5 largest values among ({c0010}, {c0020}, {c0030}, {c0040}, {c0050}, {c0060}, {c0070}))
+
+we need to change : "sum(5 largest values among " to get only the 5 max values of (the list) and do the sum of them
+but it could be : "sum(10 largest values among ") etc 
+
+
+______
+
+same for this which not working : 
+template : C22.00
+table : C22.00
+rows: empty
+columns : empty
+formula : {r0010,c0080} = {r0020,c0080}
+
+we just need to check if : 
+(template=C22.00, table=C22.00, row=r0010, column=c0080) = (template=C22.00, table=C22.00, row=r0020, column=c0080)
+
+____
+
+same for this which not working : 
+template : C22.00
+table : C22.00
+rows: 0130; 0140; 0150
+columns : empty
+formula : {c0080} >= {c0100} - {c0100}
+
+we just need to check if : 
+(template=C22.00, table=C22.00, row= for each rows(0130; 0140; 0150), column= c0080) >= (template=C22.00, table=C22.00, row= for each rows(0130; 0140; 0150), column= c0100) - (template=C22.00, table=C22.00, row= for each rows(0130; 0140; 0150), column= c0100)
+
+______
+template : C22.00
+table : C22.00
+rows: empty
+columns : 0060; 0070
+formula : {r0010} = {r0030}+{r0040}
