@@ -10,6 +10,11 @@ import openpyxl
 import pandas as pd
 from openpyxl.worksheet.worksheet import Worksheet
 
+try:
+    from v2.excel_io import load_workbook_quiet, read_excel_quiet
+except ModuleNotFoundError:
+    from v2.excel_io import load_workbook_quiet, read_excel_quiet  # type: ignore
+
 
 MODULE_DIR = Path(__file__).resolve().parent
 DATA_DIR = MODULE_DIR / "data"
@@ -90,7 +95,7 @@ def load_table_sheet_mapping(
     if not path.exists():
         return {}
 
-    df = pd.read_excel(path)
+    df = read_excel_quiet(path)
     if df.empty:
         return {}
 
@@ -503,7 +508,7 @@ def extract_table_dataframes(
     sheets: Optional[List[str]],
     mapping_table_path: Optional[str | Path] = None,
 ) -> Dict[str, Dict[str, Any]]:
-    wb = openpyxl.load_workbook(file_path, data_only=True)
+    wb = load_workbook_quiet(file_path, data_only=True)
 
     table_map: Dict[str, Dict[str, Any]] = {}
 
@@ -588,7 +593,7 @@ def load_based_template(
 ) -> pd.DataFrame:
     resolved_path = resolve_based_template_path(based_template_path)
     resolved_sheet = resolve_based_template_sheet(sheet_name)
-    return pd.read_excel(resolved_path, sheet_name=resolved_sheet)
+    return read_excel_quiet(resolved_path, sheet_name=resolved_sheet)
 
 
 def run_from_based_template_row(

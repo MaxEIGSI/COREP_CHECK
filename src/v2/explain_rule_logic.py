@@ -7,8 +7,10 @@ from typing import Any, Dict, List, Optional, Sequence, Tuple
 import pandas as pd
 
 try:
+    from v2.excel_io import read_excel_quiet
     from v2.get_RC_value import DEFAULT_BASED_TEMPLATE_PATH, DEFAULT_BASED_TEMPLATE_SHEET, parse_selector
 except ModuleNotFoundError:
+    from v2.excel_io import read_excel_quiet  # type: ignore
     from v2.get_RC_value import DEFAULT_BASED_TEMPLATE_PATH, DEFAULT_BASED_TEMPLATE_SHEET, parse_selector  # type: ignore
 
 
@@ -169,7 +171,7 @@ def build_logic_audit(
     output_path: Path = Path("src/v2/data/output/rule_logic_audit.xlsx"),
     max_rules: Optional[int] = None,
 ) -> Dict[str, Any]:
-    df = pd.read_excel(config_path, sheet_name=sheet_name, header=1)
+    df = read_excel_quiet(config_path, sheet_name=sheet_name, header=1)
     if max_rules is not None:
         df = df.head(max_rules)
 

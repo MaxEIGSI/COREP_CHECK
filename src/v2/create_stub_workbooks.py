@@ -23,6 +23,7 @@ import openpyxl
 import pandas as pd
 
 try:
+    from v2.excel_io import read_excel_quiet
     from v2.get_RC_value import (
         DEFAULT_BASED_TEMPLATE_PATH,
         DEFAULT_BASED_TEMPLATE_SHEET,
@@ -34,6 +35,7 @@ try:
     )
     from v2.rule_engine import normalize_template_id, template_to_file_name, RuleEngineError
 except ModuleNotFoundError:
+    from v2.excel_io import read_excel_quiet  # type: ignore
     from v2.get_RC_value import (  # type: ignore
         DEFAULT_BASED_TEMPLATE_PATH,
         DEFAULT_BASED_TEMPLATE_SHEET,
@@ -165,7 +167,7 @@ def create_stubs(
     sheet_name: str = DEFAULT_BASED_TEMPLATE_SHEET,
     corep_dir: Path = DEFAULT_COREP_DIR,
 ) -> Dict[str, int]:
-    rules_df = pd.read_excel(config_path, sheet_name=sheet_name, header=1)
+    rules_df = read_excel_quiet(config_path, sheet_name=sheet_name, header=1)
 
     # Collect all referenced templates
     all_templates: Set[str] = set()

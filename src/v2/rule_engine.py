@@ -12,6 +12,7 @@ import openpyxl
 import pandas as pd
 
 try:
+    from v2.excel_io import load_workbook_quiet, read_excel_quiet
     from v2.get_RC_value import (
         ALL_SENTINEL,
         DEFAULT_BASED_TEMPLATE_PATH,
@@ -30,6 +31,7 @@ try:
         worksheet_to_dataframe,
     )
 except ModuleNotFoundError:
+    from v2.excel_io import load_workbook_quiet, read_excel_quiet  # type: ignore
     from v2.get_RC_value import (
         ALL_SENTINEL,
         DEFAULT_BASED_TEMPLATE_PATH,
@@ -58,7 +60,7 @@ def load_qx_sheet_mapping(path: str | Path) -> Dict[str, str]:
     p = Path(path)
     if not p.exists():
         return {}
-    df = pd.read_excel(p)
+    df = read_excel_quiet(p)
     if df.empty:
         return {}
     old_col = next((c for c in df.columns if "old" in c.lower()), None)
@@ -108,6 +110,8 @@ class RuleDetail:
     formula_values: Optional[Dict[str, Any]] = None
     precondition_values: Optional[Dict[str, Any]] = None
     evaluation_trace: str = ""
+    formula_with_values: str = ""
+    precondition_with_values: str = ""
 
 
 @dataclass
@@ -132,6 +136,8 @@ class RuleResult:
                     "formula_values": detail.formula_values or {},
                     "precondition_values": detail.precondition_values or {},
                     "evaluation_trace": detail.evaluation_trace,
+                    "formula_with_values": detail.formula_with_values,
+                    "precondition_with_values": detail.precondition_with_values,
                 }
                 for detail in self.details
             ],
@@ -533,7 +539,7 @@ class CorepDataRepository:
     def workbook_for_template(self, template: str) -> openpyxl.Workbook:
         norm = normalize_template_id(template)
         if norm not in self._workbooks:
-            self._workbooks[norm] = openpyxl.load_workbook(
+            self._workbooks[norm] = load_workbook_quiet(
                 template_to_file_path(norm, self.corep_dir), data_only=True
             )
         return self._workbooks[norm]
@@ -1292,6 +1298,35 @@ def _build_evaluation_trace(node: ast.AST, evaluator: AstEvaluator, env: Dict[st
     return " ".join(pieces)
 
 
+def _render_formula_with_values(raw_expression: Any, parsed_expr: ParsedExpression, env: Dict[str, Any]) -> str:
+    """Render the original DSL expression with concrete values in place of {refs}.
+
+    Example:
+        "{r0010,c0010} = {r0010,c0020} + {r0010,c0030}"
+        -> "100 = 60 + 40"
+    """
+    if raw_expression is None:
+        return ""
+
+    expression = str(raw_expression)
+    ref_names = list(parsed_expr.refs.keys())
+    idx = 0
+
+    def _replace_ref(_match: re.Match[str]) -> str:
+        nonlocal idx
+        if idx >= len(ref_names):
+            return _match.group(0)
+        ref_name = ref_names[idx]
+        idx += 1
+        value = env.get(ref_name)
+        return _format_trace_value(value)
+
+    try:
+        return FormulaParser.REF_PATTERN.sub(_replace_ref, expression)
+    except Exception:
+        return expression
+
+
 class RuleEvaluator:
     def __init__(self, repository: Any, tolerance: float = INTERVAL_TOLERANCE):
         self.repository = repository
@@ -1431,10 +1466,13 @@ class RuleEvaluator:
                                         passed=False,
                                         message=f"Reference resolution error: {exc}",
                                         formula_values=formula_values,
+                                        formula_with_values=_render_formula_with_values(formula, formula_expr, env),
                                     )
                                 )
                                 any_fail = True
                                 continue
+
+                            formula_with_values = _render_formula_with_values(formula, formula_expr, env)
 
                             # Check for missing coordinates (row/column/sheet not in data)
                             for ref_name, ref_spec in formula_expr.refs.items():
@@ -1454,6 +1492,7 @@ class RuleEvaluator:
                                             passed=False,
                                             message=f"ERROR: {missing.reason}",
                                             formula_values=formula_values,
+                                            formula_with_values=formula_with_values,
                                         )
                                     )
                                     any_error = True
@@ -1485,10 +1524,13 @@ class RuleEvaluator:
                                             message=f"Precondition resolution error: {exc}",
                                             formula_values=formula_values,
                                             precondition_values=precondition_values,
+                                            formula_with_values=formula_with_values,
+                                            precondition_with_values=_render_formula_with_values(precondition, pre_expr, pre_env),
                                         )
                                     )
                                     any_fail = True
                                     continue
+                                precondition_with_values = _render_formula_with_values(precondition, pre_expr, pre_env)
                                 try:
                                     if not bool(evaluator.evaluate(pre_expr.ast_root, pre_env)):
                                         continue
@@ -1508,12 +1550,15 @@ class RuleEvaluator:
                                             message=f"Precondition evaluation error: {exc}",
                                             formula_values=formula_values,
                                             precondition_values=precondition_values,
+                                            formula_with_values=formula_with_values,
+                                            precondition_with_values=precondition_with_values,
                                         )
                                     )
                                     any_fail = True
                                     continue
                             else:
                                 precondition_values = {}
+                                precondition_with_values = ""
 
                             try:
                                 actual = evaluator.evaluate(formula_expr.ast_root, env)
@@ -1542,6 +1587,8 @@ class RuleEvaluator:
                                     formula_values=formula_values,
                                     precondition_values=precondition_values,
                                     evaluation_trace=evaluation_trace,
+                                    formula_with_values=formula_with_values,
+                                    precondition_with_values=precondition_with_values,
                                 )
                             )
                             if not passed:
@@ -1579,7 +1626,7 @@ def load_rules(
     config_path: str | Path = DEFAULT_BASED_TEMPLATE_PATH,
     sheet_name: str = DEFAULT_BASED_TEMPLATE_SHEET,
 ) -> pd.DataFrame:
-    return pd.read_excel(config_path, sheet_name=sheet_name, header=1)
+    return read_excel_quiet(config_path, sheet_name=sheet_name, header=1)
 
 
 def evaluate_rules(

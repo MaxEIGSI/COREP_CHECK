@@ -8,6 +8,7 @@ import pandas as pd
 from openpyxl.cell.cell import MergedCell
 
 try:
+    from v2.excel_io import read_excel_quiet
     from v2.get_RC_value import (
         DEFAULT_BASED_TEMPLATE_PATH,
         DEFAULT_BASED_TEMPLATE_SHEET,
@@ -17,6 +18,7 @@ try:
     )
     from v2.rule_engine import CorepDataRepository, RuleEngineError, normalize_template_id
 except ModuleNotFoundError:
+    from v2.excel_io import read_excel_quiet  # type: ignore
     from v2.get_RC_value import (
         DEFAULT_BASED_TEMPLATE_PATH,
         DEFAULT_BASED_TEMPLATE_SHEET,
@@ -114,7 +116,7 @@ def seed_corep_values(
     corep_dir: Path = DEFAULT_COREP_DIR,
     overwrite: bool = False,
 ) -> Dict[str, int]:
-    rules_df = pd.read_excel(config_path, sheet_name=sheet_name, header=1)
+    rules_df = read_excel_quiet(config_path, sheet_name=sheet_name, header=1)
     repository = CorepDataRepository(corep_dir=corep_dir)
 
     templates = _target_templates_from_rules(rules_df)

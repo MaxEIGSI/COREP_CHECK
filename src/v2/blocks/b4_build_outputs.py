@@ -83,6 +83,19 @@ def _collect_all_traces(details: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
     return traces
 
 
+def _collect_all_rendered(details: List[Dict[str, Any]], value_key: str) -> List[Dict[str, Any]]:
+    rendered: List[Dict[str, Any]] = []
+    for detail in details:
+        rendered.append(
+            {
+                "coordinates": _serialize_coordinate(detail.get("coordinates")),
+                "passed": detail.get("passed"),
+                "rendered": detail.get(value_key) or "",
+            }
+        )
+    return rendered
+
+
 def _summarize_rule(result: Dict[str, Any], config_row: pd.Series) -> Dict[str, Any]:
     details = result.get("details", [])
     fail_count = sum(1 for d in details if not d.get("passed", False))
@@ -92,6 +105,8 @@ def _summarize_rule(result: Dict[str, Any], config_row: pd.Series) -> Dict[str, 
     row["Evaluated points"] = len(details)
     row["Failed points"] = fail_count
     row["All evaluation traces"] = _to_json_text(_collect_all_traces(details))
+    row["All formula with values"] = _to_json_text(_collect_all_rendered(details, "formula_with_values"))
+    row["All precondition with values"] = _to_json_text(_collect_all_rendered(details, "precondition_with_values"))
     row["All formula values"] = _to_json_text(_collect_all_values(details, "formula_values"))
     row["All precondition values"] = _to_json_text(_collect_all_values(details, "precondition_values"))
     return row
@@ -115,6 +130,8 @@ def _flatten_details(result: Dict[str, Any]) -> List[Dict[str, Any]]:
             "Actual": d.get("actual"),
             "Passed": d.get("passed"),
             "Evaluation trace": d.get("evaluation_trace") or "",
+            "Formula with values": d.get("formula_with_values") or "",
+            "Precondition with values": d.get("precondition_with_values") or "",
             "Formula values": _to_json_text(d.get("formula_values", {})),
             "Precondition values": _to_json_text(d.get("precondition_values", {})),
             "Message": d.get("message") or "",
