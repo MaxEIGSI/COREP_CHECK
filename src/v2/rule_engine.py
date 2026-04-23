@@ -112,6 +112,10 @@ class RuleDetail:
     evaluation_trace: str = ""
     formula_with_values: str = ""
     precondition_with_values: str = ""
+    comparison_left: str = ""
+    comparison_operator: str = ""
+    comparison_right: str = ""
+    comparison_display: str = ""
 
 
 @dataclass
@@ -138,6 +142,10 @@ class RuleResult:
                     "evaluation_trace": detail.evaluation_trace,
                     "formula_with_values": detail.formula_with_values,
                     "precondition_with_values": detail.precondition_with_values,
+                    "comparison_left": detail.comparison_left,
+                    "comparison_operator": detail.comparison_operator,
+                    "comparison_right": detail.comparison_right,
+                    "comparison_display": detail.comparison_display,
                 }
                 for detail in self.details
             ],
@@ -1327,6 +1335,30 @@ def _render_formula_with_values(raw_expression: Any, parsed_expr: ParsedExpressi
         return expression
 
 
+def _render_ast_with_values(node: ast.AST, env: Dict[str, Any]) -> str:
+    try:
+        rendered = ast.unparse(node)
+    except Exception:
+        return ""
+
+    def _replace_name(match: re.Match[str]) -> str:
+        name = match.group(0)
+        return _format_trace_value(env.get(name)) if name in env else name
+
+    return re.sub(r"__ref_\d+", _replace_name, rendered)
+
+
+def _extract_comparison_parts(node: ast.AST, env: Dict[str, Any]) -> Tuple[str, str, str, str]:
+    if not isinstance(node, ast.Compare) or len(node.ops) != 1 or len(node.comparators) != 1:
+        return "", "", "", ""
+
+    operator = _comparison_operator_symbol(node.ops[0]) or ""
+    left = _render_ast_with_values(node.left, env)
+    right = _render_ast_with_values(node.comparators[0], env)
+    display = f"{left} {operator} {right}".strip() if operator else ""
+    return left, operator, right, display
+
+
 class RuleEvaluator:
     def __init__(self, repository: Any, tolerance: float = INTERVAL_TOLERANCE):
         self.repository = repository
@@ -1565,11 +1597,15 @@ class RuleEvaluator:
                                 passed = bool(actual)
                                 message = ""
                                 evaluation_trace = _build_evaluation_trace(formula_expr.ast_root, evaluator, env)
+                                comparison_left, comparison_operator, comparison_right, comparison_display = _extract_comparison_parts(
+                                    formula_expr.ast_root, env
+                                )
                             except Exception as exc:
                                 actual = None
                                 passed = False
                                 message = f"Evaluation error: {exc}"
                                 evaluation_trace = ""
+                                comparison_left, comparison_operator, comparison_right, comparison_display = ("", "", "", "")
 
                             details.append(
                                 RuleDetail(
@@ -1589,6 +1625,10 @@ class RuleEvaluator:
                                     evaluation_trace=evaluation_trace,
                                     formula_with_values=formula_with_values,
                                     precondition_with_values=precondition_with_values,
+                                    comparison_left=comparison_left,
+                                    comparison_operator=comparison_operator,
+                                    comparison_right=comparison_right,
+                                    comparison_display=comparison_display,
                                 )
                             )
                             if not passed:

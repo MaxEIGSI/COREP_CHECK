@@ -17,6 +17,11 @@ from typing import Any, Dict, List
 
 import pandas as pd
 
+try:
+    from v2.rule_engine import FormulaParser, NonDslRuleError, RuleEngineError
+except ModuleNotFoundError:
+    from v2.rule_engine import FormulaParser, NonDslRuleError, RuleEngineError  # type: ignore
+
 
 # ---------------------------------------------------------------------------
 # Config columns forwarded to Summary sheet for easy inspection
@@ -44,6 +49,18 @@ def _to_json_text(value: Any) -> str:
         return str(value)
 
 
+def _to_multiline_objects(items: List[Dict[str, Any]]) -> str:
+    if not items:
+        return ""
+    lines: List[str] = []
+    for item in items:
+        try:
+            lines.append(json.dumps(item, ensure_ascii=False, default=str))
+        except Exception:
+            lines.append(str(item))
+    return ",\n".join(lines)
+
+
 def _serialize_coordinate(coordinates: Any) -> Dict[str, Any]:
     coords = coordinates if isinstance(coordinates, (list, tuple)) else ()
     return {
@@ -55,17 +72,34 @@ def _serialize_coordinate(coordinates: Any) -> Dict[str, Any]:
     }
 
 
+def _flatten_with_coordinates(detail: Dict[str, Any], extra: Dict[str, Any]) -> Dict[str, Any]:
+    row = dict(_serialize_coordinate(detail.get("coordinates")))
+    row.update(extra)
+    return row
+
+
+def _normalize_formula_text(value: Any) -> str:
+    if value is None or (isinstance(value, float) and pd.isna(value)):
+        return ""
+    try:
+        return FormulaParser().parse(str(value)).text
+    except (NonDslRuleError, RuleEngineError, SyntaxError, ValueError):
+        return str(value)
+
+
 def _collect_all_values(details: List[Dict[str, Any]], value_key: str) -> List[Dict[str, Any]]:
     collected: List[Dict[str, Any]] = []
     for detail in details:
         collected.append(
-            {
-                "coordinates": _serialize_coordinate(detail.get("coordinates")),
-                "passed": detail.get("passed"),
-                "actual": detail.get("actual"),
-                "message": detail.get("message") or "",
-                "values": detail.get(value_key, {}) or {},
-            }
+            _flatten_with_coordinates(
+                detail,
+                {
+                    "passed": detail.get("passed"),
+                    "actual": detail.get("actual"),
+                    "message": detail.get("message") or "",
+                    "values": detail.get(value_key, {}) or {},
+                },
+            )
         )
     return collected
 
@@ -74,11 +108,13 @@ def _collect_all_traces(details: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
     traces: List[Dict[str, Any]] = []
     for detail in details:
         traces.append(
-            {
-                "coordinates": _serialize_coordinate(detail.get("coordinates")),
-                "passed": detail.get("passed"),
-                "trace": detail.get("evaluation_trace") or "",
-            }
+            _flatten_with_coordinates(
+                detail,
+                {
+                    "passed": detail.get("passed"),
+                    "trace": detail.get("evaluation_trace") or "",
+                },
+            )
         )
     return traces
 
@@ -87,13 +123,33 @@ def _collect_all_rendered(details: List[Dict[str, Any]], value_key: str) -> List
     rendered: List[Dict[str, Any]] = []
     for detail in details:
         rendered.append(
-            {
-                "coordinates": _serialize_coordinate(detail.get("coordinates")),
-                "passed": detail.get("passed"),
-                "rendered": detail.get(value_key) or "",
-            }
+            _flatten_with_coordinates(
+                detail,
+                {
+                    "passed": detail.get("passed"),
+                    "rendered": detail.get(value_key) or "",
+                },
+            )
         )
     return rendered
+
+
+def _collect_all_compact(details: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    compact: List[Dict[str, Any]] = []
+    for detail in details:
+        compact.append(
+            _flatten_with_coordinates(
+                detail,
+                {
+                    "passed": detail.get("passed"),
+                    "left": detail.get("comparison_left") or "",
+                    "operator": detail.get("comparison_operator") or "",
+                    "right": detail.get("comparison_right") or "",
+                    "display": detail.get("comparison_display") or "",
+                },
+            )
+        )
+    return compact
 
 
 def _summarize_rule(result: Dict[str, Any], config_row: pd.Series) -> Dict[str, Any]:
@@ -104,23 +160,32 @@ def _summarize_rule(result: Dict[str, Any], config_row: pd.Series) -> Dict[str, 
     row["Skip / error reason"] = result.get("reason") or ""
     row["Evaluated points"] = len(details)
     row["Failed points"] = fail_count
-    row["All evaluation traces"] = _to_json_text(_collect_all_traces(details))
-    row["All formula with values"] = _to_json_text(_collect_all_rendered(details, "formula_with_values"))
-    row["All precondition with values"] = _to_json_text(_collect_all_rendered(details, "precondition_with_values"))
-    row["All formula values"] = _to_json_text(_collect_all_values(details, "formula_values"))
-    row["All precondition values"] = _to_json_text(_collect_all_values(details, "precondition_values"))
+    row["All evaluation traces"] = _to_multiline_objects(_collect_all_traces(details))
+    row["All formula with values"] = _to_multiline_objects(_collect_all_rendered(details, "formula_with_values"))
+    row["All precondition with values"] = _to_multiline_objects(_collect_all_rendered(details, "precondition_with_values"))
+    row["All compact comparisons"] = _to_multiline_objects(_collect_all_compact(details))
+    row["All formula values"] = _to_multiline_objects(_collect_all_values(details, "formula_values"))
+    row["All precondition values"] = _to_multiline_objects(_collect_all_values(details, "precondition_values"))
     return row
 
 
-def _flatten_details(result: Dict[str, Any]) -> List[Dict[str, Any]]:
+def _flatten_details(result: Dict[str, Any], config_row: pd.Series) -> List[Dict[str, Any]]:
     rule_id = result.get("rule_id")
     status = result.get("status")
+    formula_raw = _clean(config_row.get("Formula"))
+    precondition_raw = _clean(config_row.get("Precondition"))
+    formula_converted = _normalize_formula_text(formula_raw)
+    precondition_converted = _normalize_formula_text(precondition_raw)
     rows = []
     for d in result.get("details", []):
         coords = d.get("coordinates", ())
         rows.append({
             "Rule Id": rule_id,
             "Rule status": status,
+            "Original formula": formula_raw,
+            "Converted formula": formula_converted,
+            "Original precondition": precondition_raw,
+            "Converted precondition": precondition_converted,
             "Template": coords[0] if len(coords) > 0 else None,
             "Table": coords[1] if len(coords) > 1 else None,
             "Row": coords[2] if len(coords) > 2 else None,
@@ -132,6 +197,10 @@ def _flatten_details(result: Dict[str, Any]) -> List[Dict[str, Any]]:
             "Evaluation trace": d.get("evaluation_trace") or "",
             "Formula with values": d.get("formula_with_values") or "",
             "Precondition with values": d.get("precondition_with_values") or "",
+            "Comparison left": d.get("comparison_left") or "",
+            "Comparison operator": d.get("comparison_operator") or "",
+            "Comparison right": d.get("comparison_right") or "",
+            "Comparison display": d.get("comparison_display") or "",
             "Formula values": _to_json_text(d.get("formula_values", {})),
             "Precondition values": _to_json_text(d.get("precondition_values", {})),
             "Message": d.get("message") or "",
@@ -140,11 +209,12 @@ def _flatten_details(result: Dict[str, Any]) -> List[Dict[str, Any]]:
 
 
 def _style_summary(ws: Any, n_rules: int) -> None:
-    from openpyxl.styles import PatternFill, Font
+    from openpyxl.styles import PatternFill, Font, Alignment
     RED    = PatternFill(start_color="FFCCCC", end_color="FFCCCC", fill_type="solid")
     GREEN  = PatternFill(start_color="CCFFCC", end_color="CCFFCC", fill_type="solid")
     YELLOW = PatternFill(start_color="FFFFCC", end_color="FFFFCC", fill_type="solid")
     BOLD   = Font(bold=True)
+    WRAP   = Alignment(wrap_text=True, vertical="top")
 
     header = list(next(ws.iter_rows(min_row=1, max_row=1, values_only=False)))
     for cell in header:
@@ -154,12 +224,24 @@ def _style_summary(ws: Any, n_rules: int) -> None:
     if status_col is None:
         return
 
+    multiline_headers = {
+        "All evaluation traces",
+        "All formula with values",
+        "All precondition with values",
+        "All compact comparisons",
+        "All formula values",
+        "All precondition values",
+    }
+    multiline_cols = {c.column for c in header if c.value in multiline_headers}
+
     fill_map = {"PASS": GREEN, "FAIL": RED, "SKIPPED": YELLOW}
     for row_idx in range(2, n_rules + 2):
         cell = ws.cell(row=row_idx, column=status_col)
         fill = fill_map.get(cell.value)
         if fill:
             cell.fill = fill
+        for col_idx in multiline_cols:
+            ws.cell(row=row_idx, column=col_idx).alignment = WRAP
 
 
 def block_build_outputs(ctx: Dict[str, Any]) -> Dict[str, Any]:
@@ -181,7 +263,7 @@ def block_build_outputs(ctx: Dict[str, Any]) -> Dict[str, Any]:
         rule_id = result.get("rule_id", "")
         config_row = config_by_id.get(rule_id, pd.Series(dtype=object))
         summary_rows.append(_summarize_rule(result, config_row))
-        detail_rows.extend(_flatten_details(result))
+        detail_rows.extend(_flatten_details(result, config_row))
 
     summary_df = pd.DataFrame(summary_rows)
     details_df = pd.DataFrame(detail_rows)
@@ -201,6 +283,24 @@ def block_build_outputs(ctx: Dict[str, Any]) -> Dict[str, Any]:
         for col_cells in ws_details.columns:
             max_len = max((len(str(c.value)) for c in col_cells if c.value is not None), default=8)
             ws_details.column_dimensions[col_cells[0].column_letter].width = min(max_len + 2, 40)
+        from openpyxl.styles import Alignment
+        details_header = list(next(ws_details.iter_rows(min_row=1, max_row=1, values_only=False)))
+        details_wrap_headers = {
+            "Original formula",
+            "Converted formula",
+            "Original precondition",
+            "Converted precondition",
+            "Formula with values",
+            "Precondition with values",
+            "Formula values",
+            "Precondition values",
+            "Message",
+        }
+        details_wrap_cols = {c.column for c in details_header if c.value in details_wrap_headers}
+        wrap = Alignment(wrap_text=True, vertical="top")
+        for row_idx in range(2, ws_details.max_row + 1):
+            for col_idx in details_wrap_cols:
+                ws_details.cell(row=row_idx, column=col_idx).alignment = wrap
 
     json_path = output_dir / "rule_results.json"
     json_path.write_text(
