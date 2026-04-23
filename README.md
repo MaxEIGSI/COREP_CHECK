@@ -1,6 +1,5 @@
-cd /Users/maximeleyrit/Documents/COREP_check
-git add .
-git commit -m ""
+git add src/v2/
+git commit -m "Add v2 pipeline"
 git push
 
 

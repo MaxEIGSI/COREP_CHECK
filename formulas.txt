@@ -1,0 +1,22 @@
+template : F32.04		
+rows = 0010; 0020; 0030; 0040; 0050; 0060; 0070; 0080; 0090; 0100; 0110			
+columns empty 
+formula : {F32.04.b,c0030} > 0
+
+so i need to check if for each rows of the column c0030 if the value is above 0 
+______
+
+when we have : 
+rows = All
+columns = empty 
+formula : length({c0021}) = 20
+
+then it means that for each row of the sheet and the column c0021, we need to check if the lengh of the value in the cell is equals to 20
+
+
+______
+row : 1180; 1190; 1200; 1210			
+column = empty 
+formula: 	max({r0140,c0050},{r0150,c0050}) >= {c0050}
+
+it means that we need to take the max value between {r0140,c0050} and {r0150,c0050} and compare with >= for each row and the column c0050
