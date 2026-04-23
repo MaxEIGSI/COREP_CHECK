@@ -51,6 +51,23 @@ AGG_FUNCS = {"sum", "count", "max", "min"}
 
 
 @dataclass(frozen=True)
+class MissingRef:
+    """Sentinel returned when a row, column or sheet does not exist in the data.
+
+    This is intentionally different from ``None`` (empty cell) so the engine
+    can surface a dedicated ``"ERROR"`` status instead of silently treating a
+    missing coordinate as an empty value.
+    """
+    row: Optional[str]
+    column: Optional[str]
+    sheet: str
+    reason: str = ""
+
+    def __str__(self) -> str:  # pragma: no cover
+        return f"MISSING(row={self.row}, col={self.column}, sheet={self.sheet}: {self.reason})"
+
+
+@dataclass(frozen=True)
 class Coordinate:
     template: str
     table: str
@@ -212,6 +229,43 @@ def _normalize_sheet_key(value: Any) -> str:
 
 def _normalize_table_key(value: Any) -> str:
     return str(value).strip().upper().replace(" ", "")
+
+
+def _ref_display_key(
+    coordinate: "Coordinate",
+    ref: "RefSpec",
+    alias_map: Optional[Mapping[str, Any]] = None,
+) -> str:
+    """Return a human-readable key for formula_values showing the actual
+    resolved coordinates: ``{r=0010, c=0210}``.
+
+    Fields are omitted when they have no value so pure row-refs or
+    pure column-refs stay concise.
+    """
+    # Resolve row (alias takes priority, then ref override, then scope row)
+    if ref.row_alias is not None and alias_map:
+        row: Optional[str] = alias_map.get(ref.row_alias.lower()) or ref.row or coordinate.row
+    else:
+        row = ref.row or coordinate.row
+
+    # Resolve column
+    if ref.column_alias is not None and alias_map:
+        col: Optional[str] = alias_map.get(ref.column_alias.lower()) or ref.column or coordinate.column
+    else:
+        col = ref.column or coordinate.column
+
+    parts: List[str] = []
+    if row is not None:
+        parts.append(f"r={row}")
+    if col is not None:
+        parts.append(f"c={col}")
+    # Include sheet only when the ref explicitly targets a different one
+    if ref.sheet is not None:
+        parts.append(f"sheet={ref.sheet}")
+    elif ref.include_sheet_pattern is not None:
+        parts.append(f"sheet=~{ref.include_sheet_pattern}")
+
+    return "{" + ", ".join(parts) + "}"
 
 
 def _table_template_key(table_key: str) -> Optional[str]:
@@ -877,11 +931,40 @@ class ValueResolver:
         if coord.row is None or coord.column is None:
             return None
 
-        context = self.repository.context(coord.template, coord.sheet)
+        try:
+            context = self.repository.context(coord.template, coord.sheet)
+        except Exception:
+            return MissingRef(
+                row=coord.row,
+                column=coord.column,
+                sheet=coord.sheet,
+                reason=f"sheet '{coord.sheet}' not found for template '{coord.template}'",
+            )
+
         row_idx = context.row_map.get(coord.row)
         col_idx = context.col_map.get(coord.column)
-        if row_idx is None or col_idx is None:
-            return None
+
+        if row_idx is None and col_idx is None:
+            return MissingRef(
+                row=coord.row,
+                column=coord.column,
+                sheet=coord.sheet,
+                reason=f"row '{coord.row}' and column '{coord.column}' not found",
+            )
+        if row_idx is None:
+            return MissingRef(
+                row=coord.row,
+                column=coord.column,
+                sheet=coord.sheet,
+                reason=f"row '{coord.row}' not found in sheet '{coord.sheet}'",
+            )
+        if col_idx is None:
+            return MissingRef(
+                row=coord.row,
+                column=coord.column,
+                sheet=coord.sheet,
+                reason=f"column '{coord.column}' not found in sheet '{coord.sheet}'",
+            )
         return context.dataframe.loc[row_idx, col_idx]
 
     def _selected_sheets(self, template: str, table: str, base_sheet: str, ref: RefSpec) -> List[str]:
@@ -943,6 +1026,17 @@ class ValueResolver:
         if len(values) > 1:
             return values
         return values[0] if values else None
+
+    @staticmethod
+    def _contains_missing(value: Any) -> Optional[MissingRef]:
+        """Return the first MissingRef found in *value*, or None."""
+        if isinstance(value, MissingRef):
+            return value
+        if isinstance(value, list):
+            for item in value:
+                if isinstance(item, MissingRef):
+                    return item
+        return None
 
 
 class AstEvaluator:
@@ -1226,12 +1320,13 @@ class RuleEvaluator:
 
                             env: Dict[str, Any] = {"None": None, "True": True, "False": False}
                             formula_values: Dict[str, Any] = {}
+                            any_error = False
 
                             try:
                                 for ref_name, ref_spec in formula_expr.refs.items():
                                     resolved = value_resolver.resolve_ref(coordinate, ref_spec, alias_map=alias_map)
                                     env[ref_name] = resolved
-                                    formula_values[f"{{{ref_spec.label}}}"] = resolved
+                                    formula_values[_ref_display_key(coordinate, ref_spec, alias_map)] = resolved
                             except Exception as exc:
                                 details.append(
                                     RuleDetail(
@@ -1252,6 +1347,31 @@ class RuleEvaluator:
                                 any_fail = True
                                 continue
 
+                            # Check for missing coordinates (row/column/sheet not in data)
+                            for ref_name, ref_spec in formula_expr.refs.items():
+                                missing = value_resolver._contains_missing(env.get(ref_name))
+                                if missing is not None:
+                                    details.append(
+                                        RuleDetail(
+                                            coordinates=(
+                                                coordinate.template,
+                                                coordinate.table,
+                                                coordinate.row,
+                                                coordinate.column,
+                                                coordinate.sheet,
+                                            ),
+                                            expected=True,
+                                            actual=str(missing),
+                                            passed=False,
+                                            message=f"ERROR: {missing.reason}",
+                                            formula_values=formula_values,
+                                        )
+                                    )
+                                    any_error = True
+                                    break
+                            if any_error:
+                                continue
+
                             if pre_expr is not None:
                                 pre_env = dict(env)
                                 precondition_values: Dict[str, Any] = {}
@@ -1259,7 +1379,7 @@ class RuleEvaluator:
                                     for ref_name, ref_spec in pre_expr.refs.items():
                                         resolved_pre = value_resolver.resolve_ref(coordinate, ref_spec, alias_map=alias_map)
                                         pre_env[ref_name] = resolved_pre
-                                        precondition_values[f"{{{ref_spec.label}}}"] = resolved_pre
+                                        precondition_values[_ref_display_key(coordinate, ref_spec, alias_map)] = resolved_pre
                                 except Exception as exc:
                                     details.append(
                                         RuleDetail(
@@ -1338,7 +1458,14 @@ class RuleEvaluator:
         if not details:
             return RuleResult(rule_id=rule_id, status="SKIPPED", details=[], reason="No coordinates evaluated")
 
-        return RuleResult(rule_id=rule_id, status="FAIL" if any_fail else "PASS", details=details)
+        has_error = any(d.message.startswith("ERROR:") for d in details)
+        if has_error:
+            status = "ERROR"
+        elif any_fail:
+            status = "FAIL"
+        else:
+            status = "PASS"
+        return RuleResult(rule_id=rule_id, status=status, details=details)
 
 
 def _build_repository_from_mapping(data_mapping: Optional[Mapping[str, Any]], corep_dir: str | Path) -> Any:

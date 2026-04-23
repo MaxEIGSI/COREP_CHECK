@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import argparse
 import re
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Sequence, Tuple
@@ -167,7 +166,7 @@ def _sql_style(precondition: str, formula: str) -> str:
 def build_logic_audit(
     config_path: Path = DEFAULT_BASED_TEMPLATE_PATH,
     sheet_name: str = DEFAULT_BASED_TEMPLATE_SHEET,
-    output_path: Path = Path("outputs/rule_logic_audit.xlsx"),
+    output_path: Path = Path("src/v2/data/output/rule_logic_audit.xlsx"),
     max_rules: Optional[int] = None,
 ) -> Dict[str, Any]:
     df = pd.read_excel(config_path, sheet_name=sheet_name, header=1)
@@ -268,18 +267,18 @@ def build_logic_audit(
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Build a concise logic-audit workbook from config rules")
-    parser.add_argument("--config", type=Path, default=DEFAULT_BASED_TEMPLATE_PATH)
-    parser.add_argument("--sheet", type=str, default=DEFAULT_BASED_TEMPLATE_SHEET)
-    parser.add_argument("--output", type=Path, default=Path("outputs/rule_logic_audit.xlsx"))
-    parser.add_argument("--max-rules", type=int, default=None)
-    args = parser.parse_args()
+    # ── PARAMETERS – edit here, then run ──────────────────────────────
+    CONFIG    = DEFAULT_BASED_TEMPLATE_PATH
+    SHEET     = DEFAULT_BASED_TEMPLATE_SHEET
+    OUTPUT    = Path("src/v2/data/output/rule_logic_audit.xlsx")
+    MAX_RULES = None
+    # ──────────────────────────────────────────────────────────────────
 
     result = build_logic_audit(
-        config_path=args.config,
-        sheet_name=args.sheet,
-        output_path=args.output,
-        max_rules=args.max_rules,
+        config_path=CONFIG,
+        sheet_name=SHEET,
+        output_path=OUTPUT,
+        max_rules=MAX_RULES,
     )
     print(result)
 

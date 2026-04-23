@@ -14,7 +14,6 @@ Each sheet embeds:
 """
 from __future__ import annotations
 
-import argparse
 import re
 from collections import defaultdict
 from pathlib import Path
@@ -217,13 +216,13 @@ def create_stubs(
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Create minimal stub COREP workbooks for missing templates")
-    parser.add_argument("--config", type=Path, default=DEFAULT_BASED_TEMPLATE_PATH)
-    parser.add_argument("--sheet", type=str, default=DEFAULT_BASED_TEMPLATE_SHEET)
-    parser.add_argument("--corep-dir", type=Path, default=DEFAULT_COREP_DIR)
-    args = parser.parse_args()
+    # ── PARAMETERS – edit here, then run ──────────────────────────────
+    CONFIG    = DEFAULT_BASED_TEMPLATE_PATH
+    SHEET     = DEFAULT_BASED_TEMPLATE_SHEET
+    COREP_DIR = DEFAULT_COREP_DIR
+    # ──────────────────────────────────────────────────────────────────
 
-    result = create_stubs(config_path=args.config, sheet_name=args.sheet, corep_dir=args.corep_dir)
+    result = create_stubs(config_path=CONFIG, sheet_name=SHEET, corep_dir=COREP_DIR)
     print(result)
 
 

@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import argparse
 import re
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional, Set
@@ -177,18 +176,18 @@ def seed_corep_values(
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Seed COREP files with deterministic test values")
-    parser.add_argument("--config", type=Path, default=DEFAULT_BASED_TEMPLATE_PATH)
-    parser.add_argument("--sheet", type=str, default=DEFAULT_BASED_TEMPLATE_SHEET)
-    parser.add_argument("--corep-dir", type=Path, default=DEFAULT_COREP_DIR)
-    parser.add_argument("--overwrite", action="store_true")
-    args = parser.parse_args()
+    # ── PARAMETERS – edit here, then run ──────────────────────────────
+    CONFIG    = DEFAULT_BASED_TEMPLATE_PATH
+    SHEET     = DEFAULT_BASED_TEMPLATE_SHEET
+    COREP_DIR = DEFAULT_COREP_DIR
+    OVERWRITE = False
+    # ──────────────────────────────────────────────────────────────────
 
     summary = seed_corep_values(
-        config_path=args.config,
-        sheet_name=args.sheet,
-        corep_dir=args.corep_dir,
-        overwrite=args.overwrite,
+        config_path=CONFIG,
+        sheet_name=SHEET,
+        corep_dir=COREP_DIR,
+        overwrite=OVERWRITE,
     )
     print(summary)
 
