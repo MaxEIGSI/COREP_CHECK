@@ -18,6 +18,7 @@ try:
         DEFAULT_BASED_TEMPLATE_SHEET,
         DEFAULT_COREP_DIR,
         DEFAULT_MAPPING_TABLE_PATH,
+        DEFAULT_QX_MAPPING_PATH,
         build_column_code_map,
         build_row_code_map,
         contains_template_hint,
@@ -35,6 +36,7 @@ except ModuleNotFoundError:
         DEFAULT_BASED_TEMPLATE_SHEET,
         DEFAULT_COREP_DIR,
         DEFAULT_MAPPING_TABLE_PATH,
+        DEFAULT_QX_MAPPING_PATH,
         build_column_code_map,
         build_row_code_map,
         contains_template_hint,
@@ -48,6 +50,26 @@ except ModuleNotFoundError:
 
 INTERVAL_TOLERANCE = 1e-6
 AGG_FUNCS = {"sum", "count", "max", "min"}
+_QX_CODE_RE = re.compile(r"^qx\d+$", re.IGNORECASE)
+
+
+def load_qx_sheet_mapping(path: str | Path) -> Dict[str, str]:
+    """Load 'Mapping onglets COREP.xlsx' and return {old_format: new_format}."""
+    p = Path(path)
+    if not p.exists():
+        return {}
+    df = pd.read_excel(p)
+    if df.empty:
+        return {}
+    old_col = next((c for c in df.columns if "old" in c.lower()), None)
+    new_col = next((c for c in df.columns if "new" in c.lower()), None)
+    if old_col is None or new_col is None:
+        return {}
+    return {
+        str(row[old_col]).strip().lower(): str(row[new_col]).strip()
+        for _, row in df.iterrows()
+        if pd.notna(row[old_col]) and pd.notna(row[new_col])
+    }
 
 
 @dataclass(frozen=True)
@@ -85,6 +107,7 @@ class RuleDetail:
     message: str = ""
     formula_values: Optional[Dict[str, Any]] = None
     precondition_values: Optional[Dict[str, Any]] = None
+    evaluation_trace: str = ""
 
 
 @dataclass
@@ -108,6 +131,7 @@ class RuleResult:
                     "message": detail.message,
                     "formula_values": detail.formula_values or {},
                     "precondition_values": detail.precondition_values or {},
+                    "evaluation_trace": detail.evaluation_trace,
                 }
                 for detail in self.details
             ],
@@ -497,12 +521,14 @@ class CorepDataRepository:
         self,
         corep_dir: str | Path = DEFAULT_COREP_DIR,
         mapping_table_path: str | Path = DEFAULT_MAPPING_TABLE_PATH,
+        qx_mapping_path: str | Path = DEFAULT_QX_MAPPING_PATH,
     ):
         self.corep_dir = Path(corep_dir)
         self.mapping_table_path = Path(mapping_table_path)
         self._workbooks: Dict[str, openpyxl.Workbook] = {}
         self._sheet_context: Dict[Tuple[str, str], SheetContext] = {}
         self._table_sheet_mapping = load_table_sheet_mapping(self.mapping_table_path)
+        self._qx_sheet_mapping: Dict[str, str] = load_qx_sheet_mapping(qx_mapping_path)
 
     def workbook_for_template(self, template: str) -> openpyxl.Workbook:
         norm = normalize_template_id(template)
@@ -521,6 +547,14 @@ class CorepDataRepository:
                 return matched
 
         return resolve_sheet_for_table_generic(self.workbook_for_template(template), template, table)
+
+    def resolve_qx_sheet(self, template: str, qx_code: str) -> Optional[str]:
+        """Translate a qx#### code to the real worksheet name via the mapping file."""
+        new_name = self._qx_sheet_mapping.get(qx_code.lower())
+        if new_name is None:
+            return None
+        wb = self.workbook_for_template(template)
+        return _match_sheet_name(wb, new_name)
 
     def all_sheets(self, template: str) -> List[str]:
         return [ws.title for ws in self.workbook_for_template(template).worksheets]
@@ -595,6 +629,10 @@ class InMemoryCorepDataRepository:
         if not sheets:
             raise RuleEngineError(f"No sheets found for template {template}")
         return sheets
+
+    def resolve_qx_sheet(self, template: str, qx_code: str) -> Optional[str]:
+        """In-memory repository: no qx mapping available, return None."""
+        return None
 
     def context(self, template: str, sheet: str) -> SheetContext:
         key = (normalize_template_id(template), str(sheet))
@@ -969,7 +1007,11 @@ class ValueResolver:
 
     def _selected_sheets(self, template: str, table: str, base_sheet: str, ref: RefSpec) -> List[str]:
         if ref.sheet is not None:
-            return [ref.sheet]
+            sheet_name = ref.sheet
+            if _QX_CODE_RE.match(sheet_name):
+                resolved = self.repository.resolve_qx_sheet(template, sheet_name)
+                sheet_name = resolved if resolved is not None else sheet_name
+            return [sheet_name]
 
         available = self.repository.all_sheets(template)
         if ref.include_sheet_pattern is None:
@@ -1203,6 +1245,53 @@ class AstEvaluator:
         raise RuleEngineError("Unsupported comparison operator")
 
 
+def _comparison_operator_symbol(operator: ast.cmpop) -> Optional[str]:
+    if isinstance(operator, ast.Eq):
+        return "=="
+    if isinstance(operator, ast.NotEq):
+        return "!="
+    if isinstance(operator, ast.Gt):
+        return ">"
+    if isinstance(operator, ast.GtE):
+        return ">="
+    if isinstance(operator, ast.Lt):
+        return "<"
+    if isinstance(operator, ast.LtE):
+        return "<="
+    if isinstance(operator, ast.In):
+        return "in"
+    if isinstance(operator, ast.NotIn):
+        return "not in"
+    return None
+
+
+def _format_trace_value(value: Any) -> str:
+    if isinstance(value, float) and value.is_integer():
+        return str(int(value))
+    if isinstance(value, list):
+        try:
+            return str([_format_trace_value(item) for item in value])
+        except Exception:
+            return str(value)
+    return str(value)
+
+
+def _build_evaluation_trace(node: ast.AST, evaluator: AstEvaluator, env: Dict[str, Any]) -> str:
+    if not isinstance(node, ast.Compare):
+        return ""
+
+    left_value = evaluator.evaluate(node.left, env)
+    pieces: List[str] = [_format_trace_value(left_value)]
+    for operator, comparator in zip(node.ops, node.comparators):
+        right_value = evaluator.evaluate(comparator, env)
+        symbol = _comparison_operator_symbol(operator)
+        if symbol is None:
+            return ""
+        pieces.append(symbol)
+        pieces.append(_format_trace_value(right_value))
+    return " ".join(pieces)
+
+
 class RuleEvaluator:
     def __init__(self, repository: Any, tolerance: float = INTERVAL_TOLERANCE):
         self.repository = repository
@@ -1430,10 +1519,12 @@ class RuleEvaluator:
                                 actual = evaluator.evaluate(formula_expr.ast_root, env)
                                 passed = bool(actual)
                                 message = ""
+                                evaluation_trace = _build_evaluation_trace(formula_expr.ast_root, evaluator, env)
                             except Exception as exc:
                                 actual = None
                                 passed = False
                                 message = f"Evaluation error: {exc}"
+                                evaluation_trace = ""
 
                             details.append(
                                 RuleDetail(
@@ -1450,6 +1541,7 @@ class RuleEvaluator:
                                     message=message,
                                     formula_values=formula_values,
                                     precondition_values=precondition_values,
+                                    evaluation_trace=evaluation_trace,
                                 )
                             )
                             if not passed:
