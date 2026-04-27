@@ -55,23 +55,93 @@ AGG_FUNCS = {"sum", "count", "max", "min"}
 _QX_CODE_RE = re.compile(r"^qx\d+$", re.IGNORECASE)
 
 
-def load_qx_sheet_mapping(path: str | Path) -> Dict[str, str]:
-    """Load 'Mapping onglets COREP.xlsx' and return {old_format: new_format}."""
+def load_formula_bt_mapping(path: str | Path) -> Dict[str, str]:
+    """Load the ``formula_4_BT`` sheet from ``Mapping onglets COREP.xlsx``.
+
+    Returns ``{formula_reference: business_term}`` e.g.
+    ``{'EBA:qCO(qx2000)': 'LEI'}``.
+    """
     p = Path(path)
     if not p.exists():
         return {}
-    df = read_excel_quiet(p)
+    try:
+        df = read_excel_quiet(p, sheet_name="formula_4_BT")
+    except Exception:
+        return {}
     if df.empty:
         return {}
-    old_col = next((c for c in df.columns if "old" in c.lower()), None)
-    new_col = next((c for c in df.columns if "new" in c.lower()), None)
-    if old_col is None or new_col is None:
+    cols_lower = {str(c).strip().lower(): c for c in df.columns}
+    ref_col = cols_lower.get("formula_reference")
+    bt_col = cols_lower.get("business_term")
+    if ref_col is None or bt_col is None:
         return {}
-    return {
-        str(row[old_col]).strip().lower(): str(row[new_col]).strip()
-        for _, row in df.iterrows()
-        if pd.notna(row[old_col]) and pd.notna(row[new_col])
-    }
+    mapping: Dict[str, str] = {}
+    for _, row in df.iterrows():
+        ref = row.get(ref_col)
+        bt = row.get(bt_col)
+        if pd.notna(ref) and pd.notna(bt):
+            mapping[str(ref).strip()] = str(bt).strip()
+    return mapping
+
+
+def load_qx_sheet_mapping(path: str | Path) -> Dict[str, str]:
+    """Load *all* relevant sheets from ``Mapping onglets COREP.xlsx`` and
+    return a unified ``{qx_code_lower: sheet_or_display_name}`` mapping.
+
+    Two sheet structures are handled:
+
+    * **Old-format / New-format sheets** (e.g. ``C0800``, ``C0700``):
+      columns ``Old format`` and ``New format``.  Returns ``{old.lower(): new}``.
+    * **Formula-reference / sheet-name sheets** (e.g. ``C3300``):
+      columns ``formula_reference`` and ``sheet_name``.
+      Returns ``{formula_reference.lower(): sheet_name}``.
+
+    Sheets that match neither pattern are silently skipped.
+    """
+    _SKIP = {"tables_mapping", "formula_4_bt"}
+    p = Path(path)
+    if not p.exists():
+        return {}
+    try:
+        wb_meta = pd.ExcelFile(str(p))
+    except Exception:
+        return {}
+
+    combined: Dict[str, str] = {}
+    for sheet_name in wb_meta.sheet_names:
+        if sheet_name.lower() in _SKIP:
+            continue
+        try:
+            df = read_excel_quiet(p, sheet_name=sheet_name)
+        except Exception:
+            continue
+        if df.empty:
+            continue
+
+        cols_lower = {str(c).strip().lower(): c for c in df.columns}
+
+        # C3300-style: formula_reference → sheet_name
+        if "formula_reference" in cols_lower and "sheet_name" in cols_lower:
+            ref_col = cols_lower["formula_reference"]
+            sn_col = cols_lower["sheet_name"]
+            for _, row in df.iterrows():
+                ref = row.get(ref_col)
+                sn = row.get(sn_col)
+                if pd.notna(ref) and pd.notna(sn):
+                    combined[str(ref).strip().lower()] = str(sn).strip()
+            continue
+
+        # Old-format / New-format style
+        old_col = next((cols_lower[c] for c in cols_lower if "old" in c), None)
+        new_col = next((cols_lower[c] for c in cols_lower if "new" in c), None)
+        if old_col is not None and new_col is not None:
+            for _, row in df.iterrows():
+                old = row.get(old_col)
+                new = row.get(new_col)
+                if pd.notna(old) and pd.notna(new):
+                    combined[str(old).strip().lower()] = str(new).strip()
+
+    return combined
 
 
 @dataclass(frozen=True)
@@ -233,7 +303,13 @@ def resolve_sheet_for_table_generic(
     table_template, suffix_letter = split_table_identifier(table_name)
     norm_template = normalize_template_id(template_code)
 
-    if normalize_template_id(table_template) != norm_template:
+    # Compare only the numeric portion of the template codes so that a table
+    # labelled "C16.01.A" can still be matched against a workbook loaded from
+    # "F16.01" (different letter prefix, same form number).
+    def _numeric_part(code: str) -> str:
+        return re.sub(r"^[A-Z]", "", code.upper())
+
+    if _numeric_part(normalize_template_id(table_template)) != _numeric_part(norm_template):
         raise RuleEngineError(f"Table {table_name} does not match template {template_code}")
     if suffix_letter is None:
         raise RuleEngineError(f"Table {table_name} has no suffix letter")
@@ -556,6 +632,7 @@ class CorepDataRepository:
         self._sheet_context: Dict[Tuple[str, str], SheetContext] = {}
         self._table_sheet_mapping = load_table_sheet_mapping(self.mapping_table_path)
         self._qx_sheet_mapping: Dict[str, str] = load_qx_sheet_mapping(qx_mapping_path)
+        self._formula_bt_mapping: Dict[str, str] = load_formula_bt_mapping(qx_mapping_path)
 
     def workbook_for_template(self, template: str) -> openpyxl.Workbook:
         norm = normalize_template_id(template)
@@ -794,6 +871,15 @@ class FormulaParser:
 
     def _normalize_operators(self, text: str) -> str:
         normalized = " ".join(text.replace("\n", " ").split())
+        # Quote unquoted EBA: references (e.g. EBA:qRP(qx2085) → 'EBA:qRP(qx2085)')
+        # These are XBRL/EBA dimension-member codes that appear as literal values
+        # in string comparisons.  They contain colons which are invalid Python
+        # syntax when left unquoted.
+        normalized = re.sub(
+            r"(?<!['\"])\b(EBA:[A-Za-z0-9_]+\([^)]*\))(?!['\"])",
+            lambda m: f"'{m.group(1)}'",
+            normalized,
+        )
         # filed(C24.00) → filed("C24.00")  (template IDs contain dots, not valid Python)
         normalized = re.sub(
             r"\bfiled\s*\(\s*([A-Za-z][A-Za-z0-9._]*)\s*\)",

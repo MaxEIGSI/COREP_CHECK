@@ -21,7 +21,7 @@ DATA_DIR = MODULE_DIR / "data"
 DEFAULT_COREP_DIR = DATA_DIR / "COREP_files"
 DEFAULT_BASED_TEMPLATE_PATH = DATA_DIR / "EGDQ_publication_2026.xlsx"
 DEFAULT_BASED_TEMPLATE_SHEET = "v4.2"
-DEFAULT_MAPPING_TABLE_PATH = DATA_DIR / "mapping_table.xlsx"
+DEFAULT_MAPPING_TABLE_PATH = DATA_DIR / "Mapping onglets COREP.xlsx"
 DEFAULT_QX_MAPPING_PATH   = DATA_DIR / "Mapping onglets COREP.xlsx"
 
 ALL_SENTINEL = "__ALL__"
@@ -91,11 +91,23 @@ def _find_mapped_sheet_value(mapping: Dict[str, str], table_key: str) -> Optiona
 def load_table_sheet_mapping(
     mapping_table_path: Optional[str | Path] = None,
 ) -> Dict[str, str]:
+    """Load the ``tables_mapping`` sheet from the mapping file.
+
+    The canonical source is ``Mapping onglets COREP.xlsx`` which contains a
+    dedicated ``tables_mapping`` worksheet with ``tables_input`` /
+    ``tables_output`` columns.  Falls back to reading the first sheet when the
+    named sheet is absent (backwards-compatibility with older files).
+    """
     path = resolve_mapping_table_path(mapping_table_path)
     if not path.exists():
         return {}
 
-    df = read_excel_quiet(path)
+    # Try reading the dedicated tables_mapping sheet first
+    try:
+        df = read_excel_quiet(path, sheet_name="tables_mapping")
+    except Exception:
+        df = read_excel_quiet(path)
+
     if df.empty:
         return {}
 
@@ -104,9 +116,9 @@ def load_table_sheet_mapping(
     input_col = None
     output_col = None
     for col, norm in normalized_cols.items():
-        if input_col is None and "input" in norm and "table" in norm:
+        if input_col is None and "input" in norm:
             input_col = col
-        if output_col is None and "output" in norm and ("table" in norm or "sheet" in norm):
+        if output_col is None and "output" in norm:
             output_col = col
 
     if input_col is None or output_col is None:
@@ -280,7 +292,14 @@ def contains_template_hint(text: str, template_code: str) -> bool:
     token2 = template_code.upper().replace(".", "")
     token3 = token1.replace("C", "C ")
     up = text.upper()
-    return token1 in up or token2 in up or token3 in up
+    if token1 in up or token2 in up or token3 in up:
+        return True
+    # Also match when the sheet uses a different letter prefix for the same
+    # numeric template (e.g. sheet header "F16.01" vs table code "C16.01").
+    numeric_part = re.sub(r"^[A-Z]", "", token1)  # e.g. "16.01" from "C16.01"
+    if numeric_part and re.search(r"[A-Z]" + re.escape(numeric_part) + r"(?!\d)", up):
+        return True
+    return False
 
 
 def resolve_sheet_for_table(
