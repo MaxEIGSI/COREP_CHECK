@@ -1135,6 +1135,65 @@ class TestC0602LengthFormula:
         assert status(run_rule(r, repo)) == "PASS"
 
 
+class TestRowsAllLengthFormula:
+    """
+    EGDQ_0124 pattern: Rows=All, Columns=empty, formula=length({c0021})=20.
+    The engine must iterate every row in the sheet and check c0021 on each.
+    """
+
+    def test_rows_all_all_pass(self) -> None:
+        """Rows=All, columns empty: all rows have 20-char c0021 → PASS."""
+        val = "A" * 20
+        repo = _c0602_repo(("0021", [val, val, val]))
+        r = make_rule(
+            template="C06.02",
+            tables="C06.02",
+            rows="All",
+            cols=None,
+            formula="length({c0021}) = 20",
+        )
+        result = run_rule(r, repo)
+        assert status(result) == "PASS", result
+        assert len(result["details"]) == 3, "should evaluate one detail per row"
+        assert all(passed_flags(result))
+
+    def test_rows_all_one_fail(self) -> None:
+        """Rows=All: second row has wrong length → FAIL, 3 details."""
+        repo = _c0602_repo(("0021", ["A" * 20, "B" * 15, "C" * 20]))
+        r = make_rule(
+            template="C06.02",
+            tables="C06.02",
+            rows="All",
+            cols=None,
+            formula="length({c0021}) = 20",
+        )
+        result = run_rule(r, repo)
+        assert status(result) == "FAIL"
+        assert len(result["details"]) == 3
+        flags = passed_flags(result)
+        assert flags[0] is True
+        assert flags[1] is False
+        assert flags[2] is True
+
+    def test_rows_all_not_skipped(self) -> None:
+        """Rows=All must never be SKIPPED even with a precondition."""
+        val = "A" * 20
+        repo = _c0602_repo(
+            ("0021", [val, val, val]),
+            ("0026", ["X", "X", "X"]),
+        )
+        r = make_rule(
+            template="C06.02",
+            tables="C06.02",
+            rows="All",
+            cols=None,
+            formula="length({c0021}) = 20",
+            pre="{c0026} != empty",
+        )
+        result = run_rule(r, repo)
+        assert status(result) != "SKIPPED", "Rows=All should never be SKIPPED"
+
+
 class TestC0602WildcardLessThan:
     """Formula: {c0021}(*) < 1  (all rows, wildcard on c0021)"""
 

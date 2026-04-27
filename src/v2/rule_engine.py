@@ -904,21 +904,34 @@ class DimensionResolver:
             return [template]
 
         out: List[str] = []
+        template_mentioned = False
         for token in tokens:
             normalized = str(token).strip().upper()
             if normalized == ALL_SENTINEL:
                 continue
+            # Check whether this token refers to the template itself
+            try:
+                if normalize_template_id(normalized) == template:
+                    template_mentioned = True
+            except Exception:
+                pass
+            # Check whether this token is a sheet-level sub-table of the template
             if re.fullmatch(r"[A-Z]\d{2}\.\d{2}\.[A-Z]+", normalized) and normalized.startswith(template):
                 out.append(normalized)
 
-        return out or [template]
+        if out:
+            return out
+        # Explicit tokens were given but none reference this template → skip it
+        if template_mentioned:
+            return [template]
+        return []
 
     def _parse_axis(self, value: Any) -> Optional[List[str]]:
         tokens = parse_selector(value)
         if not tokens:
             return None
         if ALL_SENTINEL in tokens:
-            return None
+            return []  # empty list = explicit "All" (iterate every entry in context)
 
         out: List[str] = []
         for token in tokens:
@@ -1647,6 +1660,7 @@ class RuleEvaluator:
         axis_prefix: Optional[str] = None,
     ) -> List[Optional[str]]:
         if selected is None:
+            # Unspecified axis: use anchor, alias, or single None coordinate
             if anchor is not None and anchor in context_map:
                 axis: List[Optional[str]] = [anchor]
             elif alias_map is not None and axis_prefix is not None:
@@ -1658,6 +1672,9 @@ class RuleEvaluator:
                 axis = list(dict.fromkeys(alias_values))
             else:
                 axis = list(context_map.keys())
+        elif not selected:
+            # Explicitly "All" (e.g. Rows=All) → iterate every entry in context
+            axis = list(context_map.keys())
         else:
             axis = [code for code in selected if code in context_map]
         return axis or [None]
