@@ -249,6 +249,9 @@ class SheetContext:
     dataframe: pd.DataFrame
     row_map: Dict[str, int]
     col_map: Dict[str, Any]
+    # When col_map is empty the sheet has a single value column; default_col
+    # points to that column's label so row-only lookups still work.
+    default_col: Any = None
 
 
 class RuleEngineError(Exception):
@@ -425,6 +428,33 @@ def _match_sheet_name(wb: openpyxl.Workbook, mapped_name: str) -> Optional[str]:
             return sheet
 
     return None
+
+
+def _find_value_column(df: pd.DataFrame) -> Any:
+    """Return the label of the single value column for sheets without a column header row.
+
+    Heuristic: pick the **rightmost** column whose data rows contain at least
+    one non-None, non-text (i.e. numeric-looking) value.  This skips typical
+    left-side label columns (Rows, ID, Item, ...) in favour of the
+    numeric-amount column.
+    """
+    # Walk columns right-to-left looking for a numeric value in any data row
+    for col_pos in range(len(df.columns) - 1, -1, -1):
+        col = df.columns[col_pos]
+        for row_idx in df.index:
+            val = df.iat[row_idx, col_pos]
+            if val is None:
+                continue
+            if isinstance(val, (int, float)) and not isinstance(val, bool):
+                return col
+            # Accept numeric strings too
+            try:
+                float(str(val).strip())
+                return col
+            except (ValueError, TypeError):
+                pass
+    # Fallback: last column
+    return df.columns[-1] if not df.empty else None
 
 
 def is_empty(value: Any) -> bool:
@@ -670,7 +700,13 @@ class CorepDataRepository:
             df = worksheet_to_dataframe(ws)
             row_map = {k.zfill(4): v for k, v in build_row_code_map(df).items()}
             col_map = {k.zfill(4): v for k, v in build_column_code_map(df).items()}
-            self._sheet_context[key] = SheetContext(df, row_map, col_map)
+            # If no column header row found → single-value-column sheet.
+            # Use the rightmost column that contains at least one non-None value
+            # (skipping pure row-label / ID columns on the left).
+            default_col: Any = None
+            if not col_map and not df.empty:
+                default_col = _find_value_column(df)
+            self._sheet_context[key] = SheetContext(df, row_map, col_map, default_col)
         return self._sheet_context[key]
 
 
@@ -709,7 +745,10 @@ class InMemoryCorepDataRepository:
                 self._template_sheets[template].append(sheet)
                 row_map = {k.zfill(4): v for k, v in build_row_code_map(frame).items()}
                 col_map = {k.zfill(4): v for k, v in build_column_code_map(frame).items()}
-                self._sheet_context[(template, sheet)] = SheetContext(frame, row_map, col_map)
+                default_col: Any = None
+                if not col_map and not frame.empty:
+                    default_col = _find_value_column(frame)
+                self._sheet_context[(template, sheet)] = SheetContext(frame, row_map, col_map, default_col)
 
             self._template_sheets[template] = sorted(set(self._template_sheets[template]))
 
@@ -1101,6 +1140,12 @@ class ValueResolver:
         row_idx = context.row_map.get(coord.row)
         col_idx = context.col_map.get(coord.column)
 
+        # Single-value-column fallback: when the sheet has no column-code
+        # dimension (col_map is empty), ignore the column coordinate entirely
+        # and use the pre-computed default_col.
+        if col_idx is None and not context.col_map and context.default_col is not None:
+            col_idx = context.default_col
+
         if row_idx is None and col_idx is None:
             return MissingRef(
                 row=coord.row,
@@ -1169,7 +1214,12 @@ class ValueResolver:
         for sheet in sheets:
             context = self.repository.context(template, sheet)
             rows = list(context.row_map.keys()) if expand_rows else [row]
-            cols = list(context.col_map.keys()) if expand_cols else [column]
+            # Single-value-column sheet: col_map is empty; use [None] as the
+            # only "column" so _read_value can fall back to default_col.
+            if expand_cols:
+                cols = list(context.col_map.keys()) if context.col_map else [None]
+            else:
+                cols = [column]
 
             for row_code, col_code in product(rows, cols):
                 values.append(

@@ -396,16 +396,59 @@ def build_row_code_map(df: pd.DataFrame, search_cols: int = 10) -> Dict[str, int
 
 
 def build_column_code_map(df: pd.DataFrame, header_rows: int = 20) -> Dict[str, Any]:
+    """Build a mapping of column codes (e.g. '0010') to DataFrame column labels.
+
+    A column header row is identified as a row where:
+    - All non-None cells contain valid numeric axis codes (no descriptive text),
+    - AND at least 2 such codes appear in distinct columns.
+
+    This ensures that data rows with mixed text/number values (e.g. row-label,
+    ID, description, amount) are never mistaken for column header rows.
+
+    Returns an empty dict when no column-header row is found, signalling to the
+    caller that the sheet has only one value column (no CXXXX column dimension).
+    """
     col_map: Dict[str, Any] = {}
     max_rows = min(header_rows, len(df.index))
+    n_cols = len(df.columns)
 
-    for col_position, col in enumerate(df.columns):
-        for row_idx in range(max_rows):
-            value = df.iat[row_idx, col_position]
-            normalized_code = normalize_axis_code(value)
-            if normalized_code is not None:
-                col_map[normalized_code] = col
+    header_row_idx: Optional[int] = None
+    for row_idx in range(max_rows):
+        codes_found: List[Tuple[int, str]] = []   # (col_position, code)
+        has_non_code_value = False
+
+        for col_pos in range(n_cols):
+            val = df.iat[row_idx, col_pos]
+            if val is None:
+                continue
+            # openpyxl / pandas may represent empty cells as NaN
+            try:
+                import math as _math
+                if isinstance(val, float) and _math.isnan(val):
+                    continue
+            except (TypeError, ValueError):
+                pass
+            code = normalize_axis_code(val)
+            if code is not None:
+                codes_found.append((col_pos, code))
+            else:
+                # A non-empty, non-numeric cell means this is NOT a pure header row
+                has_non_code_value = True
                 break
+
+        if not has_non_code_value and len(codes_found) >= 2:
+            header_row_idx = row_idx
+            break
+
+    if header_row_idx is None:
+        return {}
+
+    # Build the map using that header row only.
+    for col_position, col in enumerate(df.columns):
+        value = df.iat[header_row_idx, col_position]
+        normalized_code = normalize_axis_code(value)
+        if normalized_code is not None:
+            col_map[normalized_code] = col
 
     return col_map
 

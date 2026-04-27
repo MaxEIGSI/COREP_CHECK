@@ -3434,7 +3434,7 @@
   },
   {
     "rule_id": "EGDQ_0301a",
-    "status": "FAIL",
+    "status": "ERROR",
     "reason": null,
     "details": [
       {
@@ -3442,118 +3442,110 @@
           "C73.00",
           "C73.00.A",
           "1180",
-          "0050",
+          null,
           "C73.00.a"
         ],
         "expected": true,
-        "actual": false,
+        "actual": "MISSING(row=0140, col=0050, sheet=C73.00.a: column '0050' not found in sheet 'C73.00.a')",
         "passed": false,
-        "message": "",
+        "message": "ERROR: column '0050' not found in sheet 'C73.00.a'",
         "formula_values": {
-          "{r=0140, c=0050}": 85.0,
-          "{r=0150, c=0050}": 86.0,
-          "{r=1180, c=0050}": 90.0
+          "{r=0140, c=0050}": "MISSING(row=0140, col=0050, sheet=C73.00.a: column '0050' not found in sheet 'C73.00.a')",
+          "{r=0150, c=0050}": "MISSING(row=0150, col=0050, sheet=C73.00.a: column '0050' not found in sheet 'C73.00.a')",
+          "{r=1180, c=0050}": "MISSING(row=1180, col=0050, sheet=C73.00.a: column '0050' not found in sheet 'C73.00.a')"
         },
-        "precondition_values": {
-          "{r=1180, c=0050}": 90.0
-        },
-        "evaluation_trace": "86 >= 90",
-        "formula_with_values": "max(85,86) >= 90",
-        "precondition_with_values": "90 != empty",
-        "comparison_left": "max(85, 86)",
-        "comparison_operator": ">=",
-        "comparison_right": "90",
-        "comparison_display": "max(85, 86) >= 90"
+        "precondition_values": {},
+        "evaluation_trace": "",
+        "formula_with_values": "max(MISSING(row=0140, col=0050, sheet=C73.00.a: column '0050' not found in sheet 'C73.00.a'),MISSING(row=0150, col=0050, sheet=C73.00.a: column '0050' not found in sheet 'C73.00.a')) >= MISSING(row=1180, col=0050, sheet=C73.00.a: column '0050' not found in sheet 'C73.00.a')",
+        "precondition_with_values": "",
+        "comparison_left": "",
+        "comparison_operator": "",
+        "comparison_right": "",
+        "comparison_display": ""
       },
       {
         "coordinates": [
           "C73.00",
           "C73.00.A",
           "1190",
-          "0050",
+          null,
           "C73.00.a"
         ],
         "expected": true,
-        "actual": false,
+        "actual": "MISSING(row=0140, col=0050, sheet=C73.00.a: column '0050' not found in sheet 'C73.00.a')",
         "passed": false,
-        "message": "",
+        "message": "ERROR: column '0050' not found in sheet 'C73.00.a'",
         "formula_values": {
-          "{r=0140, c=0050}": 85.0,
-          "{r=0150, c=0050}": 86.0,
-          "{r=1190, c=0050}": 91.0
+          "{r=0140, c=0050}": "MISSING(row=0140, col=0050, sheet=C73.00.a: column '0050' not found in sheet 'C73.00.a')",
+          "{r=0150, c=0050}": "MISSING(row=0150, col=0050, sheet=C73.00.a: column '0050' not found in sheet 'C73.00.a')",
+          "{r=1190, c=0050}": "MISSING(row=1190, col=0050, sheet=C73.00.a: column '0050' not found in sheet 'C73.00.a')"
         },
-        "precondition_values": {
-          "{r=1190, c=0050}": 91.0
-        },
-        "evaluation_trace": "86 >= 91",
-        "formula_with_values": "max(85,86) >= 91",
-        "precondition_with_values": "91 != empty",
-        "comparison_left": "max(85, 86)",
-        "comparison_operator": ">=",
-        "comparison_right": "91",
-        "comparison_display": "max(85, 86) >= 91"
+        "precondition_values": {},
+        "evaluation_trace": "",
+        "formula_with_values": "max(MISSING(row=0140, col=0050, sheet=C73.00.a: column '0050' not found in sheet 'C73.00.a'),MISSING(row=0150, col=0050, sheet=C73.00.a: column '0050' not found in sheet 'C73.00.a')) >= MISSING(row=1190, col=0050, sheet=C73.00.a: column '0050' not found in sheet 'C73.00.a')",
+        "precondition_with_values": "",
+        "comparison_left": "",
+        "comparison_operator": "",
+        "comparison_right": "",
+        "comparison_display": ""
       },
       {
         "coordinates": [
           "C73.00",
           "C73.00.A",
           "1200",
-          "0050",
+          null,
           "C73.00.a"
         ],
         "expected": true,
-        "actual": true,
-        "passed": true,
-        "message": "",
+        "actual": "MISSING(row=0140, col=0050, sheet=C73.00.a: column '0050' not found in sheet 'C73.00.a')",
+        "passed": false,
+        "message": "ERROR: column '0050' not found in sheet 'C73.00.a'",
         "formula_values": {
-          "{r=0140, c=0050}": 85.0,
-          "{r=0150, c=0050}": 86.0,
-          "{r=1200, c=0050}": 83.0
+          "{r=0140, c=0050}": "MISSING(row=0140, col=0050, sheet=C73.00.a: column '0050' not found in sheet 'C73.00.a')",
+          "{r=0150, c=0050}": "MISSING(row=0150, col=0050, sheet=C73.00.a: column '0050' not found in sheet 'C73.00.a')",
+          "{r=1200, c=0050}": "MISSING(row=1200, col=0050, sheet=C73.00.a: column '0050' not found in sheet 'C73.00.a')"
         },
-        "precondition_values": {
-          "{r=1200, c=0050}": 83.0
-        },
-        "evaluation_trace": "86 >= 83",
-        "formula_with_values": "max(85,86) >= 83",
-        "precondition_with_values": "83 != empty",
-        "comparison_left": "max(85, 86)",
-        "comparison_operator": ">=",
-        "comparison_right": "83",
-        "comparison_display": "max(85, 86) >= 83"
+        "precondition_values": {},
+        "evaluation_trace": "",
+        "formula_with_values": "max(MISSING(row=0140, col=0050, sheet=C73.00.a: column '0050' not found in sheet 'C73.00.a'),MISSING(row=0150, col=0050, sheet=C73.00.a: column '0050' not found in sheet 'C73.00.a')) >= MISSING(row=1200, col=0050, sheet=C73.00.a: column '0050' not found in sheet 'C73.00.a')",
+        "precondition_with_values": "",
+        "comparison_left": "",
+        "comparison_operator": "",
+        "comparison_right": "",
+        "comparison_display": ""
       },
       {
         "coordinates": [
           "C73.00",
           "C73.00.A",
           "1210",
-          "0050",
+          null,
           "C73.00.a"
         ],
         "expected": true,
-        "actual": true,
-        "passed": true,
-        "message": "",
+        "actual": "MISSING(row=0140, col=0050, sheet=C73.00.a: column '0050' not found in sheet 'C73.00.a')",
+        "passed": false,
+        "message": "ERROR: column '0050' not found in sheet 'C73.00.a'",
         "formula_values": {
-          "{r=0140, c=0050}": 85.0,
-          "{r=0150, c=0050}": 86.0,
-          "{r=1210, c=0050}": 84.0
+          "{r=0140, c=0050}": "MISSING(row=0140, col=0050, sheet=C73.00.a: column '0050' not found in sheet 'C73.00.a')",
+          "{r=0150, c=0050}": "MISSING(row=0150, col=0050, sheet=C73.00.a: column '0050' not found in sheet 'C73.00.a')",
+          "{r=1210, c=0050}": "MISSING(row=1210, col=0050, sheet=C73.00.a: column '0050' not found in sheet 'C73.00.a')"
         },
-        "precondition_values": {
-          "{r=1210, c=0050}": 84.0
-        },
-        "evaluation_trace": "86 >= 84",
-        "formula_with_values": "max(85,86) >= 84",
-        "precondition_with_values": "84 != empty",
-        "comparison_left": "max(85, 86)",
-        "comparison_operator": ">=",
-        "comparison_right": "84",
-        "comparison_display": "max(85, 86) >= 84"
+        "precondition_values": {},
+        "evaluation_trace": "",
+        "formula_with_values": "max(MISSING(row=0140, col=0050, sheet=C73.00.a: column '0050' not found in sheet 'C73.00.a'),MISSING(row=0150, col=0050, sheet=C73.00.a: column '0050' not found in sheet 'C73.00.a')) >= MISSING(row=1210, col=0050, sheet=C73.00.a: column '0050' not found in sheet 'C73.00.a')",
+        "precondition_with_values": "",
+        "comparison_left": "",
+        "comparison_operator": "",
+        "comparison_right": "",
+        "comparison_display": ""
       }
     ]
   },
   {
     "rule_id": "EGDQ_0301b",
-    "status": "FAIL",
+    "status": "ERROR",
     "reason": null,
     "details": [
       {
@@ -3561,112 +3553,104 @@
           "C73.00",
           "C73.00.W",
           "1180",
-          "0050",
+          null,
           "C73.00.w"
         ],
         "expected": true,
-        "actual": false,
+        "actual": "MISSING(row=0140, col=0050, sheet=C73.00.w: column '0050' not found in sheet 'C73.00.w')",
         "passed": false,
-        "message": "",
+        "message": "ERROR: column '0050' not found in sheet 'C73.00.w'",
         "formula_values": {
-          "{r=0140, c=0050}": 10.0,
-          "{r=0150, c=0050}": 11.0,
-          "{r=1180, c=0050}": 15.0
+          "{r=0140, c=0050}": "MISSING(row=0140, col=0050, sheet=C73.00.w: column '0050' not found in sheet 'C73.00.w')",
+          "{r=0150, c=0050}": "MISSING(row=0150, col=0050, sheet=C73.00.w: column '0050' not found in sheet 'C73.00.w')",
+          "{r=1180, c=0050}": "MISSING(row=1180, col=0050, sheet=C73.00.w: column '0050' not found in sheet 'C73.00.w')"
         },
-        "precondition_values": {
-          "{r=1180, c=0050}": 15.0
-        },
-        "evaluation_trace": "11 >= 15",
-        "formula_with_values": "max(10,11) >= 15",
-        "precondition_with_values": "15 != empty",
-        "comparison_left": "max(10, 11)",
-        "comparison_operator": ">=",
-        "comparison_right": "15",
-        "comparison_display": "max(10, 11) >= 15"
+        "precondition_values": {},
+        "evaluation_trace": "",
+        "formula_with_values": "max(MISSING(row=0140, col=0050, sheet=C73.00.w: column '0050' not found in sheet 'C73.00.w'),MISSING(row=0150, col=0050, sheet=C73.00.w: column '0050' not found in sheet 'C73.00.w')) >= MISSING(row=1180, col=0050, sheet=C73.00.w: column '0050' not found in sheet 'C73.00.w')",
+        "precondition_with_values": "",
+        "comparison_left": "",
+        "comparison_operator": "",
+        "comparison_right": "",
+        "comparison_display": ""
       },
       {
         "coordinates": [
           "C73.00",
           "C73.00.W",
           "1190",
-          "0050",
+          null,
           "C73.00.w"
         ],
         "expected": true,
-        "actual": false,
+        "actual": "MISSING(row=0140, col=0050, sheet=C73.00.w: column '0050' not found in sheet 'C73.00.w')",
         "passed": false,
-        "message": "",
+        "message": "ERROR: column '0050' not found in sheet 'C73.00.w'",
         "formula_values": {
-          "{r=0140, c=0050}": 10.0,
-          "{r=0150, c=0050}": 11.0,
-          "{r=1190, c=0050}": 16.0
+          "{r=0140, c=0050}": "MISSING(row=0140, col=0050, sheet=C73.00.w: column '0050' not found in sheet 'C73.00.w')",
+          "{r=0150, c=0050}": "MISSING(row=0150, col=0050, sheet=C73.00.w: column '0050' not found in sheet 'C73.00.w')",
+          "{r=1190, c=0050}": "MISSING(row=1190, col=0050, sheet=C73.00.w: column '0050' not found in sheet 'C73.00.w')"
         },
-        "precondition_values": {
-          "{r=1190, c=0050}": 16.0
-        },
-        "evaluation_trace": "11 >= 16",
-        "formula_with_values": "max(10,11) >= 16",
-        "precondition_with_values": "16 != empty",
-        "comparison_left": "max(10, 11)",
-        "comparison_operator": ">=",
-        "comparison_right": "16",
-        "comparison_display": "max(10, 11) >= 16"
+        "precondition_values": {},
+        "evaluation_trace": "",
+        "formula_with_values": "max(MISSING(row=0140, col=0050, sheet=C73.00.w: column '0050' not found in sheet 'C73.00.w'),MISSING(row=0150, col=0050, sheet=C73.00.w: column '0050' not found in sheet 'C73.00.w')) >= MISSING(row=1190, col=0050, sheet=C73.00.w: column '0050' not found in sheet 'C73.00.w')",
+        "precondition_with_values": "",
+        "comparison_left": "",
+        "comparison_operator": "",
+        "comparison_right": "",
+        "comparison_display": ""
       },
       {
         "coordinates": [
           "C73.00",
           "C73.00.W",
           "1200",
-          "0050",
+          null,
           "C73.00.w"
         ],
         "expected": true,
-        "actual": true,
-        "passed": true,
-        "message": "",
+        "actual": "MISSING(row=0140, col=0050, sheet=C73.00.w: column '0050' not found in sheet 'C73.00.w')",
+        "passed": false,
+        "message": "ERROR: column '0050' not found in sheet 'C73.00.w'",
         "formula_values": {
-          "{r=0140, c=0050}": 10.0,
-          "{r=0150, c=0050}": 11.0,
-          "{r=1200, c=0050}": 8.0
+          "{r=0140, c=0050}": "MISSING(row=0140, col=0050, sheet=C73.00.w: column '0050' not found in sheet 'C73.00.w')",
+          "{r=0150, c=0050}": "MISSING(row=0150, col=0050, sheet=C73.00.w: column '0050' not found in sheet 'C73.00.w')",
+          "{r=1200, c=0050}": "MISSING(row=1200, col=0050, sheet=C73.00.w: column '0050' not found in sheet 'C73.00.w')"
         },
-        "precondition_values": {
-          "{r=1200, c=0050}": 8.0
-        },
-        "evaluation_trace": "11 >= 8",
-        "formula_with_values": "max(10,11) >= 8",
-        "precondition_with_values": "8 != empty",
-        "comparison_left": "max(10, 11)",
-        "comparison_operator": ">=",
-        "comparison_right": "8",
-        "comparison_display": "max(10, 11) >= 8"
+        "precondition_values": {},
+        "evaluation_trace": "",
+        "formula_with_values": "max(MISSING(row=0140, col=0050, sheet=C73.00.w: column '0050' not found in sheet 'C73.00.w'),MISSING(row=0150, col=0050, sheet=C73.00.w: column '0050' not found in sheet 'C73.00.w')) >= MISSING(row=1200, col=0050, sheet=C73.00.w: column '0050' not found in sheet 'C73.00.w')",
+        "precondition_with_values": "",
+        "comparison_left": "",
+        "comparison_operator": "",
+        "comparison_right": "",
+        "comparison_display": ""
       },
       {
         "coordinates": [
           "C73.00",
           "C73.00.W",
           "1210",
-          "0050",
+          null,
           "C73.00.w"
         ],
         "expected": true,
-        "actual": true,
-        "passed": true,
-        "message": "",
+        "actual": "MISSING(row=0140, col=0050, sheet=C73.00.w: column '0050' not found in sheet 'C73.00.w')",
+        "passed": false,
+        "message": "ERROR: column '0050' not found in sheet 'C73.00.w'",
         "formula_values": {
-          "{r=0140, c=0050}": 10.0,
-          "{r=0150, c=0050}": 11.0,
-          "{r=1210, c=0050}": 9.0
+          "{r=0140, c=0050}": "MISSING(row=0140, col=0050, sheet=C73.00.w: column '0050' not found in sheet 'C73.00.w')",
+          "{r=0150, c=0050}": "MISSING(row=0150, col=0050, sheet=C73.00.w: column '0050' not found in sheet 'C73.00.w')",
+          "{r=1210, c=0050}": "MISSING(row=1210, col=0050, sheet=C73.00.w: column '0050' not found in sheet 'C73.00.w')"
         },
-        "precondition_values": {
-          "{r=1210, c=0050}": 9.0
-        },
-        "evaluation_trace": "11 >= 9",
-        "formula_with_values": "max(10,11) >= 9",
-        "precondition_with_values": "9 != empty",
-        "comparison_left": "max(10, 11)",
-        "comparison_operator": ">=",
-        "comparison_right": "9",
-        "comparison_display": "max(10, 11) >= 9"
+        "precondition_values": {},
+        "evaluation_trace": "",
+        "formula_with_values": "max(MISSING(row=0140, col=0050, sheet=C73.00.w: column '0050' not found in sheet 'C73.00.w'),MISSING(row=0150, col=0050, sheet=C73.00.w: column '0050' not found in sheet 'C73.00.w')) >= MISSING(row=1210, col=0050, sheet=C73.00.w: column '0050' not found in sheet 'C73.00.w')",
+        "precondition_with_values": "",
+        "comparison_left": "",
+        "comparison_operator": "",
+        "comparison_right": "",
+        "comparison_display": ""
       }
     ]
   },
@@ -19056,7 +19040,7 @@
   },
   {
     "rule_id": "EGDQ_0541",
-    "status": "ERROR",
+    "status": "FAIL",
     "reason": null,
     "details": [
       {
@@ -19065,23 +19049,27 @@
           "C01.00",
           "0010",
           null,
-          "1"
+          "C0100"
         ],
         "expected": true,
-        "actual": "MISSING(row=0010, col=0090, sheet=1: column '0090' not found in sheet '1')",
-        "passed": false,
-        "message": "ERROR: column '0090' not found in sheet '1'",
+        "actual": true,
+        "passed": true,
+        "message": "",
         "formula_values": {
-          "{r=0010, c=0090}": "MISSING(row=0010, col=0090, sheet=1: column '0090' not found in sheet '1')"
+          "{r=0010, c=0090}": 10
         },
-        "precondition_values": {},
-        "evaluation_trace": "",
-        "formula_with_values": "MISSING(row=0010, col=0090, sheet=1: column '0090' not found in sheet '1') > 0",
-        "precondition_with_values": "",
-        "comparison_left": "",
-        "comparison_operator": "",
-        "comparison_right": "",
-        "comparison_display": ""
+        "precondition_values": {
+          "{r=0010, c=0060}": 10,
+          "{r=0010, c=0070}": 10,
+          "{r=0010, c=0010}": 10
+        },
+        "evaluation_trace": "10 > 0",
+        "formula_with_values": "10 > 0",
+        "precondition_with_values": "10+10 > 0.02 * 10",
+        "comparison_left": "10",
+        "comparison_operator": ">",
+        "comparison_right": "0",
+        "comparison_display": "10 > 0"
       },
       {
         "coordinates": [
@@ -26420,13 +26408,13 @@
           "C01.00",
           "C01.00",
           "0010",
-          "0010",
-          "1"
+          null,
+          "C0100"
         ],
         "expected": true,
         "actual": null,
         "passed": false,
-        "message": "Reference resolution error: 'Worksheet 1 does not exist.'",
+        "message": "Reference resolution error: 'Worksheet C0100 does not exist.'",
         "formula_values": {},
         "precondition_values": {},
         "evaluation_trace": "",
@@ -26450,11 +26438,11 @@
         "passed": false,
         "message": "Reference resolution error: 'Worksheet C26.00.a does not exist.'",
         "formula_values": {
-          "{r=0010, c=0010}": 73.0
+          "{r=0010, c=0010}": 10
         },
         "precondition_values": {},
         "evaluation_trace": "",
-        "formula_with_values": "73 <= 0.25 * None",
+        "formula_with_values": "10 <= 0.25 * None",
         "precondition_with_values": "",
         "comparison_left": "",
         "comparison_operator": "",
@@ -26473,13 +26461,13 @@
           "C01.00",
           "C01.00",
           "0030",
-          "0010",
-          "1"
+          null,
+          "C0100"
         ],
         "expected": true,
         "actual": null,
         "passed": false,
-        "message": "Reference resolution error: 'Worksheet 1 does not exist.'",
+        "message": "Reference resolution error: 'Worksheet C0100 does not exist.'",
         "formula_values": {},
         "precondition_values": {},
         "evaluation_trace": "",
@@ -26503,12 +26491,12 @@
         "passed": false,
         "message": "Reference resolution error: 'Worksheet C26.00.a does not exist.'",
         "formula_values": {
-          "{r=0030, c=0010}": 75.0,
-          "{r=0020, c=0010}": 74.0
+          "{r=0030, c=0010}": 30,
+          "{r=0020, c=0010}": 20
         },
         "precondition_values": {},
         "evaluation_trace": "",
-        "formula_with_values": "75 = 74 / None",
+        "formula_with_values": "30 = 20 / None",
         "precondition_with_values": "",
         "comparison_left": "",
         "comparison_operator": "",
@@ -26527,13 +26515,13 @@
           "C01.00",
           "C01.00",
           "0020",
-          "0010",
-          "1"
+          null,
+          "C0100"
         ],
         "expected": true,
         "actual": null,
         "passed": false,
-        "message": "Reference resolution error: 'Worksheet 1 does not exist.'",
+        "message": "Reference resolution error: 'Worksheet C0100 does not exist.'",
         "formula_values": {},
         "precondition_values": {},
         "evaluation_trace": "",
@@ -26557,11 +26545,11 @@
         "passed": false,
         "message": "Reference resolution error: 'Worksheet C26.00.a does not exist.'",
         "formula_values": {
-          "{r=0020, c=0010}": 74.0
+          "{r=0020, c=0010}": 20
         },
         "precondition_values": {},
         "evaluation_trace": "",
-        "formula_with_values": "74 <= min(max(0.25 * None, 150000000), None)",
+        "formula_with_values": "20 <= min(max(0.25 * None, 150000000), None)",
         "precondition_with_values": "",
         "comparison_left": "",
         "comparison_operator": "",
@@ -35716,7 +35704,7 @@
   },
   {
     "rule_id": "EGDQ_0692",
-    "status": "FAIL",
+    "status": "ERROR",
     "reason": null,
     "details": [
       {
@@ -35750,20 +35738,20 @@
           "F41.01",
           "F41.01",
           "0015",
-          "0010",
+          null,
           "F41.01.a"
         ],
         "expected": true,
-        "actual": null,
+        "actual": "MISSING(row=0015, col=0010, sheet=F41.01.a: column '0010' not found in sheet 'F41.01.a')",
         "passed": false,
-        "message": "Precondition resolution error: 'Worksheet F41.01.a does not exist.'",
+        "message": "ERROR: column '0010' not found in sheet 'F41.01.a'",
         "formula_values": {
-          "{r=0015, c=0010}": 80.0
+          "{r=0015, c=0010}": "MISSING(row=0015, col=0010, sheet=F41.01.a: column '0010' not found in sheet 'F41.01.a')"
         },
         "precondition_values": {},
         "evaluation_trace": "",
-        "formula_with_values": "80 != 0",
-        "precondition_with_values": "80 not in (empty,0)",
+        "formula_with_values": "MISSING(row=0015, col=0010, sheet=F41.01.a: column '0010' not found in sheet 'F41.01.a') != 0",
+        "precondition_with_values": "",
         "comparison_left": "",
         "comparison_operator": "",
         "comparison_right": "",
@@ -35773,7 +35761,7 @@
   },
   {
     "rule_id": "EGDQ_0693",
-    "status": "FAIL",
+    "status": "ERROR",
     "reason": null,
     "details": [
       {
@@ -35807,20 +35795,20 @@
           "F41.01",
           "F41.01",
           "0021",
-          "0010",
+          null,
           "F41.01.a"
         ],
         "expected": true,
-        "actual": null,
+        "actual": "MISSING(row=0021, col=0010, sheet=F41.01.a: column '0010' not found in sheet 'F41.01.a')",
         "passed": false,
-        "message": "Precondition resolution error: 'Worksheet F41.01.a does not exist.'",
+        "message": "ERROR: column '0010' not found in sheet 'F41.01.a'",
         "formula_values": {
-          "{r=0021, c=0010}": 77.0
+          "{r=0021, c=0010}": "MISSING(row=0021, col=0010, sheet=F41.01.a: column '0010' not found in sheet 'F41.01.a')"
         },
         "precondition_values": {},
         "evaluation_trace": "",
-        "formula_with_values": "77 != 0",
-        "precondition_with_values": "77 not in (empty,0)",
+        "formula_with_values": "MISSING(row=0021, col=0010, sheet=F41.01.a: column '0010' not found in sheet 'F41.01.a') != 0",
+        "precondition_with_values": "",
         "comparison_left": "",
         "comparison_operator": "",
         "comparison_right": "",
@@ -35830,7 +35818,7 @@
   },
   {
     "rule_id": "EGDQ_0694",
-    "status": "FAIL",
+    "status": "ERROR",
     "reason": null,
     "details": [
       {
@@ -35864,20 +35852,20 @@
           "F41.01",
           "F41.01",
           "0031",
-          "0010",
+          null,
           "F41.01.a"
         ],
         "expected": true,
-        "actual": null,
+        "actual": "MISSING(row=0031, col=0010, sheet=F41.01.a: column '0010' not found in sheet 'F41.01.a')",
         "passed": false,
-        "message": "Precondition resolution error: 'Worksheet F41.01.a does not exist.'",
+        "message": "ERROR: column '0010' not found in sheet 'F41.01.a'",
         "formula_values": {
-          "{r=0031, c=0010}": 78.0
+          "{r=0031, c=0010}": "MISSING(row=0031, col=0010, sheet=F41.01.a: column '0010' not found in sheet 'F41.01.a')"
         },
         "precondition_values": {},
         "evaluation_trace": "",
-        "formula_with_values": "78 != 0",
-        "precondition_with_values": "78 not in (empty,0)",
+        "formula_with_values": "MISSING(row=0031, col=0010, sheet=F41.01.a: column '0010' not found in sheet 'F41.01.a') != 0",
+        "precondition_with_values": "",
         "comparison_left": "",
         "comparison_operator": "",
         "comparison_right": "",
@@ -35887,7 +35875,7 @@
   },
   {
     "rule_id": "EGDQ_0695",
-    "status": "FAIL",
+    "status": "ERROR",
     "reason": null,
     "details": [
       {
@@ -35895,46 +35883,44 @@
           "F01.02",
           "F01.02",
           "0070",
-          "0010",
+          null,
           "F01.02.a"
         ],
         "expected": true,
-        "actual": true,
-        "passed": true,
-        "message": "",
+        "actual": "MISSING(row=0070, col=0010, sheet=F01.02.a: column '0010' not found in sheet 'F01.02.a')",
+        "passed": false,
+        "message": "ERROR: column '0010' not found in sheet 'F01.02.a'",
         "formula_values": {
-          "{r=0070, c=0010}": 75.0
+          "{r=0070, c=0010}": "MISSING(row=0070, col=0010, sheet=F01.02.a: column '0010' not found in sheet 'F01.02.a')"
         },
-        "precondition_values": {
-          "{r=0110, c=0010}": 70.0
-        },
-        "evaluation_trace": "75 != 0",
-        "formula_with_values": "75 != 0",
-        "precondition_with_values": "70 not in (empty,0)",
-        "comparison_left": "75",
-        "comparison_operator": "!=",
-        "comparison_right": "0",
-        "comparison_display": "75 != 0"
+        "precondition_values": {},
+        "evaluation_trace": "",
+        "formula_with_values": "MISSING(row=0070, col=0010, sheet=F01.02.a: column '0010' not found in sheet 'F01.02.a') != 0",
+        "precondition_with_values": "",
+        "comparison_left": "",
+        "comparison_operator": "",
+        "comparison_right": "",
+        "comparison_display": ""
       },
       {
         "coordinates": [
           "F41.01",
           "F41.01",
           "0070",
-          "0010",
+          null,
           "F41.01.a"
         ],
         "expected": true,
-        "actual": null,
+        "actual": "MISSING(row=0070, col=0010, sheet=F41.01.a: column '0010' not found in sheet 'F41.01.a')",
         "passed": false,
-        "message": "Precondition resolution error: 'Worksheet F41.01.a does not exist.'",
+        "message": "ERROR: column '0010' not found in sheet 'F41.01.a'",
         "formula_values": {
-          "{r=0070, c=0010}": 81.0
+          "{r=0070, c=0010}": "MISSING(row=0070, col=0010, sheet=F41.01.a: column '0010' not found in sheet 'F41.01.a')"
         },
         "precondition_values": {},
         "evaluation_trace": "",
-        "formula_with_values": "81 != 0",
-        "precondition_with_values": "81 not in (empty,0)",
+        "formula_with_values": "MISSING(row=0070, col=0010, sheet=F41.01.a: column '0010' not found in sheet 'F41.01.a') != 0",
+        "precondition_with_values": "",
         "comparison_left": "",
         "comparison_operator": "",
         "comparison_right": "",
@@ -35944,7 +35930,7 @@
   },
   {
     "rule_id": "EGDQ_0696",
-    "status": "FAIL",
+    "status": "ERROR",
     "reason": null,
     "details": [
       {
@@ -35952,46 +35938,44 @@
           "F01.02",
           "F01.02",
           "0101",
-          "0010",
+          null,
           "F01.02.a"
         ],
         "expected": true,
-        "actual": true,
-        "passed": true,
-        "message": "",
+        "actual": "MISSING(row=0101, col=0010, sheet=F01.02.a: column '0010' not found in sheet 'F01.02.a')",
+        "passed": false,
+        "message": "ERROR: column '0010' not found in sheet 'F01.02.a'",
         "formula_values": {
-          "{r=0101, c=0010}": 70.0
+          "{r=0101, c=0010}": "MISSING(row=0101, col=0010, sheet=F01.02.a: column '0010' not found in sheet 'F01.02.a')"
         },
-        "precondition_values": {
-          "{r=0141, c=0010}": 74.0
-        },
-        "evaluation_trace": "70 != 0",
-        "formula_with_values": "70 != 0",
-        "precondition_with_values": "74 not in (empty,0)",
-        "comparison_left": "70",
-        "comparison_operator": "!=",
-        "comparison_right": "0",
-        "comparison_display": "70 != 0"
+        "precondition_values": {},
+        "evaluation_trace": "",
+        "formula_with_values": "MISSING(row=0101, col=0010, sheet=F01.02.a: column '0010' not found in sheet 'F01.02.a') != 0",
+        "precondition_with_values": "",
+        "comparison_left": "",
+        "comparison_operator": "",
+        "comparison_right": "",
+        "comparison_display": ""
       },
       {
         "coordinates": [
           "F41.01",
           "F41.01",
           "0101",
-          "0010",
+          null,
           "F41.01.a"
         ],
         "expected": true,
-        "actual": null,
+        "actual": "MISSING(row=0101, col=0010, sheet=F41.01.a: column '0010' not found in sheet 'F41.01.a')",
         "passed": false,
-        "message": "Precondition resolution error: 'Worksheet F41.01.a does not exist.'",
+        "message": "ERROR: column '0010' not found in sheet 'F41.01.a'",
         "formula_values": {
-          "{r=0101, c=0010}": 76.0
+          "{r=0101, c=0010}": "MISSING(row=0101, col=0010, sheet=F41.01.a: column '0010' not found in sheet 'F41.01.a')"
         },
         "precondition_values": {},
         "evaluation_trace": "",
-        "formula_with_values": "76 != 0",
-        "precondition_with_values": "76 not in (empty,0)",
+        "formula_with_values": "MISSING(row=0101, col=0010, sheet=F41.01.a: column '0010' not found in sheet 'F41.01.a') != 0",
+        "precondition_with_values": "",
         "comparison_left": "",
         "comparison_operator": "",
         "comparison_right": "",
@@ -36001,7 +35985,7 @@
   },
   {
     "rule_id": "EGDQ_0697",
-    "status": "FAIL",
+    "status": "ERROR",
     "reason": null,
     "details": [
       {
@@ -36009,46 +35993,44 @@
           "F01.02",
           "F01.02",
           "0100",
-          "0010",
+          null,
           "F01.02.a"
         ],
         "expected": true,
-        "actual": true,
-        "passed": true,
-        "message": "",
+        "actual": "MISSING(row=0100, col=0010, sheet=F01.02.a: column '0010' not found in sheet 'F01.02.a')",
+        "passed": false,
+        "message": "ERROR: column '0010' not found in sheet 'F01.02.a'",
         "formula_values": {
-          "{r=0100, c=0010}": 69.0
+          "{r=0100, c=0010}": "MISSING(row=0100, col=0010, sheet=F01.02.a: column '0010' not found in sheet 'F01.02.a')"
         },
-        "precondition_values": {
-          "{r=0180, c=0010}": 77.0
-        },
-        "evaluation_trace": "69 != 0",
-        "formula_with_values": "69 != 0",
-        "precondition_with_values": "77 not in (empty,0)",
-        "comparison_left": "69",
-        "comparison_operator": "!=",
-        "comparison_right": "0",
-        "comparison_display": "69 != 0"
+        "precondition_values": {},
+        "evaluation_trace": "",
+        "formula_with_values": "MISSING(row=0100, col=0010, sheet=F01.02.a: column '0010' not found in sheet 'F01.02.a') != 0",
+        "precondition_with_values": "",
+        "comparison_left": "",
+        "comparison_operator": "",
+        "comparison_right": "",
+        "comparison_display": ""
       },
       {
         "coordinates": [
           "F44.01",
           "F44.01",
           "0100",
-          "0010",
+          null,
           "F44.01.a"
         ],
         "expected": true,
-        "actual": null,
+        "actual": "MISSING(row=0100, col=0010, sheet=F44.01.a: column '0010' not found in sheet 'F44.01.a')",
         "passed": false,
-        "message": "Precondition resolution error: 'Worksheet F44.01.a does not exist.'",
+        "message": "ERROR: column '0010' not found in sheet 'F44.01.a'",
         "formula_values": {
-          "{r=0100, c=0010}": 81.0
+          "{r=0100, c=0010}": "MISSING(row=0100, col=0010, sheet=F44.01.a: column '0010' not found in sheet 'F44.01.a')"
         },
         "precondition_values": {},
         "evaluation_trace": "",
-        "formula_with_values": "81 != 0",
-        "precondition_with_values": "81 not in (empty,0)",
+        "formula_with_values": "MISSING(row=0100, col=0010, sheet=F44.01.a: column '0010' not found in sheet 'F44.01.a') != 0",
+        "precondition_with_values": "",
         "comparison_left": "",
         "comparison_operator": "",
         "comparison_right": "",
@@ -36606,7 +36588,7 @@
           "F20.07.1",
           "F20.07.1",
           "0190",
-          "0010",
+          null,
           "F20.07.1.a"
         ],
         "expected": true,
@@ -38824,18 +38806,18 @@
         "passed": true,
         "message": "",
         "formula_values": {
-          "{r=0010, c=0010}": 85.0,
-          "{r=0020, c=0010}": 86.0,
-          "{r=0030, c=0010}": 87.0
+          "{r=0010, c=0010}": 10,
+          "{r=0020, c=0010}": 20,
+          "{r=0030, c=0010}": 30
         },
         "precondition_values": {},
-        "evaluation_trace": "171 >= 87",
-        "formula_with_values": "85+86 >= 87",
+        "evaluation_trace": "30 >= 30",
+        "formula_with_values": "10+20 >= 30",
         "precondition_with_values": "",
-        "comparison_left": "85 + 86",
+        "comparison_left": "10 + 20",
         "comparison_operator": ">=",
-        "comparison_right": "87",
-        "comparison_display": "85 + 86 >= 87"
+        "comparison_right": "30",
+        "comparison_display": "10 + 20 >= 30"
       }
     ]
   },
@@ -38871,7 +38853,7 @@
           "C03.00",
           "C03.00",
           null,
-          "0010",
+          null,
           "3"
         ],
         "expected": true,
@@ -38924,7 +38906,7 @@
           "C03.00",
           "C03.00",
           null,
-          "0010",
+          null,
           "3"
         ],
         "expected": true,
@@ -38949,7 +38931,7 @@
           "C04.00",
           "C04.00",
           "0180",
-          "0010",
+          null,
           "4"
         ],
         "expected": true,
@@ -39317,20 +39299,20 @@
         "passed": false,
         "message": "",
         "formula_values": {
-          "{r=0030, c=0010}": 85.0,
-          "{r=0010, c=0010}": 83.0,
-          "{r=0020, c=0010}": 84.0
+          "{r=0030, c=0010}": 30,
+          "{r=0010, c=0010}": 10,
+          "{r=0020, c=0010}": 20
         },
         "precondition_values": {
-          "{r=0020, c=0010}": 84.0
+          "{r=0020, c=0010}": 20
         },
-        "evaluation_trace": "85 == 0.9880952380952381",
-        "formula_with_values": "85 = 83/84",
-        "precondition_with_values": "84 > 0",
-        "comparison_left": "85",
+        "evaluation_trace": "30 == 0.5",
+        "formula_with_values": "30 = 10/20",
+        "precondition_with_values": "20 > 0",
+        "comparison_left": "30",
         "comparison_operator": "==",
-        "comparison_right": "83 / 84",
-        "comparison_display": "85 == 83 / 84"
+        "comparison_right": "10 / 20",
+        "comparison_display": "30 == 10 / 20"
       }
     ]
   },
@@ -39352,20 +39334,20 @@
         "passed": false,
         "message": "",
         "formula_values": {
-          "{r=0030, c=0010}": 10.0,
-          "{r=0010, c=0010}": 8.0,
-          "{r=0020, c=0010}": 9.0
+          "{r=0030, c=0010}": 30,
+          "{r=0010, c=0010}": 10,
+          "{r=0020, c=0010}": 20
         },
         "precondition_values": {
-          "{r=0020, c=0010}": 9.0
+          "{r=0020, c=0010}": 20
         },
-        "evaluation_trace": "10 == 0.8888888888888888",
-        "formula_with_values": "10 = 8/9",
-        "precondition_with_values": "9 > 0",
-        "comparison_left": "10",
+        "evaluation_trace": "30 == 0.5",
+        "formula_with_values": "30 = 10/20",
+        "precondition_with_values": "20 > 0",
+        "comparison_left": "30",
         "comparison_operator": "==",
-        "comparison_right": "8 / 9",
-        "comparison_display": "10 == 8 / 9"
+        "comparison_right": "10 / 20",
+        "comparison_display": "30 == 10 / 20"
       }
     ]
   },
@@ -39379,16 +39361,16 @@
           "C01.00",
           "C01.00",
           "0170",
-          "0010",
-          "1"
+          null,
+          "C0100"
         ],
         "expected": true,
         "actual": true,
         "passed": true,
         "message": "",
         "formula_values": {
-          "{r=0170, c=0010}": "170",
-          "{r=0160, c=0010}": "160"
+          "{r=0170, c=0010}": 170,
+          "{r=0160, c=0010}": 160
         },
         "precondition_values": {},
         "evaluation_trace": "170 >= -160",
@@ -40145,7 +40127,7 @@
           "C04.00",
           "C04.00",
           "0370",
-          "0010",
+          null,
           "4"
         ],
         "expected": true,
@@ -40153,13 +40135,13 @@
         "passed": false,
         "message": "Reference resolution error: No worksheet found for table C02.00.A (marker 0001)",
         "formula_values": {
-          "{r=0370, c=0010}": 62,
-          "{r=0300, c=0010}": 55,
+          "{r=0370}": null,
+          "{r=0300}": null,
           "{r=0800, c=0010}": 60
         },
         "precondition_values": {},
         "evaluation_trace": "",
-        "formula_with_values": "62 = 55 * 0.5 * 60 / None",
+        "formula_with_values": "None = None * 0.5 * 60 / None",
         "precondition_with_values": "",
         "comparison_left": "",
         "comparison_operator": "",
@@ -40203,13 +40185,13 @@
           "C01.00",
           "C01.00",
           "0320",
-          "0010",
-          "1"
+          null,
+          "C0100"
         ],
         "expected": true,
         "actual": null,
         "passed": false,
-        "message": "Reference resolution error: 'Worksheet 1 does not exist.'",
+        "message": "Reference resolution error: 'Worksheet C0100 does not exist.'",
         "formula_values": {},
         "precondition_values": {},
         "evaluation_trace": "",
@@ -40257,12 +40239,12 @@
           "C01.00",
           "0010",
           null,
-          "1"
+          "C0100"
         ],
         "expected": true,
         "actual": null,
         "passed": false,
-        "message": "Reference resolution error: 'Worksheet 1 does not exist.'",
+        "message": "Reference resolution error: 'Worksheet C0100 does not exist.'",
         "formula_values": {},
         "precondition_values": {},
         "evaluation_trace": "",
@@ -41681,11 +41663,11 @@
         "passed": false,
         "message": "Reference resolution error: 'Worksheet F17.01.a does not exist.'",
         "formula_values": {
-          "{r=0370, c=0010}": 90.0
+          "{r=0370, c=0010}": 370
         },
         "precondition_values": {},
         "evaluation_trace": "",
-        "formula_with_values": "90 = None",
+        "formula_with_values": "370 = None",
         "precondition_with_values": "",
         "comparison_left": "",
         "comparison_operator": "",
@@ -41697,7 +41679,7 @@
           "F17.03",
           "F17.03",
           "0370",
-          "0010",
+          null,
           "F17.03.a"
         ],
         "expected": true,
@@ -42138,28 +42120,28 @@
         "passed": false,
         "message": "",
         "formula_values": {
-          "{r=0610, c=0010}": 74.0,
-          "{r=0355, c=0010}": 80.0,
-          "{r=0360, c=0010}": 76.0,
-          "{r=0390, c=0010}": 79.0,
-          "{r=0425, c=0010}": 78.0,
-          "{r=0430, c=0010}": 74.0,
-          "{r=0455, c=0010}": 81.0,
-          "{r=0460, c=0010}": 77.0,
-          "{r=0510, c=0010}": 73.0,
-          "{r=0520, c=0010}": 74.0,
-          "{r=0580, c=0010}": 80.0,
-          "{r=0590, c=0010}": 81.0,
-          "{r=0600, c=0010}": 73.0
+          "{r=0610, c=0010}": 610,
+          "{r=0355, c=0010}": 355,
+          "{r=0360, c=0010}": 360,
+          "{r=0390, c=0010}": 390,
+          "{r=0425, c=0010}": 425,
+          "{r=0430, c=0010}": 430,
+          "{r=0455, c=0010}": 455,
+          "{r=0460, c=0010}": 460,
+          "{r=0510, c=0010}": 510,
+          "{r=0520, c=0010}": 520,
+          "{r=0580, c=0010}": 580,
+          "{r=0590, c=0010}": 590,
+          "{r=0600, c=0010}": 600
         },
         "precondition_values": {},
-        "evaluation_trace": "74 <= -142",
-        "formula_with_values": "74 <= 80 - 76 - 79 + 78 - 74 - 81 - 77 - 73 - 74 + 80 + 81 + 73",
+        "evaluation_trace": "610 <= -575",
+        "formula_with_values": "610 <= 355 - 360 - 390 + 425 - 430 - 455 - 460 - 510 - 520 + 580 + 590 + 600",
         "precondition_with_values": "",
-        "comparison_left": "74",
+        "comparison_left": "610",
         "comparison_operator": "<=",
-        "comparison_right": "80 - 76 - 79 + 78 - 74 - 81 - 77 - 73 - 74 + 80 + 81 + 73",
-        "comparison_display": "74 <= 80 - 76 - 79 + 78 - 74 - 81 - 77 - 73 - 74 + 80 + 81 + 73"
+        "comparison_right": "355 - 360 - 390 + 425 - 430 - 455 - 460 - 510 - 520 + 580 + 590 + 600",
+        "comparison_display": "610 <= 355 - 360 - 390 + 425 - 430 - 455 - 460 - 510 - 520 + 580 + 590 + 600"
       }
     ]
   },
@@ -43727,242 +43709,984 @@
   {
     "rule_id": "EGDQ_0900a",
     "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(J05.00)",
+    "reason": "No coordinates evaluated",
     "details": []
   },
   {
     "rule_id": "EGDQ_0900b",
     "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(J06.00)",
+    "reason": "No coordinates evaluated",
     "details": []
   },
   {
     "rule_id": "EGDQ_0900c",
     "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(J07.00)",
+    "reason": "No coordinates evaluated",
     "details": []
   },
   {
     "rule_id": "EGDQ_0901a",
     "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(J05.00)",
+    "reason": "No coordinates evaluated",
     "details": []
   },
   {
     "rule_id": "EGDQ_0901b",
     "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(J06.00)",
+    "reason": "No coordinates evaluated",
     "details": []
   },
   {
     "rule_id": "EGDQ_0901c",
     "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(J07.00)",
+    "reason": "No coordinates evaluated",
     "details": []
   },
   {
     "rule_id": "EGDQ_0901d",
     "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(J08.00)",
+    "reason": "No coordinates evaluated",
     "details": []
   },
   {
     "rule_id": "EGDQ_0901e",
     "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(J09.00)",
+    "reason": "No coordinates evaluated",
     "details": []
   },
   {
     "rule_id": "EGDQ_0902a",
     "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(J08.00)",
+    "reason": "No coordinates evaluated",
     "details": []
   },
   {
     "rule_id": "EGDQ_0902b",
     "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(J09.00)",
+    "reason": "No coordinates evaluated",
     "details": []
   },
   {
     "rule_id": "EGDQ_0902c",
     "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(J09.00)",
+    "reason": "No coordinates evaluated",
     "details": []
   },
   {
     "rule_id": "EGDQ_0903a",
     "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(J05.00)",
+    "reason": "No coordinates evaluated",
     "details": []
   },
   {
     "rule_id": "EGDQ_0903b",
     "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(J06.00)",
+    "reason": "No coordinates evaluated",
     "details": []
   },
   {
     "rule_id": "EGDQ_0903c",
     "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(J07.00)",
+    "reason": "No coordinates evaluated",
     "details": []
   },
   {
     "rule_id": "EGDQ_0905a",
-    "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(J02.00)",
-    "details": []
+    "status": "FAIL",
+    "reason": null,
+    "details": [
+      {
+        "coordinates": [
+          "J02.00",
+          "J02.00",
+          "0010",
+          "0030",
+          "J02.00.a"
+        ],
+        "expected": true,
+        "actual": null,
+        "passed": false,
+        "message": "Reference resolution error: 'Worksheet J02.00.a does not exist.'",
+        "formula_values": {
+          "{r=0010, c=0030}": 77.0,
+          "{r=0190, c=0030}": 86.0,
+          "{r=0200, c=0030}": 78.0,
+          "{r=0520, c=0030}": 83.0,
+          "{r=0530, c=0030}": 84.0
+        },
+        "precondition_values": {},
+        "evaluation_trace": "",
+        "formula_with_values": "77 + 86 - 78 - 83 + 84 = None",
+        "precondition_with_values": "",
+        "comparison_left": "",
+        "comparison_operator": "",
+        "comparison_right": "",
+        "comparison_display": ""
+      }
+    ]
   },
   {
     "rule_id": "EGDQ_0905b",
-    "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(J03.00)",
-    "details": []
+    "status": "FAIL",
+    "reason": null,
+    "details": [
+      {
+        "coordinates": [
+          "J03.00",
+          "J03.00",
+          "0010",
+          "0030",
+          "J03.00.a"
+        ],
+        "expected": true,
+        "actual": null,
+        "passed": false,
+        "message": "Reference resolution error: 'Worksheet J03.00.a does not exist.'",
+        "formula_values": {
+          "{r=0010, c=0030}": 79.0,
+          "{r=0190, c=0030}": 88.0,
+          "{r=0200, c=0030}": 80.0,
+          "{r=0520, c=0030}": 85.0,
+          "{r=0530, c=0030}": 86.0
+        },
+        "precondition_values": {},
+        "evaluation_trace": "",
+        "formula_with_values": "79 + 88 - 80 - 85 + 86 = None",
+        "precondition_with_values": "",
+        "comparison_left": "",
+        "comparison_operator": "",
+        "comparison_right": "",
+        "comparison_display": ""
+      }
+    ]
   },
   {
     "rule_id": "EGDQ_0906a",
-    "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(J02.00)",
-    "details": []
+    "status": "FAIL",
+    "reason": null,
+    "details": [
+      {
+        "coordinates": [
+          "J02.00",
+          "J02.00",
+          "0010",
+          "0040",
+          "J02.00.a"
+        ],
+        "expected": true,
+        "actual": null,
+        "passed": false,
+        "message": "Reference resolution error: 'Worksheet J02.00.a does not exist.'",
+        "formula_values": {
+          "{r=0010, c=0040}": 78.0,
+          "{r=0190, c=0040}": 87.0,
+          "{r=0200, c=0040}": 79.0,
+          "{r=0520, c=0040}": 84.0,
+          "{r=0530, c=0040}": 85.0
+        },
+        "precondition_values": {},
+        "evaluation_trace": "",
+        "formula_with_values": "78 + 87 - 79 - 84 + 85 = None",
+        "precondition_with_values": "",
+        "comparison_left": "",
+        "comparison_operator": "",
+        "comparison_right": "",
+        "comparison_display": ""
+      }
+    ]
   },
   {
     "rule_id": "EGDQ_0906b",
-    "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(J03.00)",
-    "details": []
+    "status": "FAIL",
+    "reason": null,
+    "details": [
+      {
+        "coordinates": [
+          "J03.00",
+          "J03.00",
+          "0010",
+          "0040",
+          "J03.00.a"
+        ],
+        "expected": true,
+        "actual": null,
+        "passed": false,
+        "message": "Reference resolution error: 'Worksheet J03.00.a does not exist.'",
+        "formula_values": {
+          "{r=0010, c=0040}": 80.0,
+          "{r=0190, c=0040}": 89.0,
+          "{r=0200, c=0040}": 81.0,
+          "{r=0520, c=0040}": 86.0,
+          "{r=0530, c=0040}": 87.0
+        },
+        "precondition_values": {},
+        "evaluation_trace": "",
+        "formula_with_values": "80 + 89 - 81 - 86 + 87 = None",
+        "precondition_with_values": "",
+        "comparison_left": "",
+        "comparison_operator": "",
+        "comparison_right": "",
+        "comparison_display": ""
+      }
+    ]
   },
   {
     "rule_id": "EGDQ_0907a",
-    "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(J02.00)",
-    "details": []
+    "status": "FAIL",
+    "reason": null,
+    "details": [
+      {
+        "coordinates": [
+          "J02.00",
+          "J02.00",
+          "0010",
+          "0050",
+          "J02.00.a"
+        ],
+        "expected": true,
+        "actual": null,
+        "passed": false,
+        "message": "Reference resolution error: 'Worksheet J02.00.a does not exist.'",
+        "formula_values": {
+          "{r=0010, c=0050}": 79.0,
+          "{r=0190, c=0050}": 88.0,
+          "{r=0200, c=0050}": 80.0,
+          "{r=0520, c=0050}": 85.0,
+          "{r=0530, c=0050}": 86.0
+        },
+        "precondition_values": {},
+        "evaluation_trace": "",
+        "formula_with_values": "79 + 88 - 80 - 85 + 86 = None",
+        "precondition_with_values": "",
+        "comparison_left": "",
+        "comparison_operator": "",
+        "comparison_right": "",
+        "comparison_display": ""
+      }
+    ]
   },
   {
     "rule_id": "EGDQ_0907b",
-    "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(J03.00)",
-    "details": []
+    "status": "FAIL",
+    "reason": null,
+    "details": [
+      {
+        "coordinates": [
+          "J03.00",
+          "J03.00",
+          "0010",
+          "0050",
+          "J03.00.a"
+        ],
+        "expected": true,
+        "actual": null,
+        "passed": false,
+        "message": "Reference resolution error: 'Worksheet J03.00.a does not exist.'",
+        "formula_values": {
+          "{r=0010, c=0050}": 81.0,
+          "{r=0190, c=0050}": 90.0,
+          "{r=0200, c=0050}": 82.0,
+          "{r=0520, c=0050}": 87.0,
+          "{r=0530, c=0050}": 88.0
+        },
+        "precondition_values": {},
+        "evaluation_trace": "",
+        "formula_with_values": "81 + 90 - 82 - 87 + 88 = None",
+        "precondition_with_values": "",
+        "comparison_left": "",
+        "comparison_operator": "",
+        "comparison_right": "",
+        "comparison_display": ""
+      }
+    ]
   },
   {
     "rule_id": "EGDQ_0908a",
-    "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(J02.00)",
-    "details": []
+    "status": "FAIL",
+    "reason": null,
+    "details": [
+      {
+        "coordinates": [
+          "J02.00",
+          "J02.00",
+          "0010",
+          "0060",
+          "J02.00.a"
+        ],
+        "expected": true,
+        "actual": null,
+        "passed": false,
+        "message": "Reference resolution error: 'Worksheet J02.00.a does not exist.'",
+        "formula_values": {
+          "{r=0010, c=0060}": 80.0,
+          "{r=0190, c=0060}": 89.0,
+          "{r=0200, c=0060}": 81.0,
+          "{r=0520, c=0060}": 86.0,
+          "{r=0530, c=0060}": 87.0
+        },
+        "precondition_values": {},
+        "evaluation_trace": "",
+        "formula_with_values": "80 + 89 - 81 - 86 + 87 = None",
+        "precondition_with_values": "",
+        "comparison_left": "",
+        "comparison_operator": "",
+        "comparison_right": "",
+        "comparison_display": ""
+      }
+    ]
   },
   {
     "rule_id": "EGDQ_0908b",
-    "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(J03.00)",
-    "details": []
+    "status": "FAIL",
+    "reason": null,
+    "details": [
+      {
+        "coordinates": [
+          "J03.00",
+          "J03.00",
+          "0010",
+          "0060",
+          "J03.00.a"
+        ],
+        "expected": true,
+        "actual": null,
+        "passed": false,
+        "message": "Reference resolution error: 'Worksheet J03.00.a does not exist.'",
+        "formula_values": {
+          "{r=0010, c=0060}": 82.0,
+          "{r=0190, c=0060}": 91.0,
+          "{r=0200, c=0060}": 83.0,
+          "{r=0520, c=0060}": 88.0,
+          "{r=0530, c=0060}": 89.0
+        },
+        "precondition_values": {},
+        "evaluation_trace": "",
+        "formula_with_values": "82 + 91 - 83 - 88 + 89 = None",
+        "precondition_with_values": "",
+        "comparison_left": "",
+        "comparison_operator": "",
+        "comparison_right": "",
+        "comparison_display": ""
+      }
+    ]
   },
   {
     "rule_id": "EGDQ_0909a",
-    "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(J02.00)",
-    "details": []
+    "status": "FAIL",
+    "reason": null,
+    "details": [
+      {
+        "coordinates": [
+          "J02.00",
+          "J02.00",
+          "0010",
+          "0070",
+          "J02.00.a"
+        ],
+        "expected": true,
+        "actual": null,
+        "passed": false,
+        "message": "Reference resolution error: 'Worksheet J02.00.a does not exist.'",
+        "formula_values": {
+          "{r=0010, c=0070}": 81.0,
+          "{r=0190, c=0070}": 90.0,
+          "{r=0200, c=0070}": 82.0,
+          "{r=0520, c=0070}": 87.0,
+          "{r=0530, c=0070}": 88.0
+        },
+        "precondition_values": {},
+        "evaluation_trace": "",
+        "formula_with_values": "81 + 90 - 82 - 87 + 88 = None",
+        "precondition_with_values": "",
+        "comparison_left": "",
+        "comparison_operator": "",
+        "comparison_right": "",
+        "comparison_display": ""
+      }
+    ]
   },
   {
     "rule_id": "EGDQ_0909b",
-    "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(J03.00)",
-    "details": []
+    "status": "FAIL",
+    "reason": null,
+    "details": [
+      {
+        "coordinates": [
+          "J03.00",
+          "J03.00",
+          "0010",
+          "0070",
+          "J03.00.a"
+        ],
+        "expected": true,
+        "actual": null,
+        "passed": false,
+        "message": "Reference resolution error: 'Worksheet J03.00.a does not exist.'",
+        "formula_values": {
+          "{r=0010, c=0070}": 83.0,
+          "{r=0190, c=0070}": 92.0,
+          "{r=0200, c=0070}": 84.0,
+          "{r=0520, c=0070}": 89.0,
+          "{r=0530, c=0070}": 90.0
+        },
+        "precondition_values": {},
+        "evaluation_trace": "",
+        "formula_with_values": "83 + 92 - 84 - 89 + 90 = None",
+        "precondition_with_values": "",
+        "comparison_left": "",
+        "comparison_operator": "",
+        "comparison_right": "",
+        "comparison_display": ""
+      }
+    ]
   },
   {
     "rule_id": "EGDQ_0910a",
-    "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(J02.00)",
-    "details": []
+    "status": "FAIL",
+    "reason": null,
+    "details": [
+      {
+        "coordinates": [
+          "J02.00",
+          "J02.00",
+          "0010",
+          "0080",
+          "J02.00.a"
+        ],
+        "expected": true,
+        "actual": null,
+        "passed": false,
+        "message": "Reference resolution error: 'Worksheet J02.00.a does not exist.'",
+        "formula_values": {
+          "{r=0010, c=0080}": 82.0,
+          "{r=0190, c=0080}": 91.0,
+          "{r=0200, c=0080}": 83.0,
+          "{r=0520, c=0080}": 88.0,
+          "{r=0530, c=0080}": 89.0
+        },
+        "precondition_values": {},
+        "evaluation_trace": "",
+        "formula_with_values": "82 + 91 - 83 - 88 + 89 = None",
+        "precondition_with_values": "",
+        "comparison_left": "",
+        "comparison_operator": "",
+        "comparison_right": "",
+        "comparison_display": ""
+      }
+    ]
   },
   {
     "rule_id": "EGDQ_0910b",
-    "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(J03.00)",
-    "details": []
+    "status": "FAIL",
+    "reason": null,
+    "details": [
+      {
+        "coordinates": [
+          "J03.00",
+          "J03.00",
+          "0010",
+          "0080",
+          "J03.00.a"
+        ],
+        "expected": true,
+        "actual": null,
+        "passed": false,
+        "message": "Reference resolution error: 'Worksheet J03.00.a does not exist.'",
+        "formula_values": {
+          "{r=0010, c=0080}": 84.0,
+          "{r=0190, c=0080}": 93.0,
+          "{r=0200, c=0080}": 85.0,
+          "{r=0520, c=0080}": 90.0,
+          "{r=0530, c=0080}": 91.0
+        },
+        "precondition_values": {},
+        "evaluation_trace": "",
+        "formula_with_values": "84 + 93 - 85 - 90 + 91 = None",
+        "precondition_with_values": "",
+        "comparison_left": "",
+        "comparison_operator": "",
+        "comparison_right": "",
+        "comparison_display": ""
+      }
+    ]
   },
   {
     "rule_id": "EGDQ_0911a",
-    "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(J02.00)",
-    "details": []
+    "status": "FAIL",
+    "reason": null,
+    "details": [
+      {
+        "coordinates": [
+          "J02.00",
+          "J02.00",
+          "0010",
+          "0090",
+          "J02.00.a"
+        ],
+        "expected": true,
+        "actual": null,
+        "passed": false,
+        "message": "Reference resolution error: 'Worksheet J02.00.a does not exist.'",
+        "formula_values": {
+          "{r=0010, c=0090}": 83.0,
+          "{r=0190, c=0090}": 92.0,
+          "{r=0200, c=0090}": 84.0,
+          "{r=0520, c=0090}": 89.0,
+          "{r=0530, c=0090}": 90.0
+        },
+        "precondition_values": {},
+        "evaluation_trace": "",
+        "formula_with_values": "83 + 92 - 84 - 89 + 90 = None",
+        "precondition_with_values": "",
+        "comparison_left": "",
+        "comparison_operator": "",
+        "comparison_right": "",
+        "comparison_display": ""
+      }
+    ]
   },
   {
     "rule_id": "EGDQ_0911b",
-    "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(J03.00)",
-    "details": []
+    "status": "FAIL",
+    "reason": null,
+    "details": [
+      {
+        "coordinates": [
+          "J03.00",
+          "J03.00",
+          "0010",
+          "0090",
+          "J03.00.a"
+        ],
+        "expected": true,
+        "actual": null,
+        "passed": false,
+        "message": "Reference resolution error: 'Worksheet J03.00.a does not exist.'",
+        "formula_values": {
+          "{r=0010, c=0090}": 85.0,
+          "{r=0190, c=0090}": 94.0,
+          "{r=0200, c=0090}": 86.0,
+          "{r=0520, c=0090}": 91.0,
+          "{r=0530, c=0090}": 92.0
+        },
+        "precondition_values": {},
+        "evaluation_trace": "",
+        "formula_with_values": "85 + 94 - 86 - 91 + 92 = None",
+        "precondition_with_values": "",
+        "comparison_left": "",
+        "comparison_operator": "",
+        "comparison_right": "",
+        "comparison_display": ""
+      }
+    ]
   },
   {
     "rule_id": "EGDQ_0912a",
-    "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(J02.00)",
-    "details": []
+    "status": "FAIL",
+    "reason": null,
+    "details": [
+      {
+        "coordinates": [
+          "J02.00",
+          "J02.00",
+          "0010",
+          "0100",
+          "J02.00.a"
+        ],
+        "expected": true,
+        "actual": null,
+        "passed": false,
+        "message": "Reference resolution error: 'Worksheet J02.00.a does not exist.'",
+        "formula_values": {
+          "{r=0010, c=0100}": 75.0,
+          "{r=0190, c=0100}": 84.0,
+          "{r=0200, c=0100}": 76.0,
+          "{r=0520, c=0100}": 81.0,
+          "{r=0530, c=0100}": 82.0
+        },
+        "precondition_values": {},
+        "evaluation_trace": "",
+        "formula_with_values": "75 + 84 - 76 - 81 + 82 = None",
+        "precondition_with_values": "",
+        "comparison_left": "",
+        "comparison_operator": "",
+        "comparison_right": "",
+        "comparison_display": ""
+      }
+    ]
   },
   {
     "rule_id": "EGDQ_0912b",
-    "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(J03.00)",
-    "details": []
+    "status": "FAIL",
+    "reason": null,
+    "details": [
+      {
+        "coordinates": [
+          "J03.00",
+          "J03.00",
+          "0010",
+          "0100",
+          "J03.00.a"
+        ],
+        "expected": true,
+        "actual": null,
+        "passed": false,
+        "message": "Reference resolution error: 'Worksheet J03.00.a does not exist.'",
+        "formula_values": {
+          "{r=0010, c=0100}": 77.0,
+          "{r=0190, c=0100}": 86.0,
+          "{r=0200, c=0100}": 78.0,
+          "{r=0520, c=0100}": 83.0,
+          "{r=0530, c=0100}": 84.0
+        },
+        "precondition_values": {},
+        "evaluation_trace": "",
+        "formula_with_values": "77 + 86 - 78 - 83 + 84 = None",
+        "precondition_with_values": "",
+        "comparison_left": "",
+        "comparison_operator": "",
+        "comparison_right": "",
+        "comparison_display": ""
+      }
+    ]
   },
   {
     "rule_id": "EGDQ_0913a",
-    "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(J02.00)",
-    "details": []
+    "status": "FAIL",
+    "reason": null,
+    "details": [
+      {
+        "coordinates": [
+          "J02.00",
+          "J02.00",
+          "0010",
+          "0110",
+          "J02.00.a"
+        ],
+        "expected": true,
+        "actual": null,
+        "passed": false,
+        "message": "Reference resolution error: 'Worksheet J02.00.a does not exist.'",
+        "formula_values": {
+          "{r=0010, c=0110}": 76.0,
+          "{r=0190, c=0110}": 85.0,
+          "{r=0200, c=0110}": 77.0,
+          "{r=0520, c=0110}": 82.0,
+          "{r=0530, c=0110}": 83.0
+        },
+        "precondition_values": {},
+        "evaluation_trace": "",
+        "formula_with_values": "76 + 85 - 77 - 82 + 83 = None",
+        "precondition_with_values": "",
+        "comparison_left": "",
+        "comparison_operator": "",
+        "comparison_right": "",
+        "comparison_display": ""
+      }
+    ]
   },
   {
     "rule_id": "EGDQ_0913b",
-    "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(J03.00)",
-    "details": []
+    "status": "FAIL",
+    "reason": null,
+    "details": [
+      {
+        "coordinates": [
+          "J03.00",
+          "J03.00",
+          "0010",
+          "0110",
+          "J03.00.a"
+        ],
+        "expected": true,
+        "actual": null,
+        "passed": false,
+        "message": "Reference resolution error: 'Worksheet J03.00.a does not exist.'",
+        "formula_values": {
+          "{r=0010, c=0110}": 78.0,
+          "{r=0190, c=0110}": 87.0,
+          "{r=0200, c=0110}": 79.0,
+          "{r=0520, c=0110}": 84.0,
+          "{r=0530, c=0110}": 85.0
+        },
+        "precondition_values": {},
+        "evaluation_trace": "",
+        "formula_with_values": "78 + 87 - 79 - 84 + 85 = None",
+        "precondition_with_values": "",
+        "comparison_left": "",
+        "comparison_operator": "",
+        "comparison_right": "",
+        "comparison_display": ""
+      }
+    ]
   },
   {
     "rule_id": "EGDQ_0914a",
-    "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(J02.00)",
-    "details": []
+    "status": "FAIL",
+    "reason": null,
+    "details": [
+      {
+        "coordinates": [
+          "J02.00",
+          "J02.00",
+          "0010",
+          "0120",
+          "J02.00.a"
+        ],
+        "expected": true,
+        "actual": null,
+        "passed": false,
+        "message": "Reference resolution error: 'Worksheet J02.00.a does not exist.'",
+        "formula_values": {
+          "{r=0010, c=0120}": 77.0,
+          "{r=0190, c=0120}": 86.0,
+          "{r=0200, c=0120}": 78.0,
+          "{r=0520, c=0120}": 83.0,
+          "{r=0530, c=0120}": 84.0
+        },
+        "precondition_values": {},
+        "evaluation_trace": "",
+        "formula_with_values": "77 + 86 - 78 - 83 + 84 = None",
+        "precondition_with_values": "",
+        "comparison_left": "",
+        "comparison_operator": "",
+        "comparison_right": "",
+        "comparison_display": ""
+      }
+    ]
   },
   {
     "rule_id": "EGDQ_0914b",
-    "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(J03.00)",
-    "details": []
+    "status": "FAIL",
+    "reason": null,
+    "details": [
+      {
+        "coordinates": [
+          "J03.00",
+          "J03.00",
+          "0010",
+          "0120",
+          "J03.00.a"
+        ],
+        "expected": true,
+        "actual": null,
+        "passed": false,
+        "message": "Reference resolution error: 'Worksheet J03.00.a does not exist.'",
+        "formula_values": {
+          "{r=0010, c=0120}": 79.0,
+          "{r=0190, c=0120}": 88.0,
+          "{r=0200, c=0120}": 80.0,
+          "{r=0520, c=0120}": 85.0,
+          "{r=0530, c=0120}": 86.0
+        },
+        "precondition_values": {},
+        "evaluation_trace": "",
+        "formula_with_values": "79 + 88 - 80 - 85 + 86 = None",
+        "precondition_with_values": "",
+        "comparison_left": "",
+        "comparison_operator": "",
+        "comparison_right": "",
+        "comparison_display": ""
+      }
+    ]
   },
   {
     "rule_id": "EGDQ_0915a",
-    "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(J02.00)",
-    "details": []
+    "status": "FAIL",
+    "reason": null,
+    "details": [
+      {
+        "coordinates": [
+          "J02.00",
+          "J02.00",
+          "0570",
+          "0130",
+          "J02.00.a"
+        ],
+        "expected": true,
+        "actual": null,
+        "passed": false,
+        "message": "Reference resolution error: 'Worksheet J02.00.a does not exist.'",
+        "formula_values": {
+          "{r=0570, c=0130}": 89.0,
+          "{r=0610, c=0130}": 84.0,
+          "{r=0530, c=0130}": 85.0
+        },
+        "precondition_values": {},
+        "evaluation_trace": "",
+        "formula_with_values": "89 - 84 + 85 = None",
+        "precondition_with_values": "",
+        "comparison_left": "",
+        "comparison_operator": "",
+        "comparison_right": "",
+        "comparison_display": ""
+      }
+    ]
   },
   {
     "rule_id": "EGDQ_0915b",
-    "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(J03.00)",
-    "details": []
+    "status": "FAIL",
+    "reason": null,
+    "details": [
+      {
+        "coordinates": [
+          "J03.00",
+          "J03.00",
+          "0570",
+          "0130",
+          "J03.00.a"
+        ],
+        "expected": true,
+        "actual": null,
+        "passed": false,
+        "message": "Reference resolution error: 'Worksheet J03.00.a does not exist.'",
+        "formula_values": {
+          "{r=0570, c=0130}": 91.0,
+          "{r=0610, c=0130}": 86.0,
+          "{r=0530, c=0130}": 87.0
+        },
+        "precondition_values": {},
+        "evaluation_trace": "",
+        "formula_with_values": "91 - 86 + 87 = None",
+        "precondition_with_values": "",
+        "comparison_left": "",
+        "comparison_operator": "",
+        "comparison_right": "",
+        "comparison_display": ""
+      }
+    ]
   },
   {
     "rule_id": "EGDQ_0916a",
-    "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(J02.00)",
-    "details": []
+    "status": "FAIL",
+    "reason": null,
+    "details": [
+      {
+        "coordinates": [
+          "J02.00",
+          "J02.00",
+          "0570",
+          "0140",
+          "J02.00.a"
+        ],
+        "expected": true,
+        "actual": null,
+        "passed": false,
+        "message": "Reference resolution error: 'Worksheet J02.00.a does not exist.'",
+        "formula_values": {
+          "{r=0570, c=0140}": 90.0,
+          "{r=0610, c=0140}": 85.0,
+          "{r=0530, c=0140}": 86.0
+        },
+        "precondition_values": {},
+        "evaluation_trace": "",
+        "formula_with_values": "90 - 85 + 86 = None",
+        "precondition_with_values": "",
+        "comparison_left": "",
+        "comparison_operator": "",
+        "comparison_right": "",
+        "comparison_display": ""
+      }
+    ]
   },
   {
     "rule_id": "EGDQ_0916b",
-    "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(J03.00)",
-    "details": []
+    "status": "FAIL",
+    "reason": null,
+    "details": [
+      {
+        "coordinates": [
+          "J03.00",
+          "J03.00",
+          "0570",
+          "0140",
+          "J03.00.a"
+        ],
+        "expected": true,
+        "actual": null,
+        "passed": false,
+        "message": "Reference resolution error: 'Worksheet J03.00.a does not exist.'",
+        "formula_values": {
+          "{r=0570, c=0140}": 92.0,
+          "{r=0610, c=0140}": 87.0,
+          "{r=0530, c=0140}": 88.0
+        },
+        "precondition_values": {},
+        "evaluation_trace": "",
+        "formula_with_values": "92 - 87 + 88 = None",
+        "precondition_with_values": "",
+        "comparison_left": "",
+        "comparison_operator": "",
+        "comparison_right": "",
+        "comparison_display": ""
+      }
+    ]
   },
   {
     "rule_id": "EGDQ_0917a",
-    "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(J02.00)",
-    "details": []
+    "status": "FAIL",
+    "reason": null,
+    "details": [
+      {
+        "coordinates": [
+          "J02.00",
+          "J02.00",
+          "0570",
+          "0150",
+          "J02.00.a"
+        ],
+        "expected": true,
+        "actual": null,
+        "passed": false,
+        "message": "Reference resolution error: 'Worksheet J02.00.a does not exist.'",
+        "formula_values": {
+          "{r=0570, c=0150}": 91.0,
+          "{r=0610, c=0150}": 86.0,
+          "{r=0530, c=0150}": 87.0
+        },
+        "precondition_values": {},
+        "evaluation_trace": "",
+        "formula_with_values": "91 - 86 + 87 = None",
+        "precondition_with_values": "",
+        "comparison_left": "",
+        "comparison_operator": "",
+        "comparison_right": "",
+        "comparison_display": ""
+      }
+    ]
   },
   {
     "rule_id": "EGDQ_0917b",
-    "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(J03.00)",
-    "details": []
+    "status": "FAIL",
+    "reason": null,
+    "details": [
+      {
+        "coordinates": [
+          "J03.00",
+          "J03.00",
+          "0570",
+          "0150",
+          "J03.00.a"
+        ],
+        "expected": true,
+        "actual": null,
+        "passed": false,
+        "message": "Reference resolution error: 'Worksheet J03.00.a does not exist.'",
+        "formula_values": {
+          "{r=0570, c=0150}": 93.0,
+          "{r=0610, c=0150}": 88.0,
+          "{r=0530, c=0150}": 89.0
+        },
+        "precondition_values": {},
+        "evaluation_trace": "",
+        "formula_with_values": "93 - 88 + 89 = None",
+        "precondition_with_values": "",
+        "comparison_left": "",
+        "comparison_operator": "",
+        "comparison_right": "",
+        "comparison_display": ""
+      }
+    ]
   },
   {
     "rule_id": "EGDQ_0918",
@@ -43974,28 +44698,28 @@
           "C01.00",
           "C01.00",
           "0020",
-          "0010",
-          "1"
+          null,
+          "C0100"
         ],
         "expected": true,
         "actual": false,
         "passed": false,
         "message": "",
         "formula_values": {
-          "{r=0020, c=0010}": "020",
-          "{r=0010, c=0010}": "010",
-          "{r=0015, c=0010}": "015"
+          "{r=0020, c=0010}": 30,
+          "{r=0010, c=0010}": 10,
+          "{r=0015, c=0010}": 20
         },
         "precondition_values": {
-          "{r=0015, c=0010}": "015"
+          "{r=0015, c=0010}": 20
         },
-        "evaluation_trace": "020 == 0.6666666666666666",
-        "formula_with_values": "020 = 010 / 015",
-        "precondition_with_values": "015 > 0",
-        "comparison_left": "020",
+        "evaluation_trace": "30 == 0.5",
+        "formula_with_values": "30 = 10 / 20",
+        "precondition_with_values": "20 > 0",
+        "comparison_left": "30",
         "comparison_operator": "==",
-        "comparison_right": "010 / 015",
-        "comparison_display": "020 == 010 / 015"
+        "comparison_right": "10 / 20",
+        "comparison_display": "30 == 10 / 20"
       },
       {
         "coordinates": [
@@ -44034,21 +44758,21 @@
           "C01.00",
           "C01.00",
           null,
-          "0010",
-          "1"
+          null,
+          "C0100"
         ],
         "expected": true,
-        "actual": "MISSING(row=0110, col=0010, sheet=1: row '0110' not found in sheet '1')",
+        "actual": "MISSING(row=0110, col=0010, sheet=C0100: row '0110' not found in sheet 'C0100')",
         "passed": false,
-        "message": "ERROR: row '0110' not found in sheet '1'",
+        "message": "ERROR: row '0110' not found in sheet 'C0100'",
         "formula_values": {
-          "{r=0110, c=0010}": "MISSING(row=0110, col=0010, sheet=1: row '0110' not found in sheet '1')",
-          "{r=0100, c=0010}": "MISSING(row=0100, col=0010, sheet=1: row '0100' not found in sheet '1')",
-          "{r=0015, c=0010}": "015"
+          "{r=0110, c=0010}": "MISSING(row=0110, col=0010, sheet=C0100: row '0110' not found in sheet 'C0100')",
+          "{r=0100, c=0010}": "MISSING(row=0100, col=0010, sheet=C0100: row '0100' not found in sheet 'C0100')",
+          "{r=0015, c=0010}": 20
         },
         "precondition_values": {},
         "evaluation_trace": "",
-        "formula_with_values": "MISSING(row=0110, col=0010, sheet=1: row '0110' not found in sheet '1') = MISSING(row=0100, col=0010, sheet=1: row '0100' not found in sheet '1') / 015",
+        "formula_with_values": "MISSING(row=0110, col=0010, sheet=C0100: row '0110' not found in sheet 'C0100') = MISSING(row=0100, col=0010, sheet=C0100: row '0100' not found in sheet 'C0100') / 20",
         "precondition_with_values": "",
         "comparison_left": "",
         "comparison_operator": "",
@@ -44085,145 +44809,718 @@
   {
     "rule_id": "EGDQ_0920a",
     "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(J02.00) and {c0010}(*) not in (empty,0)",
+    "reason": "No coordinates evaluated",
     "details": []
   },
   {
     "rule_id": "EGDQ_0920b",
     "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(J03.00) and {c0010}(*) not in (empty,0)",
+    "reason": "No coordinates evaluated",
     "details": []
   },
   {
     "rule_id": "EGDQ_0920c",
     "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(J04.00) and {c0010}(*) not in (empty,0)",
+    "reason": "No coordinates evaluated",
     "details": []
   },
   {
     "rule_id": "EGDQ_0921a",
     "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(J05.00) and {c0010}(*) not in (empty,0)",
+    "reason": "No coordinates evaluated",
     "details": []
   },
   {
     "rule_id": "EGDQ_0921b",
     "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(J06.00) and {c0010}(*) not in (empty,0)",
+    "reason": "No coordinates evaluated",
     "details": []
   },
   {
     "rule_id": "EGDQ_0921c",
     "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(J07.00) and {c0010}(*) not in (empty,0)",
+    "reason": "No coordinates evaluated",
     "details": []
   },
   {
     "rule_id": "EGDQ_0922a",
     "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(J05.00) and {c0260}(*) not in (empty,0)",
+    "reason": "No coordinates evaluated",
     "details": []
   },
   {
     "rule_id": "EGDQ_0922b",
     "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(J06.00) and {c0260}(*) not in (empty,0)",
+    "reason": "No coordinates evaluated",
     "details": []
   },
   {
     "rule_id": "EGDQ_0922c",
     "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(J07.00) and {c0260}(*) not in (empty,0)",
+    "reason": "No coordinates evaluated",
     "details": []
   },
   {
     "rule_id": "EGDQ_0923a",
     "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(J05.00) and {c0010}(*) not in (empty,0)",
+    "reason": "No coordinates evaluated",
     "details": []
   },
   {
     "rule_id": "EGDQ_0923b",
     "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(J06.00) and {c0010}(*) not in (empty,0)",
+    "reason": "No coordinates evaluated",
     "details": []
   },
   {
     "rule_id": "EGDQ_0923c",
     "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(J07.00) and {c0010}(*) not in (empty,0)",
+    "reason": "No coordinates evaluated",
     "details": []
   },
   {
     "rule_id": "EGDQ_0924a",
     "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(J05.00) and {c0260}(*) not in (empty,0)",
+    "reason": "No coordinates evaluated",
     "details": []
   },
   {
     "rule_id": "EGDQ_0924b",
     "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(J06.00) and {c0260}(*) not in (empty,0)",
+    "reason": "No coordinates evaluated",
     "details": []
   },
   {
     "rule_id": "EGDQ_0924c",
     "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(J07.00) and {c0260}(*) not in (empty,0)",
+    "reason": "No coordinates evaluated",
     "details": []
   },
   {
     "rule_id": "EGDQ_0925a",
-    "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(J05.00)",
-    "details": []
+    "status": "ERROR",
+    "reason": null,
+    "details": [
+      {
+        "coordinates": [
+          "J05.00",
+          "J05.00",
+          "0290",
+          "0010",
+          "J05.00.a"
+        ],
+        "expected": true,
+        "actual": "MISSING(row=0020, col=0010, sheet=J05.00.a: row '0020' not found in sheet 'J05.00.a')",
+        "passed": false,
+        "message": "ERROR: row '0020' not found in sheet 'J05.00.a'",
+        "formula_values": {
+          "{r=0020, c=0010}": "MISSING(row=0020, col=0010, sheet=J05.00.a: row '0020' not found in sheet 'J05.00.a')",
+          "{r=0290, c=0010}": 92.0,
+          "{r=0290, c=0260}": 2.0
+        },
+        "precondition_values": {},
+        "evaluation_trace": "",
+        "formula_with_values": "MISSING(row=0020, col=0010, sheet=J05.00.a: row '0020' not found in sheet 'J05.00.a') = 92 + 2",
+        "precondition_with_values": "",
+        "comparison_left": "",
+        "comparison_operator": "",
+        "comparison_right": "",
+        "comparison_display": ""
+      },
+      {
+        "coordinates": [
+          "J05.00",
+          "J05.00",
+          "0370",
+          "0010",
+          "J05.00.a"
+        ],
+        "expected": true,
+        "actual": "MISSING(row=0080, col=0010, sheet=J05.00.a: row '0080' not found in sheet 'J05.00.a')",
+        "passed": false,
+        "message": "ERROR: row '0080' not found in sheet 'J05.00.a'",
+        "formula_values": {
+          "{r=0080, c=0010}": "MISSING(row=0080, col=0010, sheet=J05.00.a: row '0080' not found in sheet 'J05.00.a')",
+          "{r=0370, c=0010}": 91.0,
+          "{r=0370, c=0260}": 1.0
+        },
+        "precondition_values": {},
+        "evaluation_trace": "",
+        "formula_with_values": "MISSING(row=0080, col=0010, sheet=J05.00.a: row '0080' not found in sheet 'J05.00.a') = 91 + 1",
+        "precondition_with_values": "",
+        "comparison_left": "",
+        "comparison_operator": "",
+        "comparison_right": "",
+        "comparison_display": ""
+      }
+    ]
   },
   {
     "rule_id": "EGDQ_0925b",
-    "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(J06.00)",
-    "details": []
+    "status": "ERROR",
+    "reason": null,
+    "details": [
+      {
+        "coordinates": [
+          "J06.00",
+          "J06.00",
+          "0290",
+          "0010",
+          "J06.00.a"
+        ],
+        "expected": true,
+        "actual": "MISSING(row=0020, col=0010, sheet=J06.00.a: row '0020' not found in sheet 'J06.00.a')",
+        "passed": false,
+        "message": "ERROR: row '0020' not found in sheet 'J06.00.a'",
+        "formula_values": {
+          "{r=0020, c=0010}": "MISSING(row=0020, col=0010, sheet=J06.00.a: row '0020' not found in sheet 'J06.00.a')",
+          "{r=0290, c=0010}": 94.0,
+          "{r=0290, c=0260}": 4.0
+        },
+        "precondition_values": {},
+        "evaluation_trace": "",
+        "formula_with_values": "MISSING(row=0020, col=0010, sheet=J06.00.a: row '0020' not found in sheet 'J06.00.a') = 94 + 4",
+        "precondition_with_values": "",
+        "comparison_left": "",
+        "comparison_operator": "",
+        "comparison_right": "",
+        "comparison_display": ""
+      },
+      {
+        "coordinates": [
+          "J06.00",
+          "J06.00",
+          "0340",
+          "0010",
+          "J06.00.a"
+        ],
+        "expected": true,
+        "actual": "MISSING(row=0060, col=0010, sheet=J06.00.a: row '0060' not found in sheet 'J06.00.a')",
+        "passed": false,
+        "message": "ERROR: row '0060' not found in sheet 'J06.00.a'",
+        "formula_values": {
+          "{r=0060, c=0010}": "MISSING(row=0060, col=0010, sheet=J06.00.a: row '0060' not found in sheet 'J06.00.a')",
+          "{r=0340, c=0010}": 90.0,
+          "{r=0340, c=0260}": 97.0
+        },
+        "precondition_values": {},
+        "evaluation_trace": "",
+        "formula_with_values": "MISSING(row=0060, col=0010, sheet=J06.00.a: row '0060' not found in sheet 'J06.00.a') = 90 + 97",
+        "precondition_with_values": "",
+        "comparison_left": "",
+        "comparison_operator": "",
+        "comparison_right": "",
+        "comparison_display": ""
+      },
+      {
+        "coordinates": [
+          "J06.00",
+          "J06.00",
+          "0350",
+          "0010",
+          "J06.00.a"
+        ],
+        "expected": true,
+        "actual": "MISSING(row=0070, col=0010, sheet=J06.00.a: row '0070' not found in sheet 'J06.00.a')",
+        "passed": false,
+        "message": "ERROR: row '0070' not found in sheet 'J06.00.a'",
+        "formula_values": {
+          "{r=0070, c=0010}": "MISSING(row=0070, col=0010, sheet=J06.00.a: row '0070' not found in sheet 'J06.00.a')",
+          "{r=0350, c=0010}": 91.0,
+          "{r=0350, c=0260}": 1.0
+        },
+        "precondition_values": {},
+        "evaluation_trace": "",
+        "formula_with_values": "MISSING(row=0070, col=0010, sheet=J06.00.a: row '0070' not found in sheet 'J06.00.a') = 91 + 1",
+        "precondition_with_values": "",
+        "comparison_left": "",
+        "comparison_operator": "",
+        "comparison_right": "",
+        "comparison_display": ""
+      },
+      {
+        "coordinates": [
+          "J06.00",
+          "J06.00",
+          "0370",
+          "0010",
+          "J06.00.a"
+        ],
+        "expected": true,
+        "actual": "MISSING(row=0080, col=0010, sheet=J06.00.a: row '0080' not found in sheet 'J06.00.a')",
+        "passed": false,
+        "message": "ERROR: row '0080' not found in sheet 'J06.00.a'",
+        "formula_values": {
+          "{r=0080, c=0010}": "MISSING(row=0080, col=0010, sheet=J06.00.a: row '0080' not found in sheet 'J06.00.a')",
+          "{r=0370, c=0010}": 93.0,
+          "{r=0370, c=0260}": 3.0
+        },
+        "precondition_values": {},
+        "evaluation_trace": "",
+        "formula_with_values": "MISSING(row=0080, col=0010, sheet=J06.00.a: row '0080' not found in sheet 'J06.00.a') = 93 + 3",
+        "precondition_with_values": "",
+        "comparison_left": "",
+        "comparison_operator": "",
+        "comparison_right": "",
+        "comparison_display": ""
+      },
+      {
+        "coordinates": [
+          "J06.00",
+          "J06.00",
+          "0380",
+          "0010",
+          "J06.00.a"
+        ],
+        "expected": true,
+        "actual": "MISSING(row=0090, col=0010, sheet=J06.00.a: row '0090' not found in sheet 'J06.00.a')",
+        "passed": false,
+        "message": "ERROR: row '0090' not found in sheet 'J06.00.a'",
+        "formula_values": {
+          "{r=0090, c=0010}": "MISSING(row=0090, col=0010, sheet=J06.00.a: row '0090' not found in sheet 'J06.00.a')",
+          "{r=0380, c=0010}": 94.0,
+          "{r=0380, c=0260}": 4.0
+        },
+        "precondition_values": {},
+        "evaluation_trace": "",
+        "formula_with_values": "MISSING(row=0090, col=0010, sheet=J06.00.a: row '0090' not found in sheet 'J06.00.a') = 94 + 4",
+        "precondition_with_values": "",
+        "comparison_left": "",
+        "comparison_operator": "",
+        "comparison_right": "",
+        "comparison_display": ""
+      },
+      {
+        "coordinates": [
+          "J06.00",
+          "J06.00",
+          "0390",
+          "0010",
+          "J06.00.a"
+        ],
+        "expected": true,
+        "actual": "MISSING(row=0100, col=0010, sheet=J06.00.a: row '0100' not found in sheet 'J06.00.a')",
+        "passed": false,
+        "message": "ERROR: row '0100' not found in sheet 'J06.00.a'",
+        "formula_values": {
+          "{r=0100, c=0010}": "MISSING(row=0100, col=0010, sheet=J06.00.a: row '0100' not found in sheet 'J06.00.a')",
+          "{r=0390, c=0010}": 95.0,
+          "{r=0390, c=0260}": 5.0
+        },
+        "precondition_values": {},
+        "evaluation_trace": "",
+        "formula_with_values": "MISSING(row=0100, col=0010, sheet=J06.00.a: row '0100' not found in sheet 'J06.00.a') = 95 + 5",
+        "precondition_with_values": "",
+        "comparison_left": "",
+        "comparison_operator": "",
+        "comparison_right": "",
+        "comparison_display": ""
+      },
+      {
+        "coordinates": [
+          "J06.00",
+          "J06.00",
+          "0410",
+          "0010",
+          "J06.00.a"
+        ],
+        "expected": true,
+        "actual": "MISSING(row=0110, col=0010, sheet=J06.00.a: row '0110' not found in sheet 'J06.00.a')",
+        "passed": false,
+        "message": "ERROR: row '0110' not found in sheet 'J06.00.a'",
+        "formula_values": {
+          "{r=0110, c=0010}": "MISSING(row=0110, col=0010, sheet=J06.00.a: row '0110' not found in sheet 'J06.00.a')",
+          "{r=0410, c=0010}": 88.0,
+          "{r=0410, c=0260}": 95.0
+        },
+        "precondition_values": {},
+        "evaluation_trace": "",
+        "formula_with_values": "MISSING(row=0110, col=0010, sheet=J06.00.a: row '0110' not found in sheet 'J06.00.a') = 88 + 95",
+        "precondition_with_values": "",
+        "comparison_left": "",
+        "comparison_operator": "",
+        "comparison_right": "",
+        "comparison_display": ""
+      }
+    ]
   },
   {
     "rule_id": "EGDQ_0925c",
-    "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(J07.00)",
-    "details": []
+    "status": "ERROR",
+    "reason": null,
+    "details": [
+      {
+        "coordinates": [
+          "J07.00",
+          "J07.00",
+          "0290",
+          "0010",
+          "J07.00.a"
+        ],
+        "expected": true,
+        "actual": "MISSING(row=0020, col=0010, sheet=J07.00.a: row '0020' not found in sheet 'J07.00.a')",
+        "passed": false,
+        "message": "ERROR: row '0020' not found in sheet 'J07.00.a'",
+        "formula_values": {
+          "{r=0020, c=0010}": "MISSING(row=0020, col=0010, sheet=J07.00.a: row '0020' not found in sheet 'J07.00.a')",
+          "{r=0290, c=0010}": 96.0,
+          "{r=0290, c=0260}": 6.0
+        },
+        "precondition_values": {},
+        "evaluation_trace": "",
+        "formula_with_values": "MISSING(row=0020, col=0010, sheet=J07.00.a: row '0020' not found in sheet 'J07.00.a') = 96 + 6",
+        "precondition_with_values": "",
+        "comparison_left": "",
+        "comparison_operator": "",
+        "comparison_right": "",
+        "comparison_display": ""
+      },
+      {
+        "coordinates": [
+          "J07.00",
+          "J07.00",
+          "0340",
+          "0010",
+          "J07.00.a"
+        ],
+        "expected": true,
+        "actual": "MISSING(row=0060, col=0010, sheet=J07.00.a: row '0060' not found in sheet 'J07.00.a')",
+        "passed": false,
+        "message": "ERROR: row '0060' not found in sheet 'J07.00.a'",
+        "formula_values": {
+          "{r=0060, c=0010}": "MISSING(row=0060, col=0010, sheet=J07.00.a: row '0060' not found in sheet 'J07.00.a')",
+          "{r=0340, c=0010}": 92.0,
+          "{r=0340, c=0260}": 2.0
+        },
+        "precondition_values": {},
+        "evaluation_trace": "",
+        "formula_with_values": "MISSING(row=0060, col=0010, sheet=J07.00.a: row '0060' not found in sheet 'J07.00.a') = 92 + 2",
+        "precondition_with_values": "",
+        "comparison_left": "",
+        "comparison_operator": "",
+        "comparison_right": "",
+        "comparison_display": ""
+      },
+      {
+        "coordinates": [
+          "J07.00",
+          "J07.00",
+          "0350",
+          "0010",
+          "J07.00.a"
+        ],
+        "expected": true,
+        "actual": "MISSING(row=0070, col=0010, sheet=J07.00.a: row '0070' not found in sheet 'J07.00.a')",
+        "passed": false,
+        "message": "ERROR: row '0070' not found in sheet 'J07.00.a'",
+        "formula_values": {
+          "{r=0070, c=0010}": "MISSING(row=0070, col=0010, sheet=J07.00.a: row '0070' not found in sheet 'J07.00.a')",
+          "{r=0350, c=0010}": 93.0,
+          "{r=0350, c=0260}": 3.0
+        },
+        "precondition_values": {},
+        "evaluation_trace": "",
+        "formula_with_values": "MISSING(row=0070, col=0010, sheet=J07.00.a: row '0070' not found in sheet 'J07.00.a') = 93 + 3",
+        "precondition_with_values": "",
+        "comparison_left": "",
+        "comparison_operator": "",
+        "comparison_right": "",
+        "comparison_display": ""
+      },
+      {
+        "coordinates": [
+          "J07.00",
+          "J07.00",
+          "0370",
+          "0010",
+          "J07.00.a"
+        ],
+        "expected": true,
+        "actual": "MISSING(row=0080, col=0010, sheet=J07.00.a: row '0080' not found in sheet 'J07.00.a')",
+        "passed": false,
+        "message": "ERROR: row '0080' not found in sheet 'J07.00.a'",
+        "formula_values": {
+          "{r=0080, c=0010}": "MISSING(row=0080, col=0010, sheet=J07.00.a: row '0080' not found in sheet 'J07.00.a')",
+          "{r=0370, c=0010}": 95.0,
+          "{r=0370, c=0260}": 5.0
+        },
+        "precondition_values": {},
+        "evaluation_trace": "",
+        "formula_with_values": "MISSING(row=0080, col=0010, sheet=J07.00.a: row '0080' not found in sheet 'J07.00.a') = 95 + 5",
+        "precondition_with_values": "",
+        "comparison_left": "",
+        "comparison_operator": "",
+        "comparison_right": "",
+        "comparison_display": ""
+      },
+      {
+        "coordinates": [
+          "J07.00",
+          "J07.00",
+          "0380",
+          "0010",
+          "J07.00.a"
+        ],
+        "expected": true,
+        "actual": "MISSING(row=0090, col=0010, sheet=J07.00.a: row '0090' not found in sheet 'J07.00.a')",
+        "passed": false,
+        "message": "ERROR: row '0090' not found in sheet 'J07.00.a'",
+        "formula_values": {
+          "{r=0090, c=0010}": "MISSING(row=0090, col=0010, sheet=J07.00.a: row '0090' not found in sheet 'J07.00.a')",
+          "{r=0380, c=0010}": 96.0,
+          "{r=0380, c=0260}": 6.0
+        },
+        "precondition_values": {},
+        "evaluation_trace": "",
+        "formula_with_values": "MISSING(row=0090, col=0010, sheet=J07.00.a: row '0090' not found in sheet 'J07.00.a') = 96 + 6",
+        "precondition_with_values": "",
+        "comparison_left": "",
+        "comparison_operator": "",
+        "comparison_right": "",
+        "comparison_display": ""
+      },
+      {
+        "coordinates": [
+          "J07.00",
+          "J07.00",
+          "0390",
+          "0010",
+          "J07.00.a"
+        ],
+        "expected": true,
+        "actual": "MISSING(row=0100, col=0010, sheet=J07.00.a: row '0100' not found in sheet 'J07.00.a')",
+        "passed": false,
+        "message": "ERROR: row '0100' not found in sheet 'J07.00.a'",
+        "formula_values": {
+          "{r=0100, c=0010}": "MISSING(row=0100, col=0010, sheet=J07.00.a: row '0100' not found in sheet 'J07.00.a')",
+          "{r=0390, c=0010}": 97.0,
+          "{r=0390, c=0260}": 7.0
+        },
+        "precondition_values": {},
+        "evaluation_trace": "",
+        "formula_with_values": "MISSING(row=0100, col=0010, sheet=J07.00.a: row '0100' not found in sheet 'J07.00.a') = 97 + 7",
+        "precondition_with_values": "",
+        "comparison_left": "",
+        "comparison_operator": "",
+        "comparison_right": "",
+        "comparison_display": ""
+      },
+      {
+        "coordinates": [
+          "J07.00",
+          "J07.00",
+          "0410",
+          "0010",
+          "J07.00.a"
+        ],
+        "expected": true,
+        "actual": "MISSING(row=0110, col=0010, sheet=J07.00.a: row '0110' not found in sheet 'J07.00.a')",
+        "passed": false,
+        "message": "ERROR: row '0110' not found in sheet 'J07.00.a'",
+        "formula_values": {
+          "{r=0110, c=0010}": "MISSING(row=0110, col=0010, sheet=J07.00.a: row '0110' not found in sheet 'J07.00.a')",
+          "{r=0410, c=0010}": 90.0,
+          "{r=0410, c=0260}": 97.0
+        },
+        "precondition_values": {},
+        "evaluation_trace": "",
+        "formula_with_values": "MISSING(row=0110, col=0010, sheet=J07.00.a: row '0110' not found in sheet 'J07.00.a') = 90 + 97",
+        "precondition_with_values": "",
+        "comparison_left": "",
+        "comparison_operator": "",
+        "comparison_right": "",
+        "comparison_display": ""
+      }
+    ]
   },
   {
     "rule_id": "EGDQ_0926a",
-    "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(J05.00)",
-    "details": []
+    "status": "ERROR",
+    "reason": null,
+    "details": [
+      {
+        "coordinates": [
+          "J05.00",
+          "J05.00",
+          "0050",
+          "0010",
+          "J05.00.a"
+        ],
+        "expected": true,
+        "actual": "MISSING(row=0160, col=0010, sheet=J05.00.a: row '0160' not found in sheet 'J05.00.a')",
+        "passed": false,
+        "message": "ERROR: row '0160' not found in sheet 'J05.00.a'",
+        "formula_values": {
+          "{r=0160, c=0010}": "MISSING(row=0160, col=0010, sheet=J05.00.a: row '0160' not found in sheet 'J05.00.a')",
+          "{r=0050, c=0010}": 86.0
+        },
+        "precondition_values": {},
+        "evaluation_trace": "",
+        "formula_with_values": "MISSING(row=0160, col=0010, sheet=J05.00.a: row '0160' not found in sheet 'J05.00.a') <= 86",
+        "precondition_with_values": "",
+        "comparison_left": "",
+        "comparison_operator": "",
+        "comparison_right": "",
+        "comparison_display": ""
+      },
+      {
+        "coordinates": [
+          "J05.00",
+          "J05.00",
+          "0060",
+          "0010",
+          "J05.00.a"
+        ],
+        "expected": true,
+        "actual": "MISSING(row=0170, col=0010, sheet=J05.00.a: row '0170' not found in sheet 'J05.00.a')",
+        "passed": false,
+        "message": "ERROR: row '0170' not found in sheet 'J05.00.a'",
+        "formula_values": {
+          "{r=0170, c=0010}": "MISSING(row=0170, col=0010, sheet=J05.00.a: row '0170' not found in sheet 'J05.00.a')",
+          "{r=0060, c=0010}": 87.0
+        },
+        "precondition_values": {},
+        "evaluation_trace": "",
+        "formula_with_values": "MISSING(row=0170, col=0010, sheet=J05.00.a: row '0170' not found in sheet 'J05.00.a') <= 87",
+        "precondition_with_values": "",
+        "comparison_left": "",
+        "comparison_operator": "",
+        "comparison_right": "",
+        "comparison_display": ""
+      },
+      {
+        "coordinates": [
+          "J05.00",
+          "J05.00",
+          "0110",
+          "0010",
+          "J05.00.a"
+        ],
+        "expected": true,
+        "actual": "MISSING(row=0210, col=0010, sheet=J05.00.a: row '0210' not found in sheet 'J05.00.a')",
+        "passed": false,
+        "message": "ERROR: row '0210' not found in sheet 'J05.00.a'",
+        "formula_values": {
+          "{r=0210, c=0010}": "MISSING(row=0210, col=0010, sheet=J05.00.a: row '0210' not found in sheet 'J05.00.a')",
+          "{r=0110, c=0010}": 83.0
+        },
+        "precondition_values": {},
+        "evaluation_trace": "",
+        "formula_with_values": "MISSING(row=0210, col=0010, sheet=J05.00.a: row '0210' not found in sheet 'J05.00.a') <= 83",
+        "precondition_with_values": "",
+        "comparison_left": "",
+        "comparison_operator": "",
+        "comparison_right": "",
+        "comparison_display": ""
+      }
+    ]
   },
   {
     "rule_id": "EGDQ_0926b",
-    "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(J06.00)",
-    "details": []
+    "status": "ERROR",
+    "reason": null,
+    "details": [
+      {
+        "coordinates": [
+          "J06.00",
+          "J06.00",
+          "0050",
+          "0010",
+          "J06.00.a"
+        ],
+        "expected": true,
+        "actual": "MISSING(row=0160, col=0010, sheet=J06.00.a: row '0160' not found in sheet 'J06.00.a')",
+        "passed": false,
+        "message": "ERROR: row '0160' not found in sheet 'J06.00.a'",
+        "formula_values": {
+          "{r=0160, c=0010}": "MISSING(row=0160, col=0010, sheet=J06.00.a: row '0160' not found in sheet 'J06.00.a')",
+          "{r=0050, c=0010}": 88.0
+        },
+        "precondition_values": {},
+        "evaluation_trace": "",
+        "formula_with_values": "MISSING(row=0160, col=0010, sheet=J06.00.a: row '0160' not found in sheet 'J06.00.a') <= 88",
+        "precondition_with_values": "",
+        "comparison_left": "",
+        "comparison_operator": "",
+        "comparison_right": "",
+        "comparison_display": ""
+      }
+    ]
   },
   {
     "rule_id": "EGDQ_0926c",
-    "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(J07.00)",
-    "details": []
+    "status": "ERROR",
+    "reason": null,
+    "details": [
+      {
+        "coordinates": [
+          "J07.00",
+          "J07.00",
+          "0050",
+          "0010",
+          "J07.00.a"
+        ],
+        "expected": true,
+        "actual": "MISSING(row=0160, col=0010, sheet=J07.00.a: row '0160' not found in sheet 'J07.00.a')",
+        "passed": false,
+        "message": "ERROR: row '0160' not found in sheet 'J07.00.a'",
+        "formula_values": {
+          "{r=0160, c=0010}": "MISSING(row=0160, col=0010, sheet=J07.00.a: row '0160' not found in sheet 'J07.00.a')",
+          "{r=0050, c=0010}": 90.0
+        },
+        "precondition_values": {},
+        "evaluation_trace": "",
+        "formula_with_values": "MISSING(row=0160, col=0010, sheet=J07.00.a: row '0160' not found in sheet 'J07.00.a') <= 90",
+        "precondition_with_values": "",
+        "comparison_left": "",
+        "comparison_operator": "",
+        "comparison_right": "",
+        "comparison_display": ""
+      }
+    ]
   },
   {
     "rule_id": "EGDQ_0927a",
-    "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(J05.00)",
-    "details": []
+    "status": "ERROR",
+    "reason": null,
+    "details": [
+      {
+        "coordinates": [
+          "J05.00",
+          "J05.00",
+          "0450",
+          "0010",
+          "J05.00.a"
+        ],
+        "expected": true,
+        "actual": "MISSING(row=0320, col=0010, sheet=J05.00.a: row '0320' not found in sheet 'J05.00.a')",
+        "passed": false,
+        "message": "ERROR: row '0320' not found in sheet 'J05.00.a'",
+        "formula_values": {
+          "{r=0320, c=0010}": "MISSING(row=0320, col=0010, sheet=J05.00.a: row '0320' not found in sheet 'J05.00.a')",
+          "{r=0450, c=0010}": 90.0
+        },
+        "precondition_values": {},
+        "evaluation_trace": "",
+        "formula_with_values": "MISSING(row=0320, col=0010, sheet=J05.00.a: row '0320' not found in sheet 'J05.00.a') <= 90",
+        "precondition_with_values": "",
+        "comparison_left": "",
+        "comparison_operator": "",
+        "comparison_right": "",
+        "comparison_display": ""
+      }
+    ]
   },
   {
     "rule_id": "EGDQ_0927b",
     "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(J06.00)",
+    "reason": "No coordinates evaluated",
     "details": []
   },
   {
     "rule_id": "EGDQ_0927c",
     "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(J07.00)",
+    "reason": "No coordinates evaluated",
     "details": []
   },
   {
@@ -44266,7 +45563,7 @@
           "C04.00",
           "C04.00",
           null,
-          "0010",
+          null,
           "4"
         ],
         "expected": true,
@@ -44321,7 +45618,7 @@
           "C04.00",
           "C04.00",
           null,
-          "0010",
+          null,
           "4"
         ],
         "expected": true,
@@ -44376,7 +45673,7 @@
           "C04.00",
           "C04.00",
           null,
-          "0010",
+          null,
           "4"
         ],
         "expected": true,
@@ -44431,7 +45728,7 @@
           "C04.00",
           "C04.00",
           null,
-          "0010",
+          null,
           "4"
         ],
         "expected": true,
@@ -44484,7 +45781,7 @@
           "C04.00",
           "C04.00",
           null,
-          "0010",
+          null,
           "4"
         ],
         "expected": true,
@@ -44513,13 +45810,13 @@
           "C01.00",
           "C01.00",
           "0070",
-          "0010",
-          "1"
+          null,
+          "C0100"
         ],
         "expected": true,
         "actual": null,
         "passed": false,
-        "message": "Reference resolution error: 'Worksheet 1 does not exist.'",
+        "message": "Reference resolution error: 'Worksheet C0100 does not exist.'",
         "formula_values": {},
         "precondition_values": {},
         "evaluation_trace": "",
@@ -44557,7 +45854,7 @@
           "C03.00",
           "C03.00",
           "0070",
-          "0010",
+          null,
           "3"
         ],
         "expected": true,
@@ -44565,11 +45862,11 @@
         "passed": false,
         "message": "Reference resolution error: 'Worksheet 3 does not exist.'",
         "formula_values": {
-          "{r=0070, c=0010}": "070"
+          "{r=0070, c=0010}": NaN
         },
         "precondition_values": {},
         "evaluation_trace": "",
-        "formula_with_values": "070 = None / None",
+        "formula_with_values": "nan = None / None",
         "precondition_with_values": "",
         "comparison_left": "",
         "comparison_operator": "",
@@ -44588,13 +45885,13 @@
           "C01.00",
           "C01.00",
           "0080",
-          "0010",
-          "1"
+          null,
+          "C0100"
         ],
         "expected": true,
         "actual": null,
         "passed": false,
-        "message": "Reference resolution error: 'Worksheet 1 does not exist.'",
+        "message": "Reference resolution error: 'Worksheet C0100 does not exist.'",
         "formula_values": {},
         "precondition_values": {},
         "evaluation_trace": "",
@@ -44632,7 +45929,7 @@
           "C03.00",
           "C03.00",
           "0080",
-          "0010",
+          null,
           "3"
         ],
         "expected": true,
@@ -44640,11 +45937,11 @@
         "passed": false,
         "message": "Reference resolution error: 'Worksheet 3 does not exist.'",
         "formula_values": {
-          "{r=0080, c=0010}": "080"
+          "{r=0080, c=0010}": NaN
         },
         "precondition_values": {},
         "evaluation_trace": "",
-        "formula_with_values": "080 = None / None",
+        "formula_with_values": "nan = None / None",
         "precondition_with_values": "",
         "comparison_left": "",
         "comparison_operator": "",
@@ -44663,13 +45960,13 @@
           "C01.00",
           "C01.00",
           "0090",
-          "0010",
-          "1"
+          null,
+          "C0100"
         ],
         "expected": true,
         "actual": null,
         "passed": false,
-        "message": "Reference resolution error: 'Worksheet 1 does not exist.'",
+        "message": "Reference resolution error: 'Worksheet C0100 does not exist.'",
         "formula_values": {},
         "precondition_values": {},
         "evaluation_trace": "",
@@ -44707,7 +46004,7 @@
           "C03.00",
           "C03.00",
           "0090",
-          "0010",
+          null,
           "3"
         ],
         "expected": true,
@@ -44715,11 +46012,11 @@
         "passed": false,
         "message": "Reference resolution error: 'Worksheet 3 does not exist.'",
         "formula_values": {
-          "{r=0090, c=0010}": "090"
+          "{r=0090, c=0010}": NaN
         },
         "precondition_values": {},
         "evaluation_trace": "",
-        "formula_with_values": "090 = None / None",
+        "formula_with_values": "nan = None / None",
         "precondition_with_values": "",
         "comparison_left": "",
         "comparison_operator": "",
@@ -44738,13 +46035,13 @@
           "C01.00",
           "C01.00",
           "0330",
-          "0010",
-          "1"
+          null,
+          "C0100"
         ],
         "expected": true,
         "actual": null,
         "passed": false,
-        "message": "Reference resolution error: 'Worksheet 1 does not exist.'",
+        "message": "Reference resolution error: 'Worksheet C0100 does not exist.'",
         "formula_values": {},
         "precondition_values": {},
         "evaluation_trace": "",
@@ -44782,7 +46079,7 @@
           "C03.00",
           "C03.00",
           null,
-          "0010",
+          null,
           "3"
         ],
         "expected": true,
@@ -44806,7 +46103,7 @@
           "C04.00",
           "C04.00",
           "0330",
-          "0010",
+          null,
           "4"
         ],
         "expected": true,
@@ -44835,13 +46132,13 @@
           "C01.00",
           "C01.00",
           "0340",
-          "0010",
-          "1"
+          null,
+          "C0100"
         ],
         "expected": true,
         "actual": null,
         "passed": false,
-        "message": "Reference resolution error: 'Worksheet 1 does not exist.'",
+        "message": "Reference resolution error: 'Worksheet C0100 does not exist.'",
         "formula_values": {},
         "precondition_values": {},
         "evaluation_trace": "",
@@ -44879,7 +46176,7 @@
           "C03.00",
           "C03.00",
           null,
-          "0010",
+          null,
           "3"
         ],
         "expected": true,
@@ -44903,7 +46200,7 @@
           "C04.00",
           "C04.00",
           "0340",
-          "0010",
+          null,
           "4"
         ],
         "expected": true,
@@ -44932,13 +46229,13 @@
           "C01.00",
           "C01.00",
           "0350",
-          "0010",
-          "1"
+          null,
+          "C0100"
         ],
         "expected": true,
         "actual": null,
         "passed": false,
-        "message": "Reference resolution error: 'Worksheet 1 does not exist.'",
+        "message": "Reference resolution error: 'Worksheet C0100 does not exist.'",
         "formula_values": {},
         "precondition_values": {},
         "evaluation_trace": "",
@@ -44976,7 +46273,7 @@
           "C03.00",
           "C03.00",
           null,
-          "0010",
+          null,
           "3"
         ],
         "expected": true,
@@ -45000,7 +46297,7 @@
           "C04.00",
           "C04.00",
           "0350",
-          "0010",
+          null,
           "4"
         ],
         "expected": true,
@@ -45072,15 +46369,65 @@
   },
   {
     "rule_id": "EGDQ_0947",
-    "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(C32.02)",
-    "details": []
+    "status": "FAIL",
+    "reason": null,
+    "details": [
+      {
+        "coordinates": [
+          "C32.02",
+          "C32.02",
+          "0010",
+          "0130",
+          "C32.02.a"
+        ],
+        "expected": true,
+        "actual": null,
+        "passed": false,
+        "message": "Reference resolution error: 'Worksheet C32.02.a does not exist.'",
+        "formula_values": {
+          "{r=0010, c=0130}": 76.0
+        },
+        "precondition_values": {},
+        "evaluation_trace": "",
+        "formula_with_values": "76 = None",
+        "precondition_with_values": "",
+        "comparison_left": "",
+        "comparison_operator": "",
+        "comparison_right": "",
+        "comparison_display": ""
+      }
+    ]
   },
   {
     "rule_id": "EGDQ_0948",
-    "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(C32.02)",
-    "details": []
+    "status": "FAIL",
+    "reason": null,
+    "details": [
+      {
+        "coordinates": [
+          "C32.02",
+          "C32.02",
+          "0010",
+          "0140",
+          "C32.02.a"
+        ],
+        "expected": true,
+        "actual": null,
+        "passed": false,
+        "message": "Reference resolution error: 'Worksheet C32.02.a does not exist.'",
+        "formula_values": {
+          "{r=0010, c=0140}": 77.0
+        },
+        "precondition_values": {},
+        "evaluation_trace": "",
+        "formula_with_values": "77 = None",
+        "precondition_with_values": "",
+        "comparison_left": "",
+        "comparison_operator": "",
+        "comparison_right": "",
+        "comparison_display": ""
+      }
+    ]
   },
   {
     "rule_id": "EGDQ_0949",
@@ -45344,19 +46691,19 @@
           "C01.00",
           "C01.00",
           "0490",
-          "0010",
-          "1"
+          null,
+          "C0100"
         ],
         "expected": true,
         "actual": null,
         "passed": false,
-        "message": "Reference resolution error: 'Worksheet 1 does not exist.'",
+        "message": "Reference resolution error: 'Worksheet C0100 does not exist.'",
         "formula_values": {
-          "{r=0490, c=0010}": "490"
+          "{r=0490, c=0010}": 510
         },
         "precondition_values": {},
         "evaluation_trace": "",
-        "formula_with_values": "-490 = max(None - None - None, 0)",
+        "formula_with_values": "-510 = max(None - None - None, 0)",
         "precondition_with_values": "",
         "comparison_left": "",
         "comparison_operator": "",
@@ -45368,7 +46715,7 @@
           "C04.00",
           "C04.00",
           "0490",
-          "0010",
+          null,
           "4"
         ],
         "expected": true,
@@ -45418,9 +46765,9 @@
         "coordinates": [
           "C16.01",
           "C16.01",
-          "0590",
-          "0010",
-          "C16.01.a"
+          null,
+          null,
+          "C1601"
         ],
         "expected": true,
         "actual": null,
@@ -45448,27 +46795,27 @@
           "C16.01",
           "C16.01.A",
           "0010",
-          "0040",
-          "C16.01.a"
+          null,
+          "C1601"
         ],
         "expected": true,
         "actual": false,
         "passed": false,
         "message": "",
         "formula_values": {
-          "{r=0010, c=0040}": 76.0,
-          "{r=0080, c=0040}": 83.0,
-          "{r=0090, c=0040}": 84.0,
-          "{r=0020, c=0010}": 74.0
+          "{r=0010, c=0040}": 13,
+          "{r=0080, c=0040}": 813,
+          "{r=0090, c=0040}": 913,
+          "{r=0020, c=0010}": 113
         },
         "precondition_values": {},
-        "evaluation_trace": "-91 >= 8.879999999999999",
-        "formula_with_values": "76 - 83 - 84 >= 0.12 * 74",
+        "evaluation_trace": "-1713 >= 13.559999999999999",
+        "formula_with_values": "13 - 813 - 913 >= 0.12 * 113",
         "precondition_with_values": "",
-        "comparison_left": "76 - 83 - 84",
+        "comparison_left": "13 - 813 - 913",
         "comparison_operator": ">=",
-        "comparison_right": "0.12 * 74",
-        "comparison_display": "76 - 83 - 84 >= 0.12 * 74"
+        "comparison_right": "0.12 * 113",
+        "comparison_display": "13 - 813 - 913 >= 0.12 * 113"
       }
     ]
   },
@@ -45482,27 +46829,27 @@
           "C16.01",
           "C16.01.A",
           "0010",
-          "0040",
-          "C16.01.a"
+          null,
+          "C1601"
         ],
         "expected": true,
         "actual": true,
         "passed": true,
         "message": "",
         "formula_values": {
-          "{r=0010, c=0040}": 76.0,
-          "{r=0080, c=0040}": 83.0,
-          "{r=0090, c=0040}": 84.0,
-          "{r=0020, c=0010}": 74.0
+          "{r=0010, c=0040}": 13,
+          "{r=0080, c=0040}": 813,
+          "{r=0090, c=0040}": 913,
+          "{r=0020, c=0010}": 113
         },
         "precondition_values": {},
-        "evaluation_trace": "-91 <= 13.32",
-        "formula_with_values": "76 - 83 - 84 <= 0.18 * 74",
+        "evaluation_trace": "-1713 <= 20.34",
+        "formula_with_values": "13 - 813 - 913 <= 0.18 * 113",
         "precondition_with_values": "",
-        "comparison_left": "76 - 83 - 84",
+        "comparison_left": "13 - 813 - 913",
         "comparison_operator": "<=",
-        "comparison_right": "0.18 * 74",
-        "comparison_display": "76 - 83 - 84 <= 0.18 * 74"
+        "comparison_right": "0.18 * 113",
+        "comparison_display": "13 - 813 - 913 <= 0.18 * 113"
       }
     ]
   },
@@ -45516,19 +46863,19 @@
           "C16.01",
           "C16.01",
           "0050",
-          "0010",
-          "C16.01.a"
+          null,
+          "C1601"
         ],
         "expected": true,
         "actual": null,
         "passed": false,
-        "message": "Reference resolution error: 'Worksheet C16.01.a does not exist.'",
+        "message": "Reference resolution error: 'Worksheet C1601 does not exist.'",
         "formula_values": {
-          "{r=0050, c=0010}": 77.0
+          "{r=0050, c=0010}": 513
         },
         "precondition_values": {},
         "evaluation_trace": "",
-        "formula_with_values": "77 = sum(0, sum[None])",
+        "formula_with_values": "513 = sum(0, sum[None])",
         "precondition_with_values": "",
         "comparison_left": "",
         "comparison_operator": "",
@@ -45548,17 +46895,17 @@
         "passed": false,
         "message": "",
         "formula_values": {
-          "{r=0050, c=0010}": 77.0,
+          "{r=0050, c=0010}": 513,
           "{r=0050, c=0030}": 85.0
         },
         "precondition_values": {},
-        "evaluation_trace": "77 == 85",
-        "formula_with_values": "77 = sum(0, sum[85])",
+        "evaluation_trace": "513 == 85",
+        "formula_with_values": "513 = sum(0, sum[85])",
         "precondition_with_values": "",
-        "comparison_left": "77",
+        "comparison_left": "513",
         "comparison_operator": "==",
         "comparison_right": "sum(0, sum(85))",
-        "comparison_display": "77 == sum(0, sum(85))"
+        "comparison_display": "513 == sum(0, sum(85))"
       }
     ]
   },
@@ -46591,229 +47938,302 @@
   {
     "rule_id": "EGDQ_C017",
     "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(C17.01)",
+    "reason": "No coordinates evaluated",
     "details": []
   },
   {
     "rule_id": "EGDQ_C018",
     "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(C17.01)",
+    "reason": "No coordinates evaluated",
     "details": []
   },
   {
     "rule_id": "EGDQ_C019",
     "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(C47.00)",
+    "reason": "No coordinates evaluated",
     "details": []
   },
   {
     "rule_id": "EGDQ_C020",
     "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(C47.00)",
+    "reason": "No coordinates evaluated",
     "details": []
   },
   {
     "rule_id": "EGDQ_C021",
     "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(F01.01)",
+    "reason": "No coordinates evaluated",
     "details": []
   },
   {
     "rule_id": "EGDQ_C021_dp",
     "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(F01.01_dp)",
+    "reason": "No coordinates evaluated",
     "details": []
   },
   {
     "rule_id": "EGDQ_C022",
-    "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(F01.02)",
-    "details": []
+    "status": "ERROR",
+    "reason": null,
+    "details": [
+      {
+        "coordinates": [
+          "F01.02",
+          "F01.02",
+          "0300",
+          null,
+          "F01.02.a"
+        ],
+        "expected": true,
+        "actual": "MISSING(row=0300, col=0010, sheet=F01.02.a: column '0010' not found in sheet 'F01.02.a')",
+        "passed": false,
+        "message": "ERROR: column '0010' not found in sheet 'F01.02.a'",
+        "formula_values": {
+          "{r=0300, c=0010}": "MISSING(row=0300, col=0010, sheet=F01.02.a: column '0010' not found in sheet 'F01.02.a')"
+        },
+        "precondition_values": {},
+        "evaluation_trace": "",
+        "formula_with_values": "MISSING(row=0300, col=0010, sheet=F01.02.a: column '0010' not found in sheet 'F01.02.a') != empty",
+        "precondition_with_values": "",
+        "comparison_left": "",
+        "comparison_operator": "",
+        "comparison_right": "",
+        "comparison_display": ""
+      }
+    ]
   },
   {
     "rule_id": "EGDQ_C022_dp",
     "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(F01.02_dp)",
+    "reason": "No coordinates evaluated",
     "details": []
   },
   {
     "rule_id": "EGDQ_C023",
     "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(F01.03)",
+    "reason": "No coordinates evaluated",
     "details": []
   },
   {
     "rule_id": "EGDQ_C023_dp",
     "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(F01.03_dp)",
+    "reason": "No coordinates evaluated",
     "details": []
   },
   {
     "rule_id": "EGDQ_C024",
     "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(F02.00)",
+    "reason": "No coordinates evaluated",
     "details": []
   },
   {
     "rule_id": "EGDQ_C024_dp",
     "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(F02.00_dp)",
+    "reason": "No coordinates evaluated",
     "details": []
   },
   {
     "rule_id": "EGDQ_C025",
     "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(F17.01)",
+    "reason": "No coordinates evaluated",
     "details": []
   },
   {
     "rule_id": "EGDQ_C026",
-    "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(F17.03)",
-    "details": []
+    "status": "ERROR",
+    "reason": null,
+    "details": [
+      {
+        "coordinates": [
+          "F17.03",
+          "F17.03",
+          "0390",
+          null,
+          "F17.03.a"
+        ],
+        "expected": true,
+        "actual": "MISSING(row=0390, col=0010, sheet=F17.03.a: column '0010' not found in sheet 'F17.03.a')",
+        "passed": false,
+        "message": "ERROR: column '0010' not found in sheet 'F17.03.a'",
+        "formula_values": {
+          "{r=0390, c=0010}": "MISSING(row=0390, col=0010, sheet=F17.03.a: column '0010' not found in sheet 'F17.03.a')"
+        },
+        "precondition_values": {},
+        "evaluation_trace": "",
+        "formula_with_values": "MISSING(row=0390, col=0010, sheet=F17.03.a: column '0010' not found in sheet 'F17.03.a') != empty",
+        "precondition_with_values": "",
+        "comparison_left": "",
+        "comparison_operator": "",
+        "comparison_right": "",
+        "comparison_display": ""
+      }
+    ]
   },
   {
     "rule_id": "EGDQ_C027",
     "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(F18.00)",
+    "reason": "No coordinates evaluated",
     "details": []
   },
   {
     "rule_id": "EGDQ_C027_dp",
     "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(F18.00_dp)",
+    "reason": "No coordinates evaluated",
     "details": []
   },
   {
     "rule_id": "EGDQ_C028",
     "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(F18.00)",
+    "reason": "No coordinates evaluated",
     "details": []
   },
   {
     "rule_id": "EGDQ_C028_dp",
     "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(F18.00_dp)",
+    "reason": "No coordinates evaluated",
     "details": []
   },
   {
     "rule_id": "EGDQ_C031",
     "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(C03.00)",
+    "reason": "No coordinates evaluated",
     "details": []
   },
   {
     "rule_id": "EGDQ_C032",
     "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(C03.00)",
+    "reason": "No coordinates evaluated",
     "details": []
   },
   {
     "rule_id": "EGDQ_C033",
     "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(C03.00)",
+    "reason": "No coordinates evaluated",
     "details": []
   },
   {
     "rule_id": "EGDQ_C036",
-    "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(C07.00)",
-    "details": []
+    "status": "FAIL",
+    "reason": null,
+    "details": [
+      {
+        "coordinates": [
+          "C07.00",
+          "C07.00.A",
+          "0010",
+          "0010",
+          "TOTAL SA"
+        ],
+        "expected": true,
+        "actual": null,
+        "passed": false,
+        "message": "Reference resolution error: 'Worksheet qx01 does not exist.'",
+        "formula_values": {},
+        "precondition_values": {},
+        "evaluation_trace": "",
+        "formula_with_values": "None != empty",
+        "precondition_with_values": "",
+        "comparison_left": "",
+        "comparison_operator": "",
+        "comparison_right": "",
+        "comparison_display": ""
+      }
+    ]
   },
   {
     "rule_id": "EGDQ_C037",
     "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(C10.01)",
+    "reason": "No coordinates evaluated",
     "details": []
   },
   {
     "rule_id": "EGDQ_C038",
     "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(C47.00)",
+    "reason": "No coordinates evaluated",
     "details": []
   },
   {
     "rule_id": "EGDQ_C039",
     "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(C47.00)",
+    "reason": "No coordinates evaluated",
     "details": []
   },
   {
     "rule_id": "EGDQ_C040",
     "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(C67.00)",
+    "reason": "No coordinates evaluated",
     "details": []
   },
   {
     "rule_id": "EGDQ_C041",
     "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(C67.00)",
+    "reason": "No coordinates evaluated",
     "details": []
   },
   {
     "rule_id": "EGDQ_C042",
     "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(C71.00)",
+    "reason": "No coordinates evaluated",
     "details": []
   },
   {
     "rule_id": "EGDQ_C043",
     "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(C71.00)",
+    "reason": "No coordinates evaluated",
     "details": []
   },
   {
     "rule_id": "EGDQ_C044",
     "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(C72.00)",
+    "reason": "No coordinates evaluated",
     "details": []
   },
   {
     "rule_id": "EGDQ_C045",
     "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(C72.00)",
+    "reason": "No coordinates evaluated",
     "details": []
   },
   {
     "rule_id": "EGDQ_C046",
     "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(C76.00)",
+    "reason": "No coordinates evaluated",
     "details": []
   },
   {
     "rule_id": "EGDQ_C047",
     "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(C76.00)",
+    "reason": "No coordinates evaluated",
     "details": []
   },
   {
     "rule_id": "EGDQ_C048",
     "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(C76.00)",
+    "reason": "No coordinates evaluated",
     "details": []
   },
   {
     "rule_id": "EGDQ_C049",
     "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(F03.00)",
+    "reason": "No coordinates evaluated",
     "details": []
   },
   {
     "rule_id": "EGDQ_C050",
     "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(F05.01)",
+    "reason": "No coordinates evaluated",
     "details": []
   },
   {
     "rule_id": "EGDQ_C051",
     "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(F32.01)",
+    "reason": "No coordinates evaluated",
     "details": []
   },
   {
     "rule_id": "EGDQ_C052",
     "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(F32.01)",
+    "reason": "No coordinates evaluated",
     "details": []
   },
   {
@@ -47550,50 +48970,95 @@
   },
   {
     "rule_id": "EGDQ_C054",
-    "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(C07.00) or filed(C08.01)",
-    "details": []
+    "status": "FAIL",
+    "reason": null,
+    "details": [
+      {
+        "coordinates": [
+          "C07.00",
+          "C07.00",
+          "0010",
+          "0200",
+          "TOTAL SA"
+        ],
+        "expected": true,
+        "actual": null,
+        "passed": false,
+        "message": "Reference resolution error: 'Worksheet qx16 does not exist.'",
+        "formula_values": {},
+        "precondition_values": {},
+        "evaluation_trace": "",
+        "formula_with_values": "None not in (empty,0) or None not in (empty,0) or None not in (empty,0)",
+        "precondition_with_values": "",
+        "comparison_left": "",
+        "comparison_operator": "",
+        "comparison_right": "",
+        "comparison_display": ""
+      },
+      {
+        "coordinates": [
+          "C08.01",
+          "C08.01",
+          "0010",
+          "0200",
+          "8.1"
+        ],
+        "expected": true,
+        "actual": null,
+        "passed": false,
+        "message": "Reference resolution error: 'Worksheet qx16 does not exist.'",
+        "formula_values": {},
+        "precondition_values": {},
+        "evaluation_trace": "",
+        "formula_with_values": "None not in (empty,0) or None not in (empty,0) or None not in (empty,0)",
+        "precondition_with_values": "",
+        "comparison_left": "",
+        "comparison_operator": "",
+        "comparison_right": "",
+        "comparison_display": ""
+      }
+    ]
   },
   {
     "rule_id": "EGDQ_C063",
     "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(C17.01)",
+    "reason": "No coordinates evaluated",
     "details": []
   },
   {
     "rule_id": "EGDQ_C064",
     "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(C17.01)",
+    "reason": "No coordinates evaluated",
     "details": []
   },
   {
     "rule_id": "EGDQ_C065",
     "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(C24.00)",
+    "reason": "No coordinates evaluated",
     "details": []
   },
   {
     "rule_id": "EGDQ_C066",
     "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(C24.00)",
+    "reason": "No coordinates evaluated",
     "details": []
   },
   {
     "rule_id": "EGDQ_C067",
     "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(C24.00)",
+    "reason": "No coordinates evaluated",
     "details": []
   },
   {
     "rule_id": "EGDQ_C068",
     "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(C24.00)",
+    "reason": "No coordinates evaluated",
     "details": []
   },
   {
     "rule_id": "EGDQ_C069",
     "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(C24.00)",
+    "reason": "No coordinates evaluated",
     "details": []
   },
   {
@@ -47607,7 +49072,7 @@
           "C24.00",
           "0010",
           "0070",
-          "24"
+          "C2400"
         ],
         "expected": true,
         "actual": true,
@@ -47640,7 +49105,7 @@
           "C24.00",
           "0010",
           "0080",
-          "24"
+          "C2400"
         ],
         "expected": true,
         "actual": true,
@@ -47665,7 +49130,7 @@
   {
     "rule_id": "EGDQ_C072",
     "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(C24.00)",
+    "reason": "No coordinates evaluated",
     "details": []
   },
   {
@@ -47745,13 +49210,13 @@
   {
     "rule_id": "EGDQ_C075a",
     "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(C66.01)",
+    "reason": "No coordinates evaluated",
     "details": []
   },
   {
     "rule_id": "EGDQ_C075b",
     "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(C66.01)",
+    "reason": "No coordinates evaluated",
     "details": []
   },
   {
@@ -47769,67 +49234,67 @@
   {
     "rule_id": "EGDQ_C078",
     "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(C68.00)",
+    "reason": "No coordinates evaluated",
     "details": []
   },
   {
     "rule_id": "EGDQ_C092",
     "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(F12.02)",
+    "reason": "No coordinates evaluated",
     "details": []
   },
   {
     "rule_id": "EGDQ_C093",
     "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(F12.02)",
+    "reason": "No coordinates evaluated",
     "details": []
   },
   {
     "rule_id": "EGDQ_C094",
     "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(F12.02)",
+    "reason": "No coordinates evaluated",
     "details": []
   },
   {
     "rule_id": "EGDQ_C095b",
     "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(F13.01)",
+    "reason": "No coordinates evaluated",
     "details": []
   },
   {
     "rule_id": "EGDQ_C096b",
     "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(F13.01)",
+    "reason": "No coordinates evaluated",
     "details": []
   },
   {
     "rule_id": "EGDQ_C097",
     "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(F13.01)",
+    "reason": "No coordinates evaluated",
     "details": []
   },
   {
     "rule_id": "EGDQ_C098",
     "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(F13.01)",
+    "reason": "No coordinates evaluated",
     "details": []
   },
   {
     "rule_id": "EGDQ_C100",
     "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(F32.01)",
+    "reason": "No coordinates evaluated",
     "details": []
   },
   {
     "rule_id": "EGDQ_C101",
     "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(F32.04)",
+    "reason": "No coordinates evaluated",
     "details": []
   },
   {
     "rule_id": "EGDQ_C102",
     "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(F32.04)",
+    "reason": "No coordinates evaluated",
     "details": []
   },
   {
@@ -47909,13 +49374,13 @@
   {
     "rule_id": "EGDQ_C105",
     "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(C01.00)",
+    "reason": "No coordinates evaluated",
     "details": []
   },
   {
     "rule_id": "EGDQ_C106",
     "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(C01.00)",
+    "reason": "No coordinates evaluated",
     "details": []
   },
   {
@@ -47945,434 +49410,707 @@
   {
     "rule_id": "EGDQ_C118",
     "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(C16.01)",
+    "reason": "No coordinates evaluated",
     "details": []
   },
   {
     "rule_id": "EGDQ_C121",
     "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(C18.00)",
+    "reason": "No coordinates evaluated",
     "details": []
   },
   {
     "rule_id": "EGDQ_C122",
     "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(C18.00)",
+    "reason": "No coordinates evaluated",
     "details": []
   },
   {
     "rule_id": "EGDQ_C123",
     "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(C18.00)",
+    "reason": "No coordinates evaluated",
     "details": []
   },
   {
     "rule_id": "EGDQ_C124",
     "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(C22.00)",
+    "reason": "No coordinates evaluated",
     "details": []
   },
   {
     "rule_id": "EGDQ_C125",
     "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(C22.00)",
+    "reason": "No coordinates evaluated",
     "details": []
   },
   {
     "rule_id": "EGDQ_C128",
     "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(C22.00)",
+    "reason": "No coordinates evaluated",
     "details": []
   },
   {
     "rule_id": "EGDQ_C129",
     "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(C22.00)",
+    "reason": "No coordinates evaluated",
     "details": []
   },
   {
     "rule_id": "EGDQ_C132",
     "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(C24.00)",
+    "reason": "No coordinates evaluated",
     "details": []
   },
   {
     "rule_id": "EGDQ_C133",
     "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(C24.00)",
+    "reason": "No coordinates evaluated",
     "details": []
   },
   {
     "rule_id": "EGDQ_C134",
     "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(C25.01)",
+    "reason": "No coordinates evaluated",
     "details": []
   },
   {
     "rule_id": "EGDQ_C139",
     "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(C43.00)",
+    "reason": "No coordinates evaluated",
     "details": []
   },
   {
     "rule_id": "EGDQ_C140",
     "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(C43.00)",
+    "reason": "No coordinates evaluated",
     "details": []
   },
   {
     "rule_id": "EGDQ_C141",
     "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(C44.00)",
+    "reason": "No coordinates evaluated",
     "details": []
   },
   {
     "rule_id": "EGDQ_C142",
     "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(C44.00)",
+    "reason": "No coordinates evaluated",
     "details": []
   },
   {
     "rule_id": "EGDQ_C143",
     "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(C44.00)",
+    "reason": "No coordinates evaluated",
     "details": []
   },
   {
     "rule_id": "EGDQ_C154",
     "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(C72.00)",
+    "reason": "No coordinates evaluated",
     "details": []
   },
   {
     "rule_id": "EGDQ_C155",
     "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(C72.00)",
+    "reason": "No coordinates evaluated",
     "details": []
   },
   {
     "rule_id": "EGDQ_C156",
     "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(C72.00)",
+    "reason": "No coordinates evaluated",
     "details": []
   },
   {
     "rule_id": "EGDQ_C157",
     "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(C72.00)",
+    "reason": "No coordinates evaluated",
     "details": []
   },
   {
     "rule_id": "EGDQ_C158",
     "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(F01.01)",
+    "reason": "No coordinates evaluated",
     "details": []
   },
   {
     "rule_id": "EGDQ_C158_dp",
     "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(F01.01_dp)",
+    "reason": "No coordinates evaluated",
     "details": []
   },
   {
     "rule_id": "EGDQ_C159",
     "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(F01.03)",
+    "reason": "No coordinates evaluated",
     "details": []
   },
   {
     "rule_id": "EGDQ_C159_dp",
     "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(F01.03_dp)",
+    "reason": "No coordinates evaluated",
     "details": []
   },
   {
     "rule_id": "EGDQ_C160",
-    "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(F01.03) and {F00.01,r0010,c0010} = 'EBA:qAS(qx2004)'",
-    "details": []
+    "status": "FAIL",
+    "reason": null,
+    "details": [
+      {
+        "coordinates": [
+          "F01.03",
+          "F01.03",
+          "0090",
+          "0010",
+          "F01.03.a"
+        ],
+        "expected": true,
+        "actual": null,
+        "passed": false,
+        "message": "Precondition resolution error: 'Worksheet F01.03.a does not exist.'",
+        "formula_values": {
+          "{r=0090, c=0010}": 90
+        },
+        "precondition_values": {},
+        "evaluation_trace": "",
+        "formula_with_values": "90 != empty",
+        "precondition_with_values": "filed(F01.03) and 90 = 'EBA:qAS(qx2004)'",
+        "comparison_left": "",
+        "comparison_operator": "",
+        "comparison_right": "",
+        "comparison_display": ""
+      }
+    ]
   },
   {
     "rule_id": "EGDQ_C160_dp",
-    "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(F01.03_dp) and {F00.01,r0010,c0010} = 'EBA:qAS(qx2004)'",
-    "details": []
+    "status": "FAIL",
+    "reason": null,
+    "details": [
+      {
+        "coordinates": [
+          "F01.03_DP",
+          "F01.03_DP",
+          "0090",
+          "0010",
+          "F01.03_DP.a"
+        ],
+        "expected": true,
+        "actual": null,
+        "passed": false,
+        "message": "Precondition resolution error: 'Worksheet F01.03_DP.a does not exist.'",
+        "formula_values": {
+          "{r=0090, c=0010}": 90
+        },
+        "precondition_values": {},
+        "evaluation_trace": "",
+        "formula_with_values": "90 != empty",
+        "precondition_with_values": "filed(F01.03_dp) and 90 = 'EBA:qAS(qx2004)'",
+        "comparison_left": "",
+        "comparison_operator": "",
+        "comparison_right": "",
+        "comparison_display": ""
+      }
+    ]
   },
   {
     "rule_id": "EGDQ_C161",
     "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(F01.03)",
+    "reason": "No coordinates evaluated",
     "details": []
   },
   {
     "rule_id": "EGDQ_C161_dp",
     "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(F01.03_dp)",
+    "reason": "No coordinates evaluated",
     "details": []
   },
   {
     "rule_id": "EGDQ_C162",
     "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(F01.03)",
+    "reason": "No coordinates evaluated",
     "details": []
   },
   {
     "rule_id": "EGDQ_C162_dp",
     "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(F01.03_dp)",
+    "reason": "No coordinates evaluated",
     "details": []
   },
   {
     "rule_id": "EGDQ_C163",
     "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(F02.00)",
+    "reason": "No coordinates evaluated",
     "details": []
   },
   {
     "rule_id": "EGDQ_C163_dp",
     "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(F02.00_dp)",
+    "reason": "No coordinates evaluated",
     "details": []
   },
   {
     "rule_id": "EGDQ_C164",
     "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(F02.00)",
+    "reason": "No coordinates evaluated",
     "details": []
   },
   {
     "rule_id": "EGDQ_C164_dp",
     "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(F02.00_dp)",
+    "reason": "No coordinates evaluated",
     "details": []
   },
   {
     "rule_id": "EGDQ_C165",
     "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(F02.00)",
+    "reason": "No coordinates evaluated",
     "details": []
   },
   {
     "rule_id": "EGDQ_C165_dp",
     "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(F02.00_dp)",
+    "reason": "No coordinates evaluated",
     "details": []
   },
   {
     "rule_id": "EGDQ_C166",
     "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(F02.00)",
+    "reason": "No coordinates evaluated",
     "details": []
   },
   {
     "rule_id": "EGDQ_C166_dp",
     "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(F02.00_dp)",
+    "reason": "No coordinates evaluated",
     "details": []
   },
   {
     "rule_id": "EGDQ_C167",
     "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(F02.00)",
+    "reason": "No coordinates evaluated",
     "details": []
   },
   {
     "rule_id": "EGDQ_C167_dp",
     "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(F02.00_dp)",
+    "reason": "No coordinates evaluated",
     "details": []
   },
   {
     "rule_id": "EGDQ_C168",
     "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(F02.00)",
+    "reason": "No coordinates evaluated",
     "details": []
   },
   {
     "rule_id": "EGDQ_C168_dp",
     "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(F02.00_dp)",
+    "reason": "No coordinates evaluated",
     "details": []
   },
   {
     "rule_id": "EGDQ_C169",
-    "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(F03.00) and {F00.01,r0010,c0010} = 'EBA:qAS(qx2004)'",
-    "details": []
+    "status": "FAIL",
+    "reason": null,
+    "details": [
+      {
+        "coordinates": [
+          "F03.00",
+          "F03.00",
+          "0020",
+          "0010",
+          "F03.00.a"
+        ],
+        "expected": true,
+        "actual": null,
+        "passed": false,
+        "message": "Precondition resolution error: 'Worksheet F03.00.a does not exist.'",
+        "formula_values": {
+          "{r=0020, c=0010}": 20
+        },
+        "precondition_values": {},
+        "evaluation_trace": "",
+        "formula_with_values": "20 != empty",
+        "precondition_with_values": "filed(F03.00) and 20 = 'EBA:qAS(qx2004)'",
+        "comparison_left": "",
+        "comparison_operator": "",
+        "comparison_right": "",
+        "comparison_display": ""
+      }
+    ]
   },
   {
     "rule_id": "EGDQ_C173",
     "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(F12.00)",
+    "reason": "No coordinates evaluated",
     "details": []
   },
   {
     "rule_id": "EGDQ_C174",
     "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(F12.00)",
+    "reason": "No coordinates evaluated",
     "details": []
   },
   {
     "rule_id": "EGDQ_C178",
-    "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(F16.07)",
-    "details": []
+    "status": "ERROR",
+    "reason": null,
+    "details": [
+      {
+        "coordinates": [
+          "F16.07",
+          "F16.07.B",
+          "0150",
+          null,
+          "F16.07.b"
+        ],
+        "expected": true,
+        "actual": "MISSING(row=0150, col=0040, sheet=F16.07.b: column '0040' not found in sheet 'F16.07.b')",
+        "passed": false,
+        "message": "ERROR: column '0040' not found in sheet 'F16.07.b'",
+        "formula_values": {
+          "{r=0150, c=0040}": "MISSING(row=0150, col=0040, sheet=F16.07.b: column '0040' not found in sheet 'F16.07.b')"
+        },
+        "precondition_values": {},
+        "evaluation_trace": "",
+        "formula_with_values": "MISSING(row=0150, col=0040, sheet=F16.07.b: column '0040' not found in sheet 'F16.07.b') != empty",
+        "precondition_with_values": "",
+        "comparison_left": "",
+        "comparison_operator": "",
+        "comparison_right": "",
+        "comparison_display": ""
+      }
+    ]
   },
   {
     "rule_id": "EGDQ_C179",
     "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(F17.01)",
+    "reason": "No coordinates evaluated",
     "details": []
   },
   {
     "rule_id": "EGDQ_C180",
-    "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(F17.02)",
-    "details": []
+    "status": "ERROR",
+    "reason": null,
+    "details": [
+      {
+        "coordinates": [
+          "F17.02",
+          "F17.02",
+          "0040",
+          null,
+          "F17.02.a"
+        ],
+        "expected": true,
+        "actual": "MISSING(row=0040, col=0010, sheet=F17.02.a: column '0010' not found in sheet 'F17.02.a')",
+        "passed": false,
+        "message": "ERROR: column '0010' not found in sheet 'F17.02.a'",
+        "formula_values": {
+          "{r=0040, c=0010}": "MISSING(row=0040, col=0010, sheet=F17.02.a: column '0010' not found in sheet 'F17.02.a')"
+        },
+        "precondition_values": {},
+        "evaluation_trace": "",
+        "formula_with_values": "MISSING(row=0040, col=0010, sheet=F17.02.a: column '0010' not found in sheet 'F17.02.a') != empty",
+        "precondition_with_values": "",
+        "comparison_left": "",
+        "comparison_operator": "",
+        "comparison_right": "",
+        "comparison_display": ""
+      }
+    ]
   },
   {
     "rule_id": "EGDQ_C181",
-    "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(F17.03)",
-    "details": []
+    "status": "ERROR",
+    "reason": null,
+    "details": [
+      {
+        "coordinates": [
+          "F17.03",
+          "F17.03",
+          "0250",
+          null,
+          "F17.03.a"
+        ],
+        "expected": true,
+        "actual": "MISSING(row=0250, col=0010, sheet=F17.03.a: column '0010' not found in sheet 'F17.03.a')",
+        "passed": false,
+        "message": "ERROR: column '0010' not found in sheet 'F17.03.a'",
+        "formula_values": {
+          "{r=0250, c=0010}": "MISSING(row=0250, col=0010, sheet=F17.03.a: column '0010' not found in sheet 'F17.03.a')"
+        },
+        "precondition_values": {},
+        "evaluation_trace": "",
+        "formula_with_values": "MISSING(row=0250, col=0010, sheet=F17.03.a: column '0010' not found in sheet 'F17.03.a') != empty",
+        "precondition_with_values": "",
+        "comparison_left": "",
+        "comparison_operator": "",
+        "comparison_right": "",
+        "comparison_display": ""
+      }
+    ]
   },
   {
     "rule_id": "EGDQ_C182",
-    "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(F17.03)",
-    "details": []
+    "status": "ERROR",
+    "reason": null,
+    "details": [
+      {
+        "coordinates": [
+          "F17.03",
+          "F17.03",
+          "0260",
+          null,
+          "F17.03.a"
+        ],
+        "expected": true,
+        "actual": "MISSING(row=0260, col=0010, sheet=F17.03.a: column '0010' not found in sheet 'F17.03.a')",
+        "passed": false,
+        "message": "ERROR: column '0010' not found in sheet 'F17.03.a'",
+        "formula_values": {
+          "{r=0260, c=0010}": "MISSING(row=0260, col=0010, sheet=F17.03.a: column '0010' not found in sheet 'F17.03.a')"
+        },
+        "precondition_values": {},
+        "evaluation_trace": "",
+        "formula_with_values": "MISSING(row=0260, col=0010, sheet=F17.03.a: column '0010' not found in sheet 'F17.03.a') != empty",
+        "precondition_with_values": "",
+        "comparison_left": "",
+        "comparison_operator": "",
+        "comparison_right": "",
+        "comparison_display": ""
+      }
+    ]
   },
   {
     "rule_id": "EGDQ_C183",
-    "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(F17.03)",
-    "details": []
+    "status": "ERROR",
+    "reason": null,
+    "details": [
+      {
+        "coordinates": [
+          "F17.03",
+          "F17.03",
+          "0380",
+          null,
+          "F17.03.a"
+        ],
+        "expected": true,
+        "actual": "MISSING(row=0380, col=0010, sheet=F17.03.a: column '0010' not found in sheet 'F17.03.a')",
+        "passed": false,
+        "message": "ERROR: column '0010' not found in sheet 'F17.03.a'",
+        "formula_values": {
+          "{r=0380, c=0010}": "MISSING(row=0380, col=0010, sheet=F17.03.a: column '0010' not found in sheet 'F17.03.a')"
+        },
+        "precondition_values": {},
+        "evaluation_trace": "",
+        "formula_with_values": "MISSING(row=0380, col=0010, sheet=F17.03.a: column '0010' not found in sheet 'F17.03.a') != empty",
+        "precondition_with_values": "",
+        "comparison_left": "",
+        "comparison_operator": "",
+        "comparison_right": "",
+        "comparison_display": ""
+      }
+    ]
   },
   {
     "rule_id": "EGDQ_C184",
     "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(F18.00)",
+    "reason": "No coordinates evaluated",
     "details": []
   },
   {
     "rule_id": "EGDQ_C184_dp",
     "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(F18.00_dp)",
+    "reason": "No coordinates evaluated",
     "details": []
   },
   {
     "rule_id": "EGDQ_C185",
     "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(F18.00)",
+    "reason": "No coordinates evaluated",
     "details": []
   },
   {
     "rule_id": "EGDQ_C185_dp",
     "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(F18.00_dp)",
+    "reason": "No coordinates evaluated",
     "details": []
   },
   {
     "rule_id": "EGDQ_C186",
     "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(F18.00)",
+    "reason": "No coordinates evaluated",
     "details": []
   },
   {
     "rule_id": "EGDQ_C186_dp",
     "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(F18.00_dp)",
+    "reason": "No coordinates evaluated",
     "details": []
   },
   {
     "rule_id": "EGDQ_C187",
     "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(F18.00)",
+    "reason": "No coordinates evaluated",
     "details": []
   },
   {
     "rule_id": "EGDQ_C187_dp",
     "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(F18.00_dp)",
+    "reason": "No coordinates evaluated",
     "details": []
   },
   {
     "rule_id": "EGDQ_C188",
     "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(F19.00)",
+    "reason": "No coordinates evaluated",
     "details": []
   },
   {
     "rule_id": "EGDQ_C188_dp",
-    "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(F19.00_dp)",
-    "details": []
+    "status": "ERROR",
+    "reason": null,
+    "details": [
+      {
+        "coordinates": [
+          "F19.00_DP",
+          "F19.00_DP",
+          "0330",
+          null,
+          "F19.00_DP.a"
+        ],
+        "expected": true,
+        "actual": "MISSING(row=0330, col=0010, sheet=F19.00_DP.a: column '0010' not found in sheet 'F19.00_DP.a')",
+        "passed": false,
+        "message": "ERROR: column '0010' not found in sheet 'F19.00_DP.a'",
+        "formula_values": {
+          "{r=0330, c=0010}": "MISSING(row=0330, col=0010, sheet=F19.00_DP.a: column '0010' not found in sheet 'F19.00_DP.a')"
+        },
+        "precondition_values": {},
+        "evaluation_trace": "",
+        "formula_with_values": "MISSING(row=0330, col=0010, sheet=F19.00_DP.a: column '0010' not found in sheet 'F19.00_DP.a') != empty",
+        "precondition_with_values": "",
+        "comparison_left": "",
+        "comparison_operator": "",
+        "comparison_right": "",
+        "comparison_display": ""
+      }
+    ]
   },
   {
     "rule_id": "EGDQ_C189",
     "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(F20.01)",
+    "reason": "No coordinates evaluated",
     "details": []
   },
   {
     "rule_id": "EGDQ_C190",
     "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(F20.01)",
+    "reason": "No coordinates evaluated",
     "details": []
   },
   {
     "rule_id": "EGDQ_C191",
     "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(F20.02)",
+    "reason": "No coordinates evaluated",
     "details": []
   },
   {
     "rule_id": "EGDQ_C192",
     "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(F20.02)",
+    "reason": "No coordinates evaluated",
     "details": []
   },
   {
     "rule_id": "EGDQ_C193",
     "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(F20.03)",
+    "reason": "No coordinates evaluated",
     "details": []
   },
   {
     "rule_id": "EGDQ_C194",
     "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(F20.03)",
+    "reason": "No coordinates evaluated",
     "details": []
   },
   {
     "rule_id": "EGDQ_C195",
-    "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(F46.00)",
-    "details": []
+    "status": "ERROR",
+    "reason": null,
+    "details": [
+      {
+        "coordinates": [
+          "F46.00",
+          "F46.00",
+          "0200",
+          null,
+          "F46.00.a"
+        ],
+        "expected": true,
+        "actual": "MISSING(row=0200, col=0100, sheet=F46.00.a: column '0100' not found in sheet 'F46.00.a')",
+        "passed": false,
+        "message": "ERROR: column '0100' not found in sheet 'F46.00.a'",
+        "formula_values": {
+          "{r=0200, c=0100}": "MISSING(row=0200, col=0100, sheet=F46.00.a: column '0100' not found in sheet 'F46.00.a')"
+        },
+        "precondition_values": {},
+        "evaluation_trace": "",
+        "formula_with_values": "MISSING(row=0200, col=0100, sheet=F46.00.a: column '0100' not found in sheet 'F46.00.a') != empty",
+        "precondition_with_values": "",
+        "comparison_left": "",
+        "comparison_operator": "",
+        "comparison_right": "",
+        "comparison_display": ""
+      }
+    ]
   },
   {
     "rule_id": "EGDQ_C196",
     "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(C90.00)",
+    "reason": "No coordinates evaluated",
     "details": []
   },
   {
     "rule_id": "EGDQ_C197",
     "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(C90.00)",
+    "reason": "No coordinates evaluated",
     "details": []
   },
   {
     "rule_id": "EGDQ_C198",
     "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(C90.00)",
+    "reason": "No coordinates evaluated",
     "details": []
   },
   {
     "rule_id": "EGDQ_C199",
-    "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(C33.00)",
-    "details": []
+    "status": "FAIL",
+    "reason": null,
+    "details": [
+      {
+        "coordinates": [
+          "C33.00",
+          "C33.00.A",
+          "0010",
+          null,
+          "C33.00.a"
+        ],
+        "expected": true,
+        "actual": null,
+        "passed": false,
+        "message": "Reference resolution error: 'Worksheet qx2014 does not exist.'",
+        "formula_values": {},
+        "precondition_values": {},
+        "evaluation_trace": "",
+        "formula_with_values": "None != empty and sum[None] != empty",
+        "precondition_with_values": "",
+        "comparison_left": "",
+        "comparison_operator": "",
+        "comparison_right": "",
+        "comparison_display": ""
+      }
+    ]
   },
   {
     "rule_id": "EGDQ_C200a",
@@ -48871,49 +50609,49 @@
   {
     "rule_id": "EGDQ_C202",
     "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(F44.04)",
+    "reason": "No coordinates evaluated",
     "details": []
   },
   {
     "rule_id": "EGDQ_C203",
     "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(J01.00)",
+    "reason": "No coordinates evaluated",
     "details": []
   },
   {
     "rule_id": "EGDQ_C204a",
     "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(J02.00)",
+    "reason": "No coordinates evaluated",
     "details": []
   },
   {
     "rule_id": "EGDQ_C204b",
     "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(J03.00)",
+    "reason": "No coordinates evaluated",
     "details": []
   },
   {
     "rule_id": "EGDQ_C204c",
     "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(J04.00)",
+    "reason": "No coordinates evaluated",
     "details": []
   },
   {
     "rule_id": "EGDQ_C205a",
     "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(J02.00)",
+    "reason": "No coordinates evaluated",
     "details": []
   },
   {
     "rule_id": "EGDQ_C205b",
     "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(J03.00)",
+    "reason": "No coordinates evaluated",
     "details": []
   },
   {
     "rule_id": "EGDQ_C205c",
     "status": "SKIPPED",
-    "reason": "Invalid formula syntax: filed(J04.00)",
+    "reason": "No coordinates evaluated",
     "details": []
   },
   {
