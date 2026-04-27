@@ -27,7 +27,7 @@ except ModuleNotFoundError:
 # Config columns forwarded to Summary sheet for easy inspection
 # ---------------------------------------------------------------------------
 _CONFIG_COLS = [
-    "Id", "Status", "Severity", "Templates used", "Tables", "Rows", "Columns",
+     "Id","Applicable modules", "Status", "Severity", "Templates used", "Tables", "Rows", "Columns",
     "Sheets", "Precondition", "Formula", "Arithmetic approach", "Description",
 ]
 
@@ -274,15 +274,21 @@ def block_build_outputs(ctx: Dict[str, Any]) -> Dict[str, Any]:
         details_df.to_excel(writer, sheet_name="Details", index=False)
 
         ws_summary = writer.sheets["Summary"]
+        ws_summary.freeze_panes = "A2"
         for col_cells in ws_summary.columns:
             max_len = max((len(str(c.value)) for c in col_cells if c.value is not None), default=8)
-            ws_summary.column_dimensions[col_cells[0].column_letter].width = min(max_len + 2, 60)
+            ws_summary.column_dimensions[col_cells[0].column_letter].width = min(max_len + 2, 80)
+        for row in ws_summary.iter_rows():
+            ws_summary.row_dimensions[row[0].row].height = 20
         _style_summary(ws_summary, len(summary_rows))
 
         ws_details = writer.sheets["Details"]
+        ws_details.freeze_panes = "A2"
         for col_cells in ws_details.columns:
             max_len = max((len(str(c.value)) for c in col_cells if c.value is not None), default=8)
-            ws_details.column_dimensions[col_cells[0].column_letter].width = min(max_len + 2, 40)
+            ws_details.column_dimensions[col_cells[0].column_letter].width = min(max_len + 2, 80)
+        for row in ws_details.iter_rows():
+            ws_details.row_dimensions[row[0].row].height = 20
         from openpyxl.styles import Alignment
         details_header = list(next(ws_details.iter_rows(min_row=1, max_row=1, values_only=False)))
         details_wrap_headers = {

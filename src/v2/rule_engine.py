@@ -794,6 +794,12 @@ class FormulaParser:
 
     def _normalize_operators(self, text: str) -> str:
         normalized = " ".join(text.replace("\n", " ").split())
+        # filed(C24.00) → filed("C24.00")  (template IDs contain dots, not valid Python)
+        normalized = re.sub(
+            r"\bfiled\s*\(\s*([A-Za-z][A-Za-z0-9._]*)\s*\)",
+            lambda m: f'filed("{m.group(1).upper()}")',
+            normalized,
+        )
         normalized = re.sub(r"(\S+)\s*!=\s*empty\b", r"is_not_empty(\1)", normalized, flags=re.IGNORECASE)
         normalized = re.sub(r"(\S+)\s*=\s*empty\b", r"is_empty_value(\1)", normalized, flags=re.IGNORECASE)
         normalized = re.sub(r"\bempty\b", "None", normalized, flags=re.IGNORECASE)
@@ -1186,6 +1192,13 @@ class AstEvaluator:
                 return is_empty(args[0] if args else None)
             if func_name == "is_not_empty":
                 return not is_empty(args[0] if args else None)
+            if func_name == "filed":
+                template_id = str(args[0]).upper() if args else ""
+                try:
+                    template_id = normalize_template_id(template_id)
+                except Exception:
+                    pass
+                return template_id in env.get("__filed_templates__", frozenset())
 
             raise RuleEngineError(f"Unsupported function: {func_name}")
 
@@ -1419,6 +1432,33 @@ class RuleEvaluator:
                 return alias_value
         return explicit_value
 
+    def _available_template_ids(self) -> frozenset:
+        """Return the set of normalised template IDs available in the repository."""
+        repo = self.repository
+        # InMemoryCorepDataRepository and SimpleRepo (tests)
+        if hasattr(repo, "_template_sheets"):
+            return frozenset(repo._template_sheets.keys())
+        # CorepDataRepository — derive from files present on disk
+        if hasattr(repo, "corep_dir"):
+            templates: set = set()
+            for f in Path(repo.corep_dir).glob("*.xlsx"):
+                # filename pattern: G_EU_C_C2400.xlsx  or  G_EU_C_F0101_dp.xlsx
+                m = re.fullmatch(
+                    r"G_EU_C_([A-Z])(\d{2})(\d{2})(.*)\.xlsx",
+                    f.name.upper(),
+                )
+                if m:
+                    tid = f"{m.group(1)}{m.group(2)}.{m.group(3)}{m.group(4).lower()}"
+                    try:
+                        templates.add(normalize_template_id(tid))
+                    except Exception:
+                        pass
+            return frozenset(templates)
+        # SimpleRepo (tests) stores sheets under _sheets
+        if hasattr(repo, "_sheets"):
+            return frozenset(repo._sheets.keys())
+        return frozenset()
+
     def evaluate_rule(self, rule_row: pd.Series) -> RuleResult:
         rule_id = str(rule_row.get("Id", "UNKNOWN"))
         formula = rule_row.get("Formula")
@@ -1440,6 +1480,8 @@ class RuleEvaluator:
             )
         except Exception as exc:
             return RuleResult(rule_id=rule_id, status="SKIPPED", details=[], reason=str(exc))
+
+        filed_templates: frozenset = self._available_template_ids()
 
         details: List[RuleDetail] = []
         any_fail = False
@@ -1491,7 +1533,7 @@ class RuleEvaluator:
                                 sheet=sheet,
                             )
 
-                            env: Dict[str, Any] = {"None": None, "True": True, "False": False}
+                            env: Dict[str, Any] = {"None": None, "True": True, "False": False, "__filed_templates__": filed_templates}
                             formula_values: Dict[str, Any] = {}
                             any_error = False
 
