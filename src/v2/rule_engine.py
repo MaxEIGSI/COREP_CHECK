@@ -84,19 +84,54 @@ def load_formula_bt_mapping(path: str | Path) -> Dict[str, str]:
     return mapping
 
 
-def load_qx_sheet_mapping(path: str | Path) -> Dict[str, str]:
+def _template_to_mapping_prefix(template: str) -> str:
+    """Convert a normalised template id to the sheet-name prefix used in the
+    mapping file.  E.g. ``"C08.01"`` → ``"C0801"``."""
+    return template.replace(".", "")
+
+
+def _template_to_mapping_prefixes(template: str) -> List[str]:
+    """Return candidate mapping-sheet keys for a template, most-specific first.
+
+    E.g. ``"C08.01"`` → ``["C0801", "C0800"]``.  The group prefix (last
+    character replaced with ``"0"``) covers sheets like ``C0800`` that apply
+    to all ``C08.xx`` templates.
+    """
+    prefix = _template_to_mapping_prefix(template)
+    candidates: List[str] = [prefix]
+    if len(prefix) >= 5 and prefix[-1] != "0":
+        candidates.append(prefix[:-1] + "0")
+    return candidates
+
+
+def load_qx_sheet_mapping(path: str | Path) -> Dict[str, Dict[str, Tuple[str, str]]]:
     """Load *all* relevant sheets from ``Mapping onglets COREP.xlsx`` and
-    return a unified ``{qx_code_lower: sheet_or_display_name}`` mapping.
+    return a **per-template** mapping::
 
-    Two sheet structures are handled:
+        {
+          mapping_sheet_name: {
+            qx_code_lower: (new_format_sheet_name, old_format_or_qx)
+          }
+        }
 
-    * **Old-format / New-format sheets** (e.g. ``C0800``, ``C0700``):
-      columns ``Old format`` and ``New format``.  Returns ``{old.lower(): new}``.
-    * **Formula-reference / sheet-name sheets** (e.g. ``C3300``):
-      columns ``formula_reference`` and ``sheet_name``.
-      Returns ``{formula_reference.lower(): sheet_name}``.
+    where ``mapping_sheet_name`` is e.g. ``"C0801"`` (exact template prefix)
+    or ``"C0800"`` (group prefix covering all ``C08.xx`` templates).
 
-    Sheets that match neither pattern are silently skipped.
+    Three sheet structures are handled:
+
+    * **Old-format / New-format with formula_reference** (e.g. former ``C0801``
+      style): columns ``formula_reference``, ``Old format``, ``New format``.
+      Returns ``{qx_code: (new_name, old_sheet_name)}``.
+    * **Old-format / New-format without formula_reference** (e.g. ``C0800``,
+      ``C0700``): columns ``New format`` and ``Old format`` only.  The
+      ``Old format`` value is treated as the qx code itself (e.g. ``"qx2018"``).
+      Returns ``{qx_code: (new_name, qx_code)}``.
+    * **Formula-reference / sheet-name sheets** (e.g. ``C3300``): columns
+      ``formula_reference`` and ``sheet_name``.  Returns
+      ``{qx_code: (sheet_name, sheet_name)}``.
+
+    Sheets that match none of the above (``tables_mapping``, ``formula_4_bt``,
+    etc.) are silently skipped.
     """
     _SKIP = {"tables_mapping", "formula_4_bt"}
     p = Path(path)
@@ -107,7 +142,8 @@ def load_qx_sheet_mapping(path: str | Path) -> Dict[str, str]:
     except Exception:
         return {}
 
-    combined: Dict[str, str] = {}
+    result: Dict[str, Dict[str, Tuple[str, str]]] = {}
+
     for sheet_name in wb_meta.sheet_names:
         if sheet_name.lower() in _SKIP:
             continue
@@ -119,29 +155,59 @@ def load_qx_sheet_mapping(path: str | Path) -> Dict[str, str]:
             continue
 
         cols_lower = {str(c).strip().lower(): c for c in df.columns}
+        per_template: Dict[str, Tuple[str, str]] = {}
 
-        # C3300-style: formula_reference → sheet_name
-        if "formula_reference" in cols_lower and "sheet_name" in cols_lower:
+        has_formula_ref = "formula_reference" in cols_lower
+        has_old = any("old" in c for c in cols_lower)
+        has_new = any("new" in c for c in cols_lower)
+        has_sheet_name = "sheet_name" in cols_lower
+
+        # C3300-style: formula_reference → sheet_name (old == new)
+        if has_formula_ref and has_sheet_name:
             ref_col = cols_lower["formula_reference"]
             sn_col = cols_lower["sheet_name"]
             for _, row in df.iterrows():
                 ref = row.get(ref_col)
                 sn = row.get(sn_col)
                 if pd.notna(ref) and pd.notna(sn):
-                    combined[str(ref).strip().lower()] = str(sn).strip()
-            continue
+                    qx_code = str(ref).strip().lower()
+                    sheet_val = str(sn).strip()
+                    per_template[qx_code] = (sheet_val, sheet_val)
 
-        # Old-format / New-format style
-        old_col = next((cols_lower[c] for c in cols_lower if "old" in c), None)
-        new_col = next((cols_lower[c] for c in cols_lower if "new" in c), None)
-        if old_col is not None and new_col is not None:
+        # Old-format / New-format WITH formula_reference (original C0801-style)
+        elif has_formula_ref and has_old and has_new:
+            ref_col = cols_lower["formula_reference"]
+            old_col = next(cols_lower[c] for c in cols_lower if "old" in c)
+            new_col = next(cols_lower[c] for c in cols_lower if "new" in c)
             for _, row in df.iterrows():
-                old = row.get(old_col)
-                new = row.get(new_col)
-                if pd.notna(old) and pd.notna(new):
-                    combined[str(old).strip().lower()] = str(new).strip()
+                ref = row.get(ref_col)
+                old_val = row.get(old_col)
+                new_val = row.get(new_col)
+                if pd.notna(ref) and pd.notna(old_val) and pd.notna(new_val):
+                    qx_code = str(ref).strip().lower()
+                    old_name = str(old_val).strip()
+                    new_name = str(new_val).strip()
+                    per_template[qx_code] = (new_name, old_name)
 
-    return combined
+        # Old-format / New-format WITHOUT formula_reference (C0800, C0700 style)
+        # The "Old format" cell is assumed to be the qx/reference code itself.
+        elif has_old and has_new and not has_formula_ref:
+            old_col = next(cols_lower[c] for c in cols_lower if "old" in c)
+            new_col = next(cols_lower[c] for c in cols_lower if "new" in c)
+            for _, row in df.iterrows():
+                old_val = row.get(old_col)
+                new_val = row.get(new_col)
+                if pd.notna(old_val) and pd.notna(new_val):
+                    qx_code = str(old_val).strip().lower()   # e.g. "qx2018"
+                    new_name = str(new_val).strip()           # e.g. "Institutions - No"
+                    # Old-format sheet name not given explicitly; store the qx
+                    # code so that pattern-based fallback can construct it.
+                    per_template[qx_code] = (new_name, qx_code)
+
+        if per_template:
+            result[sheet_name] = per_template
+
+    return result
 
 
 @dataclass(frozen=True)
@@ -661,7 +727,7 @@ class CorepDataRepository:
         self._workbooks: Dict[str, openpyxl.Workbook] = {}
         self._sheet_context: Dict[Tuple[str, str], SheetContext] = {}
         self._table_sheet_mapping = load_table_sheet_mapping(self.mapping_table_path)
-        self._qx_sheet_mapping: Dict[str, str] = load_qx_sheet_mapping(qx_mapping_path)
+        self._qx_sheet_mapping: Dict[str, Dict[str, Tuple[str, str]]] = load_qx_sheet_mapping(qx_mapping_path)
         self._formula_bt_mapping: Dict[str, str] = load_formula_bt_mapping(qx_mapping_path)
 
     def workbook_for_template(self, template: str) -> openpyxl.Workbook:
@@ -683,12 +749,52 @@ class CorepDataRepository:
         return resolve_sheet_for_table_generic(self.workbook_for_template(template), template, table)
 
     def resolve_qx_sheet(self, template: str, qx_code: str) -> Optional[str]:
-        """Translate a qx#### code to the real worksheet name via the mapping file."""
-        new_name = self._qx_sheet_mapping.get(qx_code.lower())
-        if new_name is None:
-            return None
+        """Translate a qx#### code to the real worksheet name via the mapping file.
+
+        Resolution order (first match wins):
+
+        1. **Mapping lookup** – check the per-template (``C0801``) then the
+           group-prefix (``C0800``) mapping for an explicit ``new_format``
+           sheet name and try to find it in the workbook.
+        2. **Mapping old-format fallback** – if an explicit old-format name or
+           qx code is stored in the mapping, try a fuzzy match (handles ``_``
+           vs ``$`` differences, e.g. ``C0805_qx2007`` finds
+           ``C0805$_qx2007``).
+        3. **Pattern fallback** – build ``{template_prefix}_{qx_code}`` (e.g.
+           ``C0805_qx2007``) and try a fuzzy match; this covers old-format
+           workbooks that were not explicitly listed in the mapping.
+        """
+        norm = normalize_template_id(template)
+        prefix = _template_to_mapping_prefix(norm)
+        qx_lower = qx_code.lower()
+
+        # Step 1 & 2: mapping-based lookup (exact prefix, then group prefix)
+        entry: Optional[Tuple[str, str]] = None
+        for candidate_prefix in _template_to_mapping_prefixes(norm):
+            per_template = self._qx_sheet_mapping.get(candidate_prefix, {})
+            if qx_lower in per_template:
+                entry = per_template[qx_lower]
+                break
+
         wb = self.workbook_for_template(template)
-        return _match_sheet_name(wb, new_name)
+
+        if entry is not None:
+            new_name, old_name = entry
+            # Try humanreadable (new-format) name first
+            matched = _match_sheet_name(wb, new_name)
+            if matched is not None:
+                return matched
+            # Fall back to old-format name / bare qx code (fuzzy match handles
+            # separator differences like _ vs $)
+            matched = _match_sheet_name(wb, old_name)
+            if matched is not None:
+                return matched
+
+        # Step 3: pattern fallback – construct "{prefix}_{qx_code}" and fuzzy-match.
+        # _match_sheet_name normalises by stripping non-alphanumeric chars so
+        # "C0805_qx2007" finds "C0805$_qx2007".
+        pattern_name = prefix + "_" + qx_lower    # e.g. "C0805_qx2007"
+        return _match_sheet_name(wb, pattern_name)
 
     def all_sheets(self, template: str) -> List[str]:
         return [ws.title for ws in self.workbook_for_template(template).worksheets]
