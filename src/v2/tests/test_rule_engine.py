@@ -508,12 +508,10 @@ class TestNotIn:
 
     def test_not_in_nan_engine_quirk_pass(self) -> None:
         """
-        ENGINE QUIRK: pandas stores None as float NaN in mixed columns.
-        Python `nan not in (None, 0)` evaluates to True because NaN is not
-        identical to None and not equal to 0.
-        Therefore the engine does NOT catch NaN as 'empty' inside not-in
-        comparisons — the check passes even for a null cell.
-        This test documents that observed behaviour.
+        pandas stores None as float NaN in mixed columns.
+        NaN is treated as empty by is_empty(), so:
+        - NaN 'not in (empty, 0)' → False  (NaN IS empty, so 'not in' fails)
+        The cell at r0140.c0030 = NaN is therefore caught → FAIL.
         """
         repo = self._repo([7, 8, 9], [10, 11, None])   # r0140.c0030 = NaN
         r = make_rule(
@@ -522,8 +520,8 @@ class TestNotIn:
             cols="0010;0020;0030",
             formula="{rY}(*) not in (empty,0)",
         )
-        # NaN 'not in (None, 0)' → True in CPython; PASS is the engine result.
-        assert status(run_rule(r, repo)) == "PASS"
+        # NaN is treated as empty → 'not in (empty, 0)' is False → FAIL.
+        assert status(run_rule(r, repo)) == "FAIL"
 
     def test_not_in_zero_alias_fail(self) -> None:
         """A second alias group where rY = 0 → caught by not in (empty,0)."""
@@ -1046,5 +1044,1171 @@ class TestCrossSheetAggregation:
         r = make_rule(
             template="C07.00",
             formula="{r0010,c0010} = {r0010,c0010} + 0",
+        )
+        assert status(run_rule(r, repo)) == "PASS"
+
+
+# ─────────────────────────────────────────────────────────────
+#  GROUP 16 — C06.02 formula patterns (all-rows iteration)
+#
+#  These tests cover the five formula types described in the
+#  user specification, all using template/table C06.02.
+#  Rows are provided explicitly ("0010;0020;0030") so the
+#  engine iterates each row independently — this is the
+#  correct mapping for "Rows = all" in real config files where
+#  row codes are known (e.g. exported/listed from the sheet).
+#
+#  1. length({c0021}) = 20
+#  2. {c0021}(*) < 1
+#  3. {c0021} in (empty, 0)
+#  4. {c0021} >= 0.05 and {c0020} <= 1
+#  5. {c0440} <= 12.5 * ({c0310}+{c0320}+{c0330})
+# ─────────────────────────────────────────────────────────────
+
+# Explicit row list used in all C06.02 tests (equivalent to "Rows = all"
+# when the sheet has rows 0010, 0020, 0030).
+_C0602_ROWS = "0010;0020;0030"
+
+
+def _c0602_repo(*col_defs: tuple) -> SimpleRepo:
+    """
+    Build a C06.02 in-memory repo with three data rows (0010, 0020, 0030).
+    col_defs: sequence of (col_code, [val_row0, val_row1, val_row2]).
+    """
+    repo = SimpleRepo()
+    row_codes = ["0010", "0020", "0030"]
+    col_codes = [cd[0] for cd in col_defs]
+    values = [
+        [col_defs[c][1][r] for c in range(len(col_defs))]
+        for r in range(3)
+    ]
+    df, rm, cm = make_ctx(row_codes, col_codes, values)
+    repo.add("C06.02", "C06.02", df, rm, cm)
+    return repo
+
+
+class TestC0602LengthFormula:
+    """Formula: length({c0021}) = 20  (all rows, column c0021)"""
+
+    def test_all_rows_length_20_pass(self) -> None:
+        """All three rows have a 20-char string → every detail passes → PASS."""
+        val = "A" * 20
+        repo = _c0602_repo(("0021", [val, val, val]))
+        r = make_rule(
+            template="C06.02",
+            tables="C06.02",
+            rows=_C0602_ROWS,
+            cols=None,
+            formula="length({c0021}) = 20",
+        )
+        result = run_rule(r, repo)
+        assert status(result) == "PASS"
+        assert all(passed_flags(result))
+
+    def test_one_row_wrong_length_fail(self) -> None:
+        """Row 0020 has only 15 chars → that detail fails → overall FAIL."""
+        repo = _c0602_repo(("0021", ["A" * 20, "B" * 15, "C" * 20]))
+        r = make_rule(
+            template="C06.02",
+            tables="C06.02",
+            rows=_C0602_ROWS,
+            cols=None,
+            formula="length({c0021}) = 20",
+        )
+        result = run_rule(r, repo)
+        assert status(result) == "FAIL"
+        flags = passed_flags(result)
+        assert flags[0] is True
+        assert flags[1] is False
+        assert flags[2] is True
+
+    def test_numeric_value_length_pass(self) -> None:
+        """A 20-digit string stored as text has length 20 → PASS."""
+        repo = _c0602_repo(("0021", ["12345678901234567890"] * 3))
+        r = make_rule(
+            template="C06.02",
+            tables="C06.02",
+            rows=_C0602_ROWS,
+            cols=None,
+            formula="length({c0021}) = 20",
+        )
+        assert status(run_rule(r, repo)) == "PASS"
+
+
+class TestC0602WildcardLessThan:
+    """Formula: {c0021}(*) < 1  (all rows, wildcard on c0021)"""
+
+    def test_all_rows_below_1_pass(self) -> None:
+        """Values 0.1, 0.5, 0.9 all < 1 → PASS."""
+        repo = _c0602_repo(("0021", [0.1, 0.5, 0.9]))
+        r = make_rule(
+            template="C06.02",
+            tables="C06.02",
+            rows=_C0602_ROWS,
+            cols=None,
+            formula="{c0021}(*) < 1",
+        )
+        result = run_rule(r, repo)
+        assert status(result) == "PASS"
+        assert all(passed_flags(result))
+
+    def test_one_row_equals_1_fail(self) -> None:
+        """Value 1.0 is NOT < 1 → that row fails → FAIL."""
+        repo = _c0602_repo(("0021", [0.5, 1.0, 0.3]))
+        r = make_rule(
+            template="C06.02",
+            tables="C06.02",
+            rows=_C0602_ROWS,
+            cols=None,
+            formula="{c0021}(*) < 1",
+        )
+        result = run_rule(r, repo)
+        assert status(result) == "FAIL"
+        flags = passed_flags(result)
+        assert flags[0] is True
+        assert flags[1] is False
+        assert flags[2] is True
+
+    def test_negative_values_pass(self) -> None:
+        """Negative values are also < 1 → PASS."""
+        repo = _c0602_repo(("0021", [-10, -0.5, 0]))
+        r = make_rule(
+            template="C06.02",
+            tables="C06.02",
+            rows=_C0602_ROWS,
+            cols=None,
+            formula="{c0021}(*) < 1",
+        )
+        assert status(run_rule(r, repo)) == "PASS"
+
+
+class TestC0602InEmptyOrZero:
+    """Formula: {c0021} in (empty, 0)  (all rows, c0021 is empty or 0)"""
+
+    def test_all_empty_pass(self) -> None:
+        """All rows are None (empty) → PASS."""
+        repo = _c0602_repo(("0021", [None, None, None]))
+        r = make_rule(
+            template="C06.02",
+            tables="C06.02",
+            rows=_C0602_ROWS,
+            cols=None,
+            formula="{c0021} in (empty, 0)",
+        )
+        assert status(run_rule(r, repo)) == "PASS"
+
+    def test_all_zero_pass(self) -> None:
+        """All rows are 0 → PASS."""
+        repo = _c0602_repo(("0021", [0, 0, 0]))
+        r = make_rule(
+            template="C06.02",
+            tables="C06.02",
+            rows=_C0602_ROWS,
+            cols=None,
+            formula="{c0021} in (empty, 0)",
+        )
+        assert status(run_rule(r, repo)) == "PASS"
+
+    def test_mixed_empty_and_zero_pass(self) -> None:
+        """Mix of None and 0 → all within (empty, 0) → PASS."""
+        repo = _c0602_repo(("0021", [None, 0, None]))
+        r = make_rule(
+            template="C06.02",
+            tables="C06.02",
+            rows=_C0602_ROWS,
+            cols=None,
+            formula="{c0021} in (empty, 0)",
+        )
+        assert status(run_rule(r, repo)) == "PASS"
+
+    def test_nonzero_value_fail(self) -> None:
+        """Row 0020 has value 5 (not empty, not 0) → FAIL."""
+        repo = _c0602_repo(("0021", [None, 5, 0]))
+        r = make_rule(
+            template="C06.02",
+            tables="C06.02",
+            rows=_C0602_ROWS,
+            cols=None,
+            formula="{c0021} in (empty, 0)",
+        )
+        result = run_rule(r, repo)
+        assert status(result) == "FAIL"
+        flags = passed_flags(result)
+        assert flags[0] is True
+        assert flags[1] is False
+        assert flags[2] is True
+
+
+class TestC0602AndCondition:
+    """Formula: {c0021} >= 0.05 and {c0020} <= 1  (all rows)"""
+
+    def test_both_conditions_met_pass(self) -> None:
+        """c0021 ∈ [0.05, ∞) and c0020 ∈ (-∞, 1] for all rows → PASS."""
+        repo = _c0602_repo(
+            ("0021", [0.05, 0.1, 1.0]),
+            ("0020", [0.0, 0.5, 1.0]),
+        )
+        r = make_rule(
+            template="C06.02",
+            tables="C06.02",
+            rows=_C0602_ROWS,
+            cols=None,
+            formula="{c0021} >= 0.05 and {c0020} <= 1",
+        )
+        result = run_rule(r, repo)
+        assert status(result) == "PASS"
+        assert all(passed_flags(result))
+
+    def test_c0021_below_threshold_fail(self) -> None:
+        """Row 0010: c0021=0.01 < 0.05 → left side fails → FAIL."""
+        repo = _c0602_repo(
+            ("0021", [0.01, 0.1, 0.2]),
+            ("0020", [0.5, 0.5, 0.5]),
+        )
+        r = make_rule(
+            template="C06.02",
+            tables="C06.02",
+            rows=_C0602_ROWS,
+            cols=None,
+            formula="{c0021} >= 0.05 and {c0020} <= 1",
+        )
+        result = run_rule(r, repo)
+        assert status(result) == "FAIL"
+        flags = passed_flags(result)
+        assert flags[0] is False
+        assert flags[1] is True
+        assert flags[2] is True
+
+    def test_c0020_above_threshold_fail(self) -> None:
+        """Row 0020: c0020=1.5 > 1 → right side fails → FAIL."""
+        repo = _c0602_repo(
+            ("0021", [0.1, 0.2, 0.3]),
+            ("0020", [0.5, 1.5, 0.8]),
+        )
+        r = make_rule(
+            template="C06.02",
+            tables="C06.02",
+            rows=_C0602_ROWS,
+            cols=None,
+            formula="{c0021} >= 0.05 and {c0020} <= 1",
+        )
+        result = run_rule(r, repo)
+        assert status(result) == "FAIL"
+        flags = passed_flags(result)
+        assert flags[0] is True
+        assert flags[1] is False
+        assert flags[2] is True
+
+
+class TestC0602ArithmeticFormula:
+    """Formula: {c0440} <= 12.5 * ({c0310}+{c0320}+{c0330})  (all rows)"""
+
+    def test_c0440_within_bound_pass(self) -> None:
+        """
+        Row sums: 60, 120, 180 → limits: 750, 1500, 2250.
+        c0440 = 100, 200, 300 ≤ respective limits → PASS.
+        """
+        repo = _c0602_repo(
+            ("0440", [100, 200, 300]),
+            ("0310", [10, 20, 30]),
+            ("0320", [20, 40, 60]),
+            ("0330", [30, 60, 90]),
+        )
+        r = make_rule(
+            template="C06.02",
+            tables="C06.02",
+            rows=_C0602_ROWS,
+            cols=None,
+            formula="{c0440} <= 12.5 * ({c0310}+{c0320}+{c0330})",
+        )
+        result = run_rule(r, repo)
+        assert status(result) == "PASS"
+        assert all(passed_flags(result))
+
+    def test_c0440_exactly_at_limit_pass(self) -> None:
+        """
+        c0310=2, c0320=2, c0330=4 → sum=8 → limit=100.
+        c0440=100 ≤ 100 → PASS (boundary value).
+        """
+        repo = _c0602_repo(
+            ("0440", [100, 100, 100]),
+            ("0310", [2, 2, 2]),
+            ("0320", [2, 2, 2]),
+            ("0330", [4, 4, 4]),
+        )
+        r = make_rule(
+            template="C06.02",
+            tables="C06.02",
+            rows=_C0602_ROWS,
+            cols=None,
+            formula="{c0440} <= 12.5 * ({c0310}+{c0320}+{c0330})",
+        )
+        assert status(run_rule(r, repo)) == "PASS"
+
+    def test_c0440_exceeds_limit_fail(self) -> None:
+        """
+        Row 0020: c0310=c0320=c0330=1 → sum=3 → limit=37.5.
+        c0440=50 > 37.5 → that row fails → overall FAIL.
+        """
+        repo = _c0602_repo(
+            ("0440", [10, 50, 10]),
+            ("0310", [10, 1, 10]),
+            ("0320", [10, 1, 10]),
+            ("0330", [10, 1, 10]),
+        )
+        r = make_rule(
+            template="C06.02",
+            tables="C06.02",
+            rows=_C0602_ROWS,
+            cols=None,
+            formula="{c0440} <= 12.5 * ({c0310}+{c0320}+{c0330})",
+        )
+        result = run_rule(r, repo)
+        assert status(result) == "FAIL"
+        flags = passed_flags(result)
+        assert flags[0] is True
+        assert flags[1] is False
+        assert flags[2] is True
+
+    def test_zero_sum_denominator_behavior(self) -> None:
+        """
+        c0310=c0320=c0330=0 → limit=0.
+        c0440=0 ≤ 0 → PASS; c0440=1 > 0 → FAIL on row 0010.
+        """
+        repo_pass = _c0602_repo(
+            ("0440", [0, 0, 0]),
+            ("0310", [0, 0, 0]),
+            ("0320", [0, 0, 0]),
+            ("0330", [0, 0, 0]),
+        )
+        r = make_rule(
+            template="C06.02",
+            tables="C06.02",
+            rows=_C0602_ROWS,
+            cols=None,
+            formula="{c0440} <= 12.5 * ({c0310}+{c0320}+{c0330})",
+        )
+        assert status(run_rule(r, repo_pass)) == "PASS"
+
+        repo_fail = _c0602_repo(
+            ("0440", [1, 0, 0]),
+            ("0310", [0, 0, 0]),
+            ("0320", [0, 0, 0]),
+            ("0330", [0, 0, 0]),
+        )
+        result_fail = run_rule(r, repo_fail)
+        assert status(result_fail) == "FAIL"
+        assert passed_flags(result_fail)[0] is False
+
+
+# ─────────────────────────────────────────────────────────────
+#  GROUP 17 — C06.02 empty / not-empty on c0448
+#
+#  1. {c0448,s0010}(*) = empty   → per-row, sheet s0010, value must be empty
+#  2. {c0448}(*) != empty        → per-row, value must NOT be empty
+# ─────────────────────────────────────────────────────────────
+
+class TestC0602EmptyChecks:
+    """Formulas involving empty / != empty on column c0448."""
+
+    # ── helpers ─────────────────────────────────────────────
+
+    def _repo_with_sheet(self, sheet: str, values: List[Any]) -> SimpleRepo:
+        """C06.02 repo with a named sheet holding column c0448."""
+        repo = SimpleRepo()
+        df, rm, cm = make_ctx(["0010", "0020", "0030"], ["0448"], [[v] for v in values])
+        repo.add("C06.02", sheet, df, rm, cm)
+        return repo
+
+    def _repo_default(self, values: List[Any]) -> SimpleRepo:
+        """C06.02 repo on the default (C06.02) sheet holding column c0448."""
+        repo = SimpleRepo()
+        df, rm, cm = make_ctx(["0010", "0020", "0030"], ["0448"], [[v] for v in values])
+        repo.add("C06.02", "C06.02", df, rm, cm)
+        return repo
+
+    # ── {c0448,s0010}(*) = empty ────────────────────────────
+
+    def test_sheet_qualified_all_empty_pass(self) -> None:
+        """All rows on sheet s0010, c0448 = None → all empty → PASS."""
+        repo = self._repo_with_sheet("s0010", [None, None, None])
+        r = make_rule(
+            template="C06.02",
+            tables="C06.02",
+            rows=_C0602_ROWS,
+            cols=None,
+            formula="{c0448,s0010}(*) = empty",
+        )
+        result = run_rule(r, repo)
+        assert status(result) == "PASS"
+        assert all(passed_flags(result))
+
+    def test_sheet_qualified_one_non_empty_fail(self) -> None:
+        """Row 0020 on sheet s0010 has a value → that row fails → FAIL."""
+        repo = self._repo_with_sheet("s0010", [None, 42, None])
+        r = make_rule(
+            template="C06.02",
+            tables="C06.02",
+            rows=_C0602_ROWS,
+            cols=None,
+            formula="{c0448,s0010}(*) = empty",
+        )
+        result = run_rule(r, repo)
+        assert status(result) == "FAIL"
+        flags = passed_flags(result)
+        assert flags[0] is True
+        assert flags[1] is False
+        assert flags[2] is True
+
+    def test_sheet_qualified_zero_is_not_empty_fail(self) -> None:
+        """0 is a concrete value, not empty → row fails → FAIL."""
+        repo = self._repo_with_sheet("s0010", [None, 0, None])
+        r = make_rule(
+            template="C06.02",
+            tables="C06.02",
+            rows=_C0602_ROWS,
+            cols=None,
+            formula="{c0448,s0010}(*) = empty",
+        )
+        result = run_rule(r, repo)
+        assert status(result) == "FAIL"
+        flags = passed_flags(result)
+        assert flags[0] is True
+        assert flags[1] is False
+        assert flags[2] is True
+
+    def test_sheet_qualified_all_non_empty_fail(self) -> None:
+        """All rows have values → all fail → FAIL."""
+        repo = self._repo_with_sheet("s0010", [1, 2, 3])
+        r = make_rule(
+            template="C06.02",
+            tables="C06.02",
+            rows=_C0602_ROWS,
+            cols=None,
+            formula="{c0448,s0010}(*) = empty",
+        )
+        result = run_rule(r, repo)
+        assert status(result) == "FAIL"
+        assert not any(passed_flags(result))
+
+    # ── {c0448}(*) != empty ─────────────────────────────────
+
+    def test_neq_empty_all_filled_pass(self) -> None:
+        """All rows of c0448 have values → none empty → PASS."""
+        repo = self._repo_default([10, 20, 30])
+        r = make_rule(
+            template="C06.02",
+            tables="C06.02",
+            rows=_C0602_ROWS,
+            cols=None,
+            formula="{c0448}(*) != empty",
+        )
+        result = run_rule(r, repo)
+        assert status(result) == "PASS"
+        assert all(passed_flags(result))
+
+    def test_neq_empty_one_null_fail(self) -> None:
+        """Row 0020 is None (empty) → fails the != empty check → FAIL."""
+        repo = self._repo_default([10, None, 30])
+        r = make_rule(
+            template="C06.02",
+            tables="C06.02",
+            rows=_C0602_ROWS,
+            cols=None,
+            formula="{c0448}(*) != empty",
+        )
+        result = run_rule(r, repo)
+        assert status(result) == "FAIL"
+        flags = passed_flags(result)
+        assert flags[0] is True
+        assert flags[1] is False
+        assert flags[2] is True
+
+    def test_neq_empty_all_null_fail(self) -> None:
+        """All rows are None → all fail → FAIL."""
+        repo = self._repo_default([None, None, None])
+        r = make_rule(
+            template="C06.02",
+            tables="C06.02",
+            rows=_C0602_ROWS,
+            cols=None,
+            formula="{c0448}(*) != empty",
+        )
+        result = run_rule(r, repo)
+        assert status(result) == "FAIL"
+        assert not any(passed_flags(result))
+
+    def test_neq_empty_zero_is_not_empty_pass(self) -> None:
+        """0 is a concrete value (not empty) → passes != empty → PASS."""
+        repo = self._repo_default([0, 0, 0])
+        r = make_rule(
+            template="C06.02",
+            tables="C06.02",
+            rows=_C0602_ROWS,
+            cols=None,
+            formula="{c0448}(*) != empty",
+        )
+        assert status(run_rule(r, repo)) == "PASS"
+
+
+# ─────────────────────────────────────────────────────────────
+#  GROUP 18 — C06.02 row×column matrix check
+#
+#  Templates = C06.02, Tables = C06.02
+#  Rows    = 0010; 0030; 0040; 0050
+#  Columns = 0020; 0030; 0270; 0280
+#  Formula = {value} <= 1
+#
+#  {value} references the current cell (no row/col qualifiers).
+#  The engine iterates every (row, col) pair and checks each value.
+# ─────────────────────────────────────────────────────────────
+
+_MATRIX_ROWS = "0010;0030;0040;0050"
+_MATRIX_COLS = "0020;0030;0270;0280"
+_MATRIX_ROW_LIST = ["0010", "0030", "0040", "0050"]
+_MATRIX_COL_LIST = ["0020", "0030", "0270", "0280"]
+
+
+def _matrix_repo(values: List[List[Any]]) -> SimpleRepo:
+    """
+    4-row × 4-col C06.02 repo.
+    values[r][c] maps to (_MATRIX_ROW_LIST[r], _MATRIX_COL_LIST[c]).
+    """
+    repo = SimpleRepo()
+    df, rm, cm = make_ctx(_MATRIX_ROW_LIST, _MATRIX_COL_LIST, values)
+    repo.add("C06.02", "C06.02", df, rm, cm)
+    return repo
+
+
+class TestC0602MatrixValueCheck:
+    """Formula: {value} <= 1  (explicit rows × explicit columns)"""
+
+    def test_all_cells_lte_1_pass(self) -> None:
+        """Every cell in the 4×4 grid is ≤ 1 → PASS."""
+        data = [[0.1, 0.5, 0.9, 1.0]] * 4
+        repo = _matrix_repo(data)
+        r = make_rule(
+            template="C06.02",
+            tables="C06.02",
+            rows=_MATRIX_ROWS,
+            cols=_MATRIX_COLS,
+            formula="{value} <= 1",
+        )
+        result = run_rule(r, repo)
+        assert status(result) == "PASS"
+        assert all(passed_flags(result))
+
+    def test_one_cell_exceeds_1_fail(self) -> None:
+        """Cell (0040, 0270) = 1.5 > 1 → that detail fails → FAIL."""
+        data = [
+            [0.1, 0.2, 0.3, 0.4],   # row 0010
+            [0.5, 0.6, 0.7, 0.8],   # row 0030
+            [0.9, 1.0, 1.5, 0.2],   # row 0040  ← col 0270 fails
+            [0.1, 0.2, 0.3, 0.4],   # row 0050
+        ]
+        repo = _matrix_repo(data)
+        r = make_rule(
+            template="C06.02",
+            tables="C06.02",
+            rows=_MATRIX_ROWS,
+            cols=_MATRIX_COLS,
+            formula="{value} <= 1",
+        )
+        result = run_rule(r, repo)
+        assert status(result) == "FAIL"
+        # 16 details total (4 rows × 4 cols); exactly one False
+        flags = passed_flags(result)
+        assert len(flags) == 16
+        assert flags.count(False) == 1
+
+    def test_all_cells_exactly_1_pass(self) -> None:
+        """Boundary: all cells = 1 (≤ 1) → PASS."""
+        data = [[1, 1, 1, 1]] * 4
+        repo = _matrix_repo(data)
+        r = make_rule(
+            template="C06.02",
+            tables="C06.02",
+            rows=_MATRIX_ROWS,
+            cols=_MATRIX_COLS,
+            formula="{value} <= 1",
+        )
+        assert status(run_rule(r, repo)) == "PASS"
+
+    def test_all_cells_above_1_fail(self) -> None:
+        """All 16 cells > 1 → all fail → FAIL."""
+        data = [[2, 3, 4, 5]] * 4
+        repo = _matrix_repo(data)
+        r = make_rule(
+            template="C06.02",
+            tables="C06.02",
+            rows=_MATRIX_ROWS,
+            cols=_MATRIX_COLS,
+            formula="{value} <= 1",
+        )
+        result = run_rule(r, repo)
+        assert status(result) == "FAIL"
+        assert not any(passed_flags(result))
+
+
+# ─────────────────────────────────────────────────────────────
+#  GROUP 19 — C06.02 arithmetic formulas on explicit rows
+#
+#  Rows = 0010; 0030; 0040; 0050, Columns = empty
+#
+#  1. {c0080}(*) = sum({c0010}(*),{c0020}(*))
+#     → for each row: c0080 == c0010 + c0020
+#
+#  2. {c0040} >= {c0020} - {c0030}
+#     → for each row: c0040 >= c0020 − c0030
+#
+#  3. {c0040} <= min({c0020},{c0030})
+#     → for each row: c0040 ≤ min(c0020, c0030)
+#
+#  4. {c0040} = 0.08 * ({c0020} + {c0030})
+#     → for each row: c0040 == 0.08 * (c0020 + c0030)
+#
+#  5. {c0040} = {c0020} * {c0030}
+#     → for each row: c0040 == c0020 * c0030
+# ─────────────────────────────────────────────────────────────
+
+_ARITH_ROWS = "0010;0030;0040;0050"
+_ARITH_ROW_LIST = ["0010", "0030", "0040", "0050"]
+
+
+def _arith_repo(*col_defs: tuple) -> SimpleRepo:
+    """4-row arithmetic repo with given columns."""
+    repo = SimpleRepo()
+    col_codes = [cd[0] for cd in col_defs]
+    values = [
+        [col_defs[c][1][r] for c in range(len(col_defs))]
+        for r in range(4)
+    ]
+    df, rm, cm = make_ctx(_ARITH_ROW_LIST, col_codes, values)
+    repo.add("C06.02", "C06.02", df, rm, cm)
+    return repo
+
+
+class TestC0602SumFormula:
+    """Formula: {c0080}(*) = sum({c0010}(*),{c0020}(*))"""
+
+    def test_c0080_equals_sum_pass(self) -> None:
+        """c0080 == c0010 + c0020 for all rows → PASS."""
+        repo = _arith_repo(
+            ("0080", [30, 70, 110, 150]),
+            ("0010", [10, 30, 50, 70]),
+            ("0020", [20, 40, 60, 80]),
+        )
+        r = make_rule(
+            template="C06.02",
+            tables="C06.02",
+            rows=_ARITH_ROWS,
+            cols=None,
+            formula="{c0080}(*) = sum({c0010}(*),{c0020}(*))");
+        assert status(run_rule(r, repo)) == "PASS"
+
+    def test_c0080_wrong_one_row_fail(self) -> None:
+        """Row 0030: c0080=99 ≠ 30+40=70 → FAIL."""
+        repo = _arith_repo(
+            ("0080", [30, 99, 110, 150]),
+            ("0010", [10, 30, 50, 70]),
+            ("0020", [20, 40, 60, 80]),
+        )
+        r = make_rule(
+            template="C06.02",
+            tables="C06.02",
+            rows=_ARITH_ROWS,
+            cols=None,
+            formula="{c0080}(*) = sum({c0010}(*),{c0020}(*))",
+        )
+        result = run_rule(r, repo)
+        assert status(result) == "FAIL"
+        flags = passed_flags(result)
+        assert flags[0] is True
+        assert flags[1] is False
+        assert flags[2] is True
+        assert flags[3] is True
+
+    def test_c0080_zero_sum_pass(self) -> None:
+        """0 + 0 = 0 → PASS."""
+        repo = _arith_repo(
+            ("0080", [0, 0, 0, 0]),
+            ("0010", [0, 0, 0, 0]),
+            ("0020", [0, 0, 0, 0]),
+        )
+        r = make_rule(
+            template="C06.02",
+            tables="C06.02",
+            rows=_ARITH_ROWS,
+            cols=None,
+            formula="{c0080}(*) = sum({c0010}(*),{c0020}(*))",
+        )
+        assert status(run_rule(r, repo)) == "PASS"
+
+
+class TestC0602SubtractFormula:
+    """Formula: {c0040} >= {c0020} - {c0030}"""
+
+    def test_c0040_gte_diff_all_pass(self) -> None:
+        """c0040 ≥ c0020 − c0030 for all rows → PASS."""
+        # diffs: 10-3=7, 20-8=12, 30-12=18, 40-18=22; c0040 > each diff
+        repo = _arith_repo(
+            ("0040", [8, 13, 19, 23]),
+            ("0020", [10, 20, 30, 40]),
+            ("0030", [3, 8, 12, 18]),
+        )
+        r = make_rule(
+            template="C06.02",
+            tables="C06.02",
+            rows=_ARITH_ROWS,
+            cols=None,
+            formula="{c0040} >= {c0020} - {c0030}",
+        )
+        assert status(run_rule(r, repo)) == "PASS"
+
+    def test_c0040_exactly_at_diff_pass(self) -> None:
+        """c0040 == c0020 − c0030 (boundary) → PASS."""
+        repo = _arith_repo(
+            ("0040", [7, 12, 18, 22]),
+            ("0020", [10, 20, 30, 40]),
+            ("0030", [3, 8, 12, 18]),
+        )
+        r = make_rule(
+            template="C06.02",
+            tables="C06.02",
+            rows=_ARITH_ROWS,
+            cols=None,
+            formula="{c0040} >= {c0020} - {c0030}",
+        )
+        assert status(run_rule(r, repo)) == "PASS"
+
+    def test_c0040_below_diff_fail(self) -> None:
+        """Row 0040: c0040=5 < 30−12=18 → FAIL."""
+        repo = _arith_repo(
+            ("0040", [7, 12, 5, 22]),
+            ("0020", [10, 20, 30, 40]),
+            ("0030", [3, 8, 12, 18]),
+        )
+        r = make_rule(
+            template="C06.02",
+            tables="C06.02",
+            rows=_ARITH_ROWS,
+            cols=None,
+            formula="{c0040} >= {c0020} - {c0030}",
+        )
+        result = run_rule(r, repo)
+        assert status(result) == "FAIL"
+        flags = passed_flags(result)
+        assert flags[0] is True
+        assert flags[1] is True
+        assert flags[2] is False
+        assert flags[3] is True
+
+
+class TestC0602MinFormula:
+    """Formula: {c0040} <= min({c0020},{c0030})"""
+
+    def test_c0040_lte_min_pass(self) -> None:
+        """c0040 ≤ min(c0020, c0030) for all rows → PASS."""
+        repo = _arith_repo(
+            ("0040", [2, 5, 8, 10]),
+            ("0020", [10, 20, 30, 40]),
+            ("0030", [3, 8, 12, 15]),
+        )
+        r = make_rule(
+            template="C06.02",
+            tables="C06.02",
+            rows=_ARITH_ROWS,
+            cols=None,
+            formula="{c0040} <= min({c0020},{c0030})",
+        )
+        assert status(run_rule(r, repo)) == "PASS"
+
+    def test_c0040_equals_min_pass(self) -> None:
+        """c0040 == min(c0020, c0030) (boundary) → PASS."""
+        repo = _arith_repo(
+            ("0040", [3, 8, 12, 15]),
+            ("0020", [10, 20, 30, 40]),
+            ("0030", [3, 8, 12, 15]),
+        )
+        r = make_rule(
+            template="C06.02",
+            tables="C06.02",
+            rows=_ARITH_ROWS,
+            cols=None,
+            formula="{c0040} <= min({c0020},{c0030})",
+        )
+        assert status(run_rule(r, repo)) == "PASS"
+
+    def test_c0040_exceeds_min_fail(self) -> None:
+        """Row 0030: c0040=9 > min(20,8)=8 → FAIL."""
+        repo = _arith_repo(
+            ("0040", [2, 9, 8, 10]),
+            ("0020", [10, 20, 30, 40]),
+            ("0030", [3, 8, 12, 15]),
+        )
+        r = make_rule(
+            template="C06.02",
+            tables="C06.02",
+            rows=_ARITH_ROWS,
+            cols=None,
+            formula="{c0040} <= min({c0020},{c0030})",
+        )
+        result = run_rule(r, repo)
+        assert status(result) == "FAIL"
+        flags = passed_flags(result)
+        assert flags[0] is True
+        assert flags[1] is False
+        assert flags[2] is True
+        assert flags[3] is True
+
+    def test_min_picks_correct_side(self) -> None:
+        """Verify min picks the smaller of the two columns regardless of order."""
+        # c0020 > c0030 in all rows; c0040 = c0030 (the minimum)
+        repo = _arith_repo(
+            ("0040", [1, 2, 3, 4]),
+            ("0020", [100, 200, 300, 400]),
+            ("0030", [1, 2, 3, 4]),
+        )
+        r = make_rule(
+            template="C06.02",
+            tables="C06.02",
+            rows=_ARITH_ROWS,
+            cols=None,
+            formula="{c0040} <= min({c0020},{c0030})",
+        )
+        assert status(run_rule(r, repo)) == "PASS"
+
+
+class TestC0602ScalarMultFormula:
+    """Formula: {c0040} = 0.08 * ({c0020} + {c0030})"""
+
+    def test_exact_match_pass(self) -> None:
+        """c0040 == 0.08*(c0020+c0030) for all rows → PASS."""
+        repo = _arith_repo(
+            ("0040", [0.08*(10+10), 0.08*(20+20), 0.08*(30+30), 0.08*(40+40)]),
+            ("0020", [10, 20, 30, 40]),
+            ("0030", [10, 20, 30, 40]),
+        )
+        r = make_rule(
+            template="C06.02",
+            tables="C06.02",
+            rows=_ARITH_ROWS,
+            cols=None,
+            formula="{c0040} = 0.08 * ({c0020} + {c0030})",
+        )
+        assert status(run_rule(r, repo)) == "PASS"
+
+    def test_wrong_value_fail(self) -> None:
+        """Row 0010: c0040=5 ≠ 0.08*(10+10)=1.6 → FAIL."""
+        repo = _arith_repo(
+            ("0040", [5, 0.08*40, 0.08*60, 0.08*80]),
+            ("0020", [10, 20, 30, 40]),
+            ("0030", [10, 20, 30, 40]),
+        )
+        r = make_rule(
+            template="C06.02",
+            tables="C06.02",
+            rows=_ARITH_ROWS,
+            cols=None,
+            formula="{c0040} = 0.08 * ({c0020} + {c0030})",
+        )
+        result = run_rule(r, repo)
+        assert status(result) == "FAIL"
+        flags = passed_flags(result)
+        assert flags[0] is False
+        assert flags[1] is True
+        assert flags[2] is True
+        assert flags[3] is True
+
+
+class TestC0602ProductFormula:
+    """Formula: {c0040} = {c0020} * {c0030}"""
+
+    def test_exact_product_pass(self) -> None:
+        """c0040 == c0020 * c0030 for all rows → PASS."""
+        repo = _arith_repo(
+            ("0040", [2*3, 4*5, 6*7, 8*9]),
+            ("0020", [2, 4, 6, 8]),
+            ("0030", [3, 5, 7, 9]),
+        )
+        r = make_rule(
+            template="C06.02",
+            tables="C06.02",
+            rows=_ARITH_ROWS,
+            cols=None,
+            formula="{c0040} = {c0020} * {c0030}",
+        )
+        assert status(run_rule(r, repo)) == "PASS"
+
+    def test_wrong_product_fail(self) -> None:
+        """Row 0050: c0040=0 ≠ 8*9=72 → FAIL."""
+        repo = _arith_repo(
+            ("0040", [2*3, 4*5, 6*7, 0]),
+            ("0020", [2, 4, 6, 8]),
+            ("0030", [3, 5, 7, 9]),
+        )
+        r = make_rule(
+            template="C06.02",
+            tables="C06.02",
+            rows=_ARITH_ROWS,
+            cols=None,
+            formula="{c0040} = {c0020} * {c0030}",
+        )
+        result = run_rule(r, repo)
+        assert status(result) == "FAIL"
+        flags = passed_flags(result)
+        assert flags[0] is True
+        assert flags[1] is True
+        assert flags[2] is True
+        assert flags[3] is False
+
+    def test_zero_product_pass(self) -> None:
+        """c0020=0 for all rows → product 0 == c0040=0 → PASS."""
+        repo = _arith_repo(
+            ("0040", [0, 0, 0, 0]),
+            ("0020", [0, 0, 0, 0]),
+            ("0030", [5, 10, 15, 20]),
+        )
+        r = make_rule(
+            template="C06.02",
+            tables="C06.02",
+            rows=_ARITH_ROWS,
+            cols=None,
+            formula="{c0040} = {c0020} * {c0030}",
+        )
+        assert status(run_rule(r, repo)) == "PASS"
+
+
+# ─────────────────────────────────────────────────────────────
+#  GROUP 20 — C17.01 column-iteration with fixed-row references
+#  Rows = empty (None), columns = 0010;0020;0030;0040
+#  Engine iterates all context rows × specified cols; every formula
+#  ref uses an explicit row code so the result per evaluation
+#  depends only on the current column, not the iteration row.
+#
+#  Patterns tested:
+#    1. {r0921 in EUR} >= {r0911} * 10000
+#    2. ({r0921 in EUR} >= {r0911} * 10000) and ({r0921 in EUR} <= {r0911} * 20000)
+#    3. {r0921} = {r0911} * 0.05 + 0.95 * ({r0711} + {r0111})
+# ─────────────────────────────────────────────────────────────
+
+_C1701_COLS     = "0010;0020;0030;0040"
+_C1701_COL_LIST = ["0010", "0020", "0030", "0040"]
+
+
+def _c1701_col_repo(rows_data: List[Tuple[str, List[Any]]]) -> SimpleRepo:
+    """
+    Build a C17.01 / C17.01.a repo for column-iteration tests (Rows=empty).
+
+    rows_data: [(row_code, [val_c0010, val_c0020, val_c0030, val_c0040]), ...]
+
+    Only the rows referenced in the formula need to be present.
+    With rows=None in make_rule the engine iterates every context row × 4 cols;
+    because each formula ref is pinned to an explicit row the outcome per
+    evaluation depends only on the active column.
+    """
+    row_codes = [rd[0] for rd in rows_data]
+    values    = [rd[1] for rd in rows_data]
+    df, row_map, col_map = make_ctx(row_codes, _C1701_COL_LIST, values)
+    repo = SimpleRepo()
+    repo.add("C17.01", "S1", df, row_map, col_map, table="C17.01.A")
+    return repo
+
+
+class TestC1701SimpleGte:
+    """Formula: {r0921 in EUR} >= {r0911} * 10000
+    Rows=None (empty), cols=0010;0020;0030;0040.
+    'in EUR' qualifier is stripped → reads row 0921.
+    """
+
+    def test_all_cols_pass(self) -> None:
+        """r0921[col] >= r0911[col]*10000 for every column → PASS."""
+        # r0911=[1,2,3,4], thresholds=[10k,20k,30k,40k]
+        # r0921=[20k,30k,40k,50k] — all above threshold
+        repo = _c1701_col_repo([
+            ("0921", [20_000, 30_000, 40_000, 50_000]),
+            ("0911", [     1,      2,      3,      4]),
+        ])
+        r = make_rule(
+            template="C17.01",
+            tables="C17.01.a",
+            rows=None,
+            cols=_C1701_COLS,
+            formula="{r0921 in EUR} >= {r0911} * 10000",
+        )
+        assert status(run_rule(r, repo)) == "PASS"
+
+    def test_one_col_below_threshold_fail(self) -> None:
+        """col 0010: r0921=5000 < r0911*10000=10000 → FAIL."""
+        repo = _c1701_col_repo([
+            ("0921", [ 5_000, 30_000, 40_000, 50_000]),
+            ("0911", [     1,      2,      3,      4]),
+        ])
+        r = make_rule(
+            template="C17.01",
+            tables="C17.01.a",
+            rows=None,
+            cols=_C1701_COLS,
+            formula="{r0921 in EUR} >= {r0911} * 10000",
+        )
+        assert status(run_rule(r, repo)) == "FAIL"
+
+    def test_exact_boundary_pass(self) -> None:
+        """r0921 == r0911*10000 exactly (>= is inclusive) → PASS."""
+        repo = _c1701_col_repo([
+            ("0921", [10_000, 20_000, 30_000, 40_000]),
+            ("0911", [     1,      2,      3,      4]),
+        ])
+        r = make_rule(
+            template="C17.01",
+            tables="C17.01.a",
+            rows=None,
+            cols=_C1701_COLS,
+            formula="{r0921 in EUR} >= {r0911} * 10000",
+        )
+        assert status(run_rule(r, repo)) == "PASS"
+
+
+class TestC1701RangeAnd:
+    """Formula: ({r0921 in EUR} >= {r0911} * 10000) and ({r0921 in EUR} <= {r0911} * 20000)
+    r0921 must fall in [r0911*10000, r0911*20000] for every column.
+    """
+
+    def test_all_in_range_pass(self) -> None:
+        """r0921 mid-band for all cols → PASS."""
+        # r0911=[1,2,3,4]; lower=[10k,20k,30k,40k]; upper=[20k,40k,60k,80k]
+        # r0921=[15k,30k,45k,60k] — strictly inside every band
+        repo = _c1701_col_repo([
+            ("0921", [15_000, 30_000, 45_000, 60_000]),
+            ("0911", [     1,      2,      3,      4]),
+        ])
+        r = make_rule(
+            template="C17.01",
+            tables="C17.01.a",
+            rows=None,
+            cols=_C1701_COLS,
+            formula="({r0921 in EUR} >= {r0911} * 10000) and ({r0921 in EUR} <= {r0911} * 20000)",
+        )
+        assert status(run_rule(r, repo)) == "PASS"
+
+    def test_col_below_lower_bound_fail(self) -> None:
+        """col 0010: r0921=5000 < lower bound 10000 → FAIL."""
+        repo = _c1701_col_repo([
+            ("0921", [ 5_000, 30_000, 45_000, 60_000]),
+            ("0911", [     1,      2,      3,      4]),
+        ])
+        r = make_rule(
+            template="C17.01",
+            tables="C17.01.a",
+            rows=None,
+            cols=_C1701_COLS,
+            formula="({r0921 in EUR} >= {r0911} * 10000) and ({r0921 in EUR} <= {r0911} * 20000)",
+        )
+        assert status(run_rule(r, repo)) == "FAIL"
+
+    def test_col_above_upper_bound_fail(self) -> None:
+        """col 0020: r0921=50000 > upper bound r0911*20000=40000 → FAIL."""
+        repo = _c1701_col_repo([
+            ("0921", [15_000, 50_000, 45_000, 60_000]),
+            ("0911", [     1,      2,      3,      4]),
+        ])
+        r = make_rule(
+            template="C17.01",
+            tables="C17.01.a",
+            rows=None,
+            cols=_C1701_COLS,
+            formula="({r0921 in EUR} >= {r0911} * 10000) and ({r0921 in EUR} <= {r0911} * 20000)",
+        )
+        assert status(run_rule(r, repo)) == "FAIL"
+
+    def test_boundary_values_pass(self) -> None:
+        """r0921 at exact lower (col 0010) and upper (col 0020) bounds → PASS."""
+        repo = _c1701_col_repo([
+            ("0921", [10_000, 40_000, 45_000, 60_000]),
+            ("0911", [     1,      2,      3,      4]),
+        ])
+        r = make_rule(
+            template="C17.01",
+            tables="C17.01.a",
+            rows=None,
+            cols=_C1701_COLS,
+            formula="({r0921 in EUR} >= {r0911} * 10000) and ({r0921 in EUR} <= {r0911} * 20000)",
+        )
+        assert status(run_rule(r, repo)) == "PASS"
+
+
+class TestC1701ComplexArith:
+    """Formula: {r0921} = {r0911} * 0.05 + 0.95 * ({r0711} + {r0111})
+    Four explicit-row references; must hold for all 4 columns.
+    """
+
+    @staticmethod
+    def _exact_r0921(
+        r0911: List[float],
+        r0711: List[float],
+        r0111: List[float],
+    ) -> List[float]:
+        return [r0911[i] * 0.05 + 0.95 * (r0711[i] + r0111[i]) for i in range(4)]
+
+    def test_all_cols_exact_pass(self) -> None:
+        """r0921 matches formula exactly for all columns → PASS.
+        r0911=[100,200,300,400], r0711=[10,20,30,40], r0111=[20,30,40,50]
+        → r0921=[33.5, 57.5, 81.5, 105.5]
+        """
+        r0911 = [100.0, 200.0, 300.0, 400.0]
+        r0711 = [ 10.0,  20.0,  30.0,  40.0]
+        r0111 = [ 20.0,  30.0,  40.0,  50.0]
+        r0921 = self._exact_r0921(r0911, r0711, r0111)
+        repo = _c1701_col_repo([
+            ("0921", r0921),
+            ("0911", r0911),
+            ("0711", r0711),
+            ("0111", r0111),
+        ])
+        r = make_rule(
+            template="C17.01",
+            tables="C17.01.a",
+            rows=None,
+            cols=_C1701_COLS,
+            formula="{r0921} = {r0911} * 0.05 + 0.95 * ({r0711} + {r0111})",
+        )
+        assert status(run_rule(r, repo)) == "PASS"
+
+    def test_one_col_wrong_fail(self) -> None:
+        """col 0030: r0921=0 ≠ formula result (81.5) → FAIL."""
+        r0911 = [100.0, 200.0, 300.0, 400.0]
+        r0711 = [ 10.0,  20.0,  30.0,  40.0]
+        r0111 = [ 20.0,  30.0,  40.0,  50.0]
+        r0921 = self._exact_r0921(r0911, r0711, r0111)
+        r0921[2] = 0.0  # corrupt col 0030
+        repo = _c1701_col_repo([
+            ("0921", r0921),
+            ("0911", r0911),
+            ("0711", r0711),
+            ("0111", r0111),
+        ])
+        r = make_rule(
+            template="C17.01",
+            tables="C17.01.a",
+            rows=None,
+            cols=_C1701_COLS,
+            formula="{r0921} = {r0911} * 0.05 + 0.95 * ({r0711} + {r0111})",
+        )
+        assert status(run_rule(r, repo)) == "FAIL"
+
+    def test_zero_inputs_pass(self) -> None:
+        """All input rows zero → r0921 must be 0 → PASS."""
+        repo = _c1701_col_repo([
+            ("0921", [0.0, 0.0, 0.0, 0.0]),
+            ("0911", [0.0, 0.0, 0.0, 0.0]),
+            ("0711", [0.0, 0.0, 0.0, 0.0]),
+            ("0111", [0.0, 0.0, 0.0, 0.0]),
+        ])
+        r = make_rule(
+            template="C17.01",
+            tables="C17.01.a",
+            rows=None,
+            cols=_C1701_COLS,
+            formula="{r0921} = {r0911} * 0.05 + 0.95 * ({r0711} + {r0111})",
         )
         assert status(run_rule(r, repo)) == "PASS"

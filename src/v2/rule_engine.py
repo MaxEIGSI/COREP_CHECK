@@ -356,6 +356,13 @@ def is_empty(value: Any) -> bool:
         return True
     if isinstance(value, float) and math.isnan(value):
         return True
+    # Handle numpy scalar types (e.g. np.float64) that no longer subclass
+    # Python's built-in float in NumPy ≥ 2.0.
+    try:
+        if math.isnan(value):
+            return True
+    except (TypeError, ValueError):
+        pass
     if isinstance(value, str) and value.strip() == "":
         return True
     return False
@@ -366,6 +373,12 @@ def to_number(value: Any) -> Optional[float]:
         return None
     if isinstance(value, (int, float)) and not isinstance(value, bool):
         return float(value)
+    # Handle numpy scalars (np.float64, np.int64, etc.) in NumPy ≥ 2.0.
+    if hasattr(value, "__float__") and not isinstance(value, str):
+        try:
+            return float(value)
+        except (TypeError, ValueError):
+            pass
     text = str(value).strip()
     try:
         return float(text)
@@ -1247,11 +1260,15 @@ class AstEvaluator:
                 return False
         if isinstance(operator, ast.In):
             try:
+                if is_empty(left):
+                    return any(is_empty(r) for r in right)
                 return left in right
             except TypeError:
                 return False
         if isinstance(operator, ast.NotIn):
             try:
+                if is_empty(left):
+                    return not any(is_empty(r) for r in right)
                 return left not in right
             except TypeError:
                 return True
